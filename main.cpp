@@ -1,5 +1,6 @@
 #include "mainwindow.h"
 #include "recorder.h"
+#include "alkinectinterface.h"
 #include <QApplication>
 #include <QThread>
 #include <QObject>
@@ -8,6 +9,7 @@ int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
     MainWindow w;
+//    w.setFixedSize(1280,500);
     w.show();
 
     Recorder* recorder = new Recorder(&w);
@@ -18,6 +20,8 @@ int main(int argc, char *argv[])
     QObject::connect(&w, SIGNAL(stopRecorder()), recorder, SLOT(stop()));
     QObject::connect(thread, SIGNAL(started()), recorder, SLOT(start()));
     thread->start();
+
+    ALKinectInterface* interface = new ALKinectInterface();
 
     return a.exec();
 }

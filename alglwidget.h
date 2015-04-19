@@ -48,9 +48,9 @@ private:
     int zRot;
 
     QPoint lastPos;
-    uint SCREEN_WIDTH = 500;
-    uint SCREEN_HEIGHT = 500;
-    unsigned char *output = new unsigned char[500 * 500 * 4];
+    uint SCREEN_WIDTH = 1280;
+    uint SCREEN_HEIGHT = 480;
+    unsigned char *output = new unsigned char[1280 * 480 * 4];
 };
 
 #endif // ALGLWIDGET_H

@@ -1,51 +1,5 @@
 #include "recorder.h"
 
-void cbNeedData_(GstElement *appsrc_,
-                 guint       unused_size,
-                 gpointer    user_data)
-{
-    static gboolean white = FALSE;
-    static GstClockTime timestamp = 0;
-
-    guint size;
-    GstFlowReturn ret;
-
-    GstBuffer *buffer;
-
-    size = 500 * 500 * 4;
-
-
-    buffer = gst_buffer_new_allocate (NULL, size, NULL);
-
-    //lock!
-    //    pthread_mutex_lock(&gl_backbuf_mutex);
-    /* this makes the image black/white */
-    //    gst_buffer_new_wrapped (output, size);
-    gst_buffer_memset (buffer, 0, white ? 0xcc : 0x0, size);
-    //    gst_buffer_fill (buffer, 0, output, size);
-    //    gst_buffer_map(buffer, output);
-
-    //unsigned char *output = 0;
-    white = !white;
-    //    pthread_mutex_unlock(&gl_backbuf_mutex);
-    //~unlock!
-
-    //    GST_BUFFER_PTS (buffer) = timestamp;
-    //    GST_BUFFER_DURATION (buffer) = gst_util_uint64_scale_int (1, GST_SECOND, 2);
-
-    //    timestamp += GST_BUFFER_DURATION (buffer);
-
-    g_signal_emit_by_name (appsrc_, "push-buffer", buffer, &ret);
-    //    g_signal_emit_by_name (this->appsrc, "push-buffer", buffer, &ret);
-
-    if (ret != GST_FLOW_OK) {
-        /* something wrong, stop pushing */
-        //        g_main_loop_quit (loop);
-        qDebug() << "fuck";
-    }
-}
-
-
 Recorder::Recorder(QWidget* mainWin, QObject *parent) :
     QObject(parent)
 {
@@ -127,31 +81,14 @@ void Recorder::cbNeedData(GstElement *appsrc_,
     QByteArray retVal;
     QMetaObject::invokeMethod(user_data->getMainWindowLink(), "getFrame", Qt::DirectConnection, Q_RETURN_ARG(QByteArray, retVal));
 
-    size = 500 * 500 * 4;
+    size = 1280 * 480 * 4;
 
 
     buffer = gst_buffer_new_allocate (NULL, size, NULL);
 
-    //lock!
-    //    pthread_mutex_lock(&gl_backbuf_mutex);
-    /* this makes the image black/white */
-    //    gst_buffer_new_wrapped (output, size);
-//    gst_buffer_memset (buffer, 0, white ? 0xcc : 0x0, size);
     gst_buffer_fill (buffer, 0, retVal.data(), size);
-    //    gst_buffer_map(buffer, output);
-
-    //unsigned char *output = 0;
-    white = !white;
-    //    pthread_mutex_unlock(&gl_backbuf_mutex);
-    //~unlock!
-
-    //    GST_BUFFER_PTS (buffer) = timestamp;
-    //    GST_BUFFER_DURATION (buffer) = gst_util_uint64_scale_int (1, GST_SECOND, 2);
-
-    //    timestamp += GST_BUFFER_DURATION (buffer);
 
     g_signal_emit_by_name (appsrc_, "push-buffer", buffer, &ret);
-    //    g_signal_emit_by_name (this->appsrc, "push-buffer", buffer, &ret);
 
     if (ret != GST_FLOW_OK) {
         /* something wrong, stop pushing */

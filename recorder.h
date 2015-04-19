@@ -46,10 +46,10 @@ private:
 
     QWidget* mainWin;
 
-    int window_width = 500; // The width of our window
-    int window_height = 500;
+    int window_width = 1280; // The width of our window
+    int window_height = 480;
 
-    unsigned char *output = new unsigned char[500 * 500 * 4];
+    unsigned char *output = new unsigned char[1280 * 480 * 4];
 
 
     //    void onBusMessage(const QGst::MessagePtr & message);
