@@ -12,3 +12,19 @@ MainWindow::~MainWindow()
 {
     delete ui;
 }
+
+QByteArray MainWindow::getFrame() {
+//    qDebug() << "test slot";
+    return ui->alGLWidget->getFrame();
+}
+
+void MainWindow::on_startRecorder_clicked()
+{
+    emit this->startRecorder();
+}
+
+void MainWindow::on_stopRecorder_clicked()
+{
+    qDebug() << "stop to fire";
+    emit this->stopRecorder();
+}

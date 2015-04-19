@@ -4,17 +4,36 @@
 #
 #-------------------------------------------------
 
-QT       += core gui
+QT       += core gui opengl
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = AlteXo
 TEMPLATE = app
 
+CONFIG += link_pkgconfig compile_libtool
+
+INCLUDEPATH += /usr/include/gstreamer-1.0
+INCLUDEPATH += /usr/include/glib-2.0
+INCLUDEPATH += /usr/lib/x86_64-linux-gnu/glib-2.0/include/
+
+PKGCONFIG = gstreamer-1.0 gstreamer-video-1.0
+
+LIBS += -pthread -lgstreamer-1.0 -lgobject-2.0 -lgmodule-2.0 -lgthread-2.0 -lrt -lglib-2.0 -lgstgl-1.0 -lgstvideo-1.0 -lGLU \
+    -lGL -lglut -lGLEW
+
+
+
+LIBS += -pthread -I/usr/include/gstreamer-1.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
+
 
 SOURCES += main.cpp\
-        mainwindow.cpp
+        mainwindow.cpp \
+    recorder.cpp \
+    alglwidget.cpp
 
-HEADERS  += mainwindow.h
+HEADERS  += mainwindow.h \
+    recorder.h \
+    alglwidget.h
 
 FORMS    += mainwindow.ui
