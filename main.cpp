@@ -21,7 +21,7 @@ int main(int argc, char *argv[])
     QObject::connect(thread, SIGNAL(started()), recorder, SLOT(start()));
     thread->start();
 
-    ALKinectInterface* interface = new ALKinectInterface();
+
 
     return a.exec();
 }

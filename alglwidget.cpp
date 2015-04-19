@@ -8,9 +8,11 @@
 ALGLWidget::ALGLWidget(QWidget *parent)
     : QGLWidget(QGLFormat(QGL::SampleBuffers), parent)
 {
-    xRot = 0;
-    yRot = 0;
-    zRot = 0;
+//    xRot = 0;
+//    yRot = 0;
+//    zRot = 0;
+
+    this->interface = new ALKinectInterface();
 }
 
 ALGLWidget::~ALGLWidget()

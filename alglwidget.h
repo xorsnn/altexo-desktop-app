@@ -3,6 +3,7 @@
 #ifndef ALGLWIDGET_H
 #define ALGLWIDGET_H
 
+#include "alkinectinterface.h"
 #include <QGLWidget>
 #include <QByteArray>
 
@@ -41,6 +42,8 @@ signals:
     void zRotationChanged(int angle);
 
 private:
+    ALKinectInterface* interface;
+
     void draw();
 
     int xRot;

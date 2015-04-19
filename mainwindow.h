@@ -28,6 +28,8 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
+
+
 signals:
     void startRecorder();
     void stopRecorder();
