@@ -24,33 +24,36 @@ protected:
 
     QSize minimumSizeHint() const;
     QSize sizeHint() const;
-    void mousePressEvent(QMouseEvent *event);
-    void mouseMoveEvent(QMouseEvent *event);
+//    void mousePressEvent(QMouseEvent *event);
+//    void mouseMoveEvent(QMouseEvent *event);
 
 public slots:
     // slots for xyz-rotation slider
-    void setXRotation(int angle);
-    void setYRotation(int angle);
-    void setZRotation(int angle);
+//    void setXRotation(int angle);
+//    void setYRotation(int angle);
+//    void setZRotation(int angle);
     QByteArray getFrame();
-
+    void ReSizeGLScene(int width, int height);
 
 signals:
     // signaling rotation from mouse movement
-    void xRotationChanged(int angle);
-    void yRotationChanged(int angle);
-    void zRotationChanged(int angle);
+//    void xRotationChanged(int angle);
+//    void yRotationChanged(int angle);
+//    void zRotationChanged(int angle);
 
 private:
     ALKinectInterface* interface;
 
     void draw();
 
-    int xRot;
-    int yRot;
-    int zRot;
+//    int xRot;
+//    int yRot;
+//    int zRot;
 
-    QPoint lastPos;
+    GLuint gl_depth_tex;
+    GLuint gl_rgb_tex;
+
+//    QPoint lastPos;
     uint SCREEN_WIDTH = 1280;
     uint SCREEN_HEIGHT = 480;
     unsigned char *output = new unsigned char[1280 * 480 * 4];

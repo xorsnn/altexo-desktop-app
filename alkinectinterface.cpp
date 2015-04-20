@@ -1,5 +1,5 @@
 #include "alkinectinterface.h"
-
+#include "recorder.h"
 //void DrawGLScene() {
 //    static std::vector<uint8_t> depth(640*480*4);
 //    static std::vector<uint8_t> rgb(640*480*4);
@@ -60,9 +60,19 @@ ALKinectInterface::ALKinectInterface(QObject *parent) :
     this->got_frames = 0;
     this->window = 0;
 
+
+//    Recorder* recorder = new Recorder(&w);
+//    QThread* thread = new QThread();
+//    recorder->moveToThread(thread);
+//    QObject::connect(&w, SIGNAL(stopRecorder()), recorder, SLOT(stop()));
+//    QObject::connect(thread, SIGNAL(started()), recorder, SLOT(start()));
+//    thread->start();
+
     this->device = &freenect.createDevice<ALFreenectDevice>(0);
     this->device->startVideo();
     this->device->startDepth();
+
+
 //    this->gl_threadfunc(NULL);
 //    this->device->stopVideo();
 //    this->device->stopDepth();
@@ -80,8 +90,10 @@ void ALKinectInterface::DrawGLScene() {
 //    printf("\r demanded tilt angle: %+4.2f device tilt angle: %+4.2f", freenect_angle, device->getState().getTiltDegs());
     fflush(stdout);
 
-    thisObject->device->getDepth(depth);
-    thisObject->device->getRGB(rgb);
+//    thisObject->device->getDepth(depth);
+//    thisObject->device->getRGB(rgb);
+    thisObject->getDepthDt(depth);
+    thisObject->getRGBDt(rgb);
 
     thisObject->got_frames = 0;
 
@@ -232,22 +244,41 @@ void *ALKinectInterface::gl_threadfunc(void *arg)
 
     InitGL(1280, 480);
 
-//    glutMainLoop();
+    glutMainLoop();
 
     return NULL;
 }
 
-QByteArray ALKinectInterface::getDepthDt() {
-    static std::vector<uint8_t> depth(640*480*4);
+//QByteArray ALKinectInterface::getDepthDt() {
+//    static std::vector<uint8_t> depth(640*480*4);
+//    this->device->getDepth(depth);
+//    QByteArray res(reinterpret_cast<const char*>(&depth[0]), 640*480*4);
+//    return res;
+//}
+
+//QByteArray ALKinectInterface::getRGBDt() {
+//    static std::vector<uint8_t> rgb(640*480*4);
+//    this->device->getRGB(rgb);
+//    QByteArray res(reinterpret_cast<const char*>(&rgb[0]), 640*480*4);
+//    return res;
+//}
+
+void ALKinectInterface::getDepthDt(std::vector<uint8_t> &depth) {
+//    static std::vector<uint8_t> depth(640*480*4);
     this->device->getDepth(depth);
-    QByteArray res(reinterpret_cast<const char*>(&depth[0]), 640*480*4);
-    return res;
-//            QByteArray res(reinterpret_cast<const char*>(this->output), this->SCREEN_WIDTH*this->SCREEN_HEIGHT*4);
+//    return depth;
+//    QByteArray res(reinterpret_cast<const char*>(&depth[0]), 640*480*4);
+//    return res;
 }
 
-QByteArray ALKinectInterface::getRGBDt() {
-    static std::vector<uint8_t> rgb(640*480*4);
+void ALKinectInterface::getRGBDt(std::vector<uint8_t> &rgb) {
+//    static std::vector<uint8_t> rgb(640*480*4);
     this->device->getRGB(rgb);
-    QByteArray res(reinterpret_cast<const char*>(&rgb[0]), 640*480*4);
-    return res;
+//    return rgb;
+//    QByteArray res(reinterpret_cast<const char*>(&rgb[0]), 640*480*4);
+//    return res;
+}
+
+void ALKinectInterface::updateDeviceState() {
+    this->device->updateState();
 }

@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QDebug>
 #include <QByteArray>
+#include "alkinectinterface.h"
 
 namespace Ui {
 class MainWindow;
@@ -19,7 +20,11 @@ public:
 
 
 public slots:
+
+//    void setKinectDeviceInterface(ALKinectInterface * alKinectInterface);
+
     QByteArray getFrame();
+
 
 private slots:
     void on_startRecorder_clicked();
