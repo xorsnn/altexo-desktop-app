@@ -5,7 +5,7 @@
 #include <QDebug>
 #include <QByteArray>
 #include "alkinectinterface.h"
-
+#include <gst/gst.h>
 namespace Ui {
 class MainWindow;
 }
@@ -24,6 +24,7 @@ public slots:
 //    void setKinectDeviceInterface(ALKinectInterface * alKinectInterface);
 
     QByteArray getFrame();
+    void gstBufferFill(GstBuffer *buffer, guint size);
 
 
 private slots:

@@ -18,6 +18,14 @@ QByteArray MainWindow::getFrame() {
     return ui->alGLWidget->getFrame();
 }
 
+void MainWindow::gstBufferFill(GstBuffer *buffer, guint size) {
+    ui->alGLWidget->gstBufferFill(buffer, size);
+//    int i = 1;
+//    i = 2;
+//    i+=1;
+//    i+=1;
+}
+
 void MainWindow::on_startRecorder_clicked()
 {
     emit this->startRecorder();

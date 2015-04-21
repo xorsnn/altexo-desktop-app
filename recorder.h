@@ -2,12 +2,14 @@
 #define RECORDER_H
 
 #include <gst/gst.h>
+//#include <gst/videofilter/gstvideoflip.h>
 #include <QObject>
 #include <QDebug>
 #include <QWidget>
 #include <QMetaObject>
 #include "mainwindow.h"
 
+#define CHEESE_VIDEO_ENC_PRESET "Profile Realtime"
 
 class Recorder : public QObject
 {
@@ -41,6 +43,10 @@ private:
     GstElement *vp_enc;
     GstElement *webmmux;
     GstElement *filesink;
+    GstElement *queue_before_mux;
+    GstElement *queue_before_enc;
+    GstElement *queue_before_file;
+    GstElement *videoflip;
 
     GMainLoop *loop;
 

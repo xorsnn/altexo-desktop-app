@@ -13,10 +13,17 @@ ALGLWidget::ALGLWidget(QWidget *parent)
 //    zRot = 0;
 
     this->interface = new ALKinectInterface();
+    this->timer = new QTimer(this);
+    connect(timer, SIGNAL(timeout()), this, SLOT(updateTimerFired()));
+    timer->start(33);
 }
 
 ALGLWidget::~ALGLWidget()
 {
+}
+
+void ALGLWidget::updateTimerFired() {
+    update();
 }
 
 QSize ALGLWidget::minimumSizeHint() const
@@ -78,7 +85,7 @@ void ALGLWidget::ReSizeGLScene(int width, int height)
 
 void ALGLWidget::initializeGL()
 {
-//    qglClearColor(Qt::black);
+    qglClearColor(Qt::black);
 
     //old (
 //    glEnable(GL_DEPTH_TEST);
@@ -120,6 +127,7 @@ void ALGLWidget::paintGL()
 //    glRotatef(zRot / 16.0, 0.0, 0.0, 1.0);
 //    draw();
     //~old
+    qglColor(Qt::red);
     static std::vector<uint8_t> depth(640*480*4);
     static std::vector<uint8_t> rgb(640*480*4);
     this->interface->updateDeviceState();
@@ -157,6 +165,17 @@ void ALGLWidget::paintGL()
     glTexCoord2f(1, 1); glVertex3f(1280,480,0);
     glTexCoord2f(0, 1); glVertex3f(640,480,0);
     glEnd();
+    glReadBuffer(GL_BACK);
+
+    mutex.lock();
+    glReadPixels(0,0, SCREEN_WIDTH, SCREEN_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, this->output);
+    mutex.unlock();
+
+    swapBuffers();
+    //make it if new buffer
+
+//    updateGL();
+//    update();
 //    glFlush();
 //    glutSwapBuffers();
 }
@@ -235,12 +254,21 @@ void ALGLWidget::resizeGL(int width, int height)
 //    glEnd();
 
 //    //xors
-//    glReadBuffer(GL_BACK);
-//    glReadPixels(0,0, SCREEN_WIDTH, SCREEN_HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE, this->output);
+
 //    //~xors
 //}
 
 QByteArray ALGLWidget::getFrame() {
     QByteArray res(reinterpret_cast<const char*>(this->output), this->SCREEN_WIDTH*this->SCREEN_HEIGHT*4);
     return res;
+}
+
+void ALGLWidget::ALUpdateGL() {
+    updateGL();
+}
+
+void ALGLWidget::gstBufferFill(GstBuffer *buffer, guint size) {
+    mutex.lock();
+    gst_buffer_fill (buffer, 0, this->output, size);
+    mutex.unlock();
 }

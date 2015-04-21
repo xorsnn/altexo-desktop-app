@@ -6,6 +6,8 @@
 #include "alkinectinterface.h"
 #include <QGLWidget>
 #include <QByteArray>
+#include <QMutex>
+#include <gst/gst.h>
 
 class ALGLWidget : public QGLWidget
 {
@@ -16,6 +18,7 @@ public:
 signals:
 
 public slots:
+    void ALUpdateGL();
 
 protected:
     void initializeGL();
@@ -35,6 +38,9 @@ public slots:
     QByteArray getFrame();
     void ReSizeGLScene(int width, int height);
 
+    void updateTimerFired();
+    void gstBufferFill(GstBuffer *buffer, guint size);
+
 signals:
     // signaling rotation from mouse movement
 //    void xRotationChanged(int angle);
@@ -43,6 +49,8 @@ signals:
 
 private:
     ALKinectInterface* interface;
+    QTimer *timer;
+    QMutex mutex;
 
     void draw();
 

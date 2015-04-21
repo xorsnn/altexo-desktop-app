@@ -13,6 +13,7 @@
 #include <GL/glu.h>
 #endif
 
+
 class ALKinectInterface : public QObject
 {
     Q_OBJECT
@@ -20,6 +21,7 @@ public:
     explicit ALKinectInterface(QObject *parent = 0);
 
 signals:
+    void newFrameArrivedSignal();
 
 public slots:
     static void DrawGLScene();
@@ -35,6 +37,7 @@ public slots:
 
     void updateDeviceState();
 
+    void newFrameArrivedSlot();
 
 public:
     ALFreenectDevice* device;

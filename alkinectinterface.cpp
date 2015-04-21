@@ -282,3 +282,7 @@ void ALKinectInterface::getRGBDt(std::vector<uint8_t> &rgb) {
 void ALKinectInterface::updateDeviceState() {
     this->device->updateState();
 }
+
+void ALKinectInterface::newFrameArrivedSlot() {
+    emit this->newFrameArrivedSignal();
+}
