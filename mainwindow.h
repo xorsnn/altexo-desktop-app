@@ -31,6 +31,10 @@ private slots:
     void on_startRecorder_clicked();
     void on_stopRecorder_clicked();
 
+    void on_substractMaxDepth_clicked();
+
+    void on_addMaxDepth_clicked();
+
 private:
     Ui::MainWindow *ui;
 
@@ -39,6 +43,9 @@ private:
 signals:
     void startRecorder();
     void stopRecorder();
+
+    void substractMaxDepthSignal(int delta);
+    void addMaxDepthSignal(int delta);
 };
 
 #endif // MAINWINDOW_H

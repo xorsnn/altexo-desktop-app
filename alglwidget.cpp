@@ -22,6 +22,10 @@ ALGLWidget::~ALGLWidget()
 {
 }
 
+ALKinectInterface* ALGLWidget::getALKinectInterface() {
+    return this->interface;
+}
+
 void ALGLWidget::updateTimerFired() {
     update();
 }

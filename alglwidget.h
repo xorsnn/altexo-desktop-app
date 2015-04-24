@@ -15,6 +15,7 @@ class ALGLWidget : public QGLWidget
 public:
     explicit ALGLWidget(QWidget *parent = 0);
     ~ALGLWidget();
+
 signals:
 
 public slots:
@@ -41,6 +42,8 @@ public slots:
     void updateTimerFired();
     void gstBufferFill(GstBuffer *buffer, guint size);
 
+
+    ALKinectInterface* getALKinectInterface();
 signals:
     // signaling rotation from mouse movement
 //    void xRotationChanged(int angle);

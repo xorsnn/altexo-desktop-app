@@ -30,14 +30,12 @@ public slots:
     void InitGL(int Width, int Height);
     void *gl_threadfunc(void *arg);
 
-//    QByteArray getDepthDt();
-//    QByteArray getRGBDt();
     void getDepthDt(std::vector<uint8_t> &depth);
     void getRGBDt(std::vector<uint8_t> &rgb);
 
     void updateDeviceState();
 
-    void newFrameArrivedSlot();
+    void changeMaxDepth(int delta);
 
 public:
     ALFreenectDevice* device;

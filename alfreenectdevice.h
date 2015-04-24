@@ -56,6 +56,11 @@ public:
 
     bool getDepth(std::vector<uint8_t> &buffer);
 
+    void createRainbowPallet();
+
+    int getMaxDepth();
+    void setMaxDepth(int newDepth);
+
 private:
     std::vector<uint8_t> m_buffer_depth;
     std::vector<uint8_t> m_buffer_video;
@@ -65,6 +70,11 @@ private:
     bool m_new_rgb_frame;
     bool m_new_depth_frame;
 
+    unsigned char LUTR[256];
+    unsigned char LUTG[256];
+    unsigned char LUTB[256];
+
+    int max_depth;
 };
 
 #endif // ALFREENECTDEVICE_H
