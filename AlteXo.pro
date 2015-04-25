@@ -33,13 +33,14 @@ SOURCES += main.cpp\
     alglwidget.cpp \
     alfreenectdevice.cpp \
     alkinectinterface.cpp \
-    utils/HSL2RGB.cpp
+    alcolor.cpp
 
 HEADERS  += mainwindow.h \
     recorder.h \
     alglwidget.h \
     alfreenectdevice.h \
     alkinectinterface.h \
-    utils/HSL2RGB.h
+    utils/HSV2RGB.h \
+    alcolor.h
 
 FORMS    += mainwindow.ui
