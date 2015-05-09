@@ -132,8 +132,8 @@ void ALGLWidget::paintGL()
 //    draw();
     //~old
     qglColor(Qt::red);
-    static std::vector<uint8_t> depth(640*480*4);
-    static std::vector<uint8_t> rgb(640*480*4);
+    static std::vector<uint8_t> depth(640*480*3);
+    static std::vector<uint8_t> rgb(640*480*3);
     this->interface->updateDeviceState();
     this->interface->getDepthDt(depth);
     this->interface->getRGBDt(rgb);

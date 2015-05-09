@@ -26,9 +26,20 @@ void ALKinectInterface::changeMaxDepth(int delta) {
     this->device->setMaxDepth(this->device->getMaxDepth()+delta);
 }
 
+void ALKinectInterface::moveVerticalSlot(int delta) {
+    qDebug() << (this->device->getMoveY()+delta);
+    this->device->setMoveY(this->device->getMoveY()+delta);
+}
+
+void ALKinectInterface::moveHorizontalSlot(int delta) {
+    qDebug() << (this->device->getMoveX()+delta);
+    this->device->setMoveX(this->device->getMoveX()+delta);
+}
+
+
 void ALKinectInterface::DrawGLScene() {
-    static std::vector<uint8_t> depth(640*480*4);
-    static std::vector<uint8_t> rgb(640*480*4);
+    static std::vector<uint8_t> depth(640*480*3);
+    static std::vector<uint8_t> rgb(640*480*3);
 
     // using getTiltDegs() in a closed loop is unstable
     /*if(device->getState().m_code == TILT_STATUS_STOPPED){
@@ -204,5 +215,5 @@ void ALKinectInterface::getRGBDt(std::vector<uint8_t> &rgb) {
 }
 
 void ALKinectInterface::updateDeviceState() {
-    this->device->updateState();
+//    this->device->updateState();
 }

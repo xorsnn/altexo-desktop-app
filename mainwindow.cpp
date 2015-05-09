@@ -8,6 +8,10 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
     connect(this, SIGNAL(addMaxDepthSignal(int)), ui->alGLWidget->getALKinectInterface(), SLOT(changeMaxDepth(int)));
     connect(this, SIGNAL(substractMaxDepthSignal(int)), ui->alGLWidget->getALKinectInterface(), SLOT(changeMaxDepth(int)));
+
+    connect(this, SIGNAL(moveHorizontalSignal(int)), ui->alGLWidget->getALKinectInterface(), SLOT(moveHorizontalSlot(int)));
+    connect(this, SIGNAL(moveVerticalSignal(int)), ui->alGLWidget->getALKinectInterface(), SLOT(moveVerticalSlot(int)));
+
 }
 
 MainWindow::~MainWindow()

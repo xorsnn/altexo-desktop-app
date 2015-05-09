@@ -36,6 +36,8 @@ public slots:
     void updateDeviceState();
 
     void changeMaxDepth(int delta);
+    void moveVerticalSlot(int delta);
+    void moveHorizontalSlot(int delta);
 
 public:
     ALFreenectDevice* device;

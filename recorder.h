@@ -42,11 +42,20 @@ private:
     GstElement *videosink; //todo remove
     GstElement *vp_enc;
     GstElement *webmmux;
+    GstElement *video_0;
+//    GstElement *audio_0;
     GstElement *filesink;
     GstElement *queue_before_mux;
     GstElement *queue_before_enc;
     GstElement *queue_before_file;
+    GstElement *queue;
     GstElement *videoflip;
+
+    GstElement *pulsesrc;
+    GstElement *audioconvert;
+    GstElement *vorbisenc;
+    GstElement *audio_queue;
+    GstElement *audio_0;
 
     GMainLoop *loop;
 

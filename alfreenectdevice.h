@@ -10,7 +10,7 @@
 #include <cmath>
 #include <vector>
 //#include "utils/HSL2RGB.h"
-#include "utils/HSV2RGB.h"
+//#include "utils/HSV2RGB.h"
 #include <QDebug>
 #include "alcolor.h"
 
@@ -67,25 +67,32 @@ public:
     int getMaxDepth();
     void setMaxDepth(int newDepth);
 
+    int getMoveX();
+    void setMoveX(int newMoveX);
+    int getMoveY();
+    void setMoveY(int newMoveY);
 
     ALColor huePixelForDepth(uint16_t pix);
     float ofMap(float value, float inputMin, float inputMax, float outputMin, float outputMax, bool clamp);
 //    RGB_t hsv2rgb(HSV_t hsv);
 private:
     std::vector<uint8_t> m_buffer_depth;
+    std::vector<uint8_t> m_buffer_depth_new;
     std::vector<uint8_t> m_buffer_video;
-    std::vector<uint16_t> m_gamma;
+
+//    std::vector<uint16_t> m_gamma;
     Mutex m_rgb_mutex;
     Mutex m_depth_mutex;
     bool m_new_rgb_frame;
     bool m_new_depth_frame;
 
-//    unsigned char LUTR[256];
-//    unsigned char LUTG[256];
-//    unsigned char LUTB[256];
+    int moveX = -12;
+    int moveY = -32;
 
     int minDepth = 200;
+//    int minDepth = 555;
     int maxDepth = 900;
+//    int maxDepth = 1005;
 
 
 //    int max_depth;

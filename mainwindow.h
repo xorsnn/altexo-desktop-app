@@ -35,6 +35,7 @@ private slots:
 
     void on_addMaxDepth_clicked();
 
+
 private:
     Ui::MainWindow *ui;
 
@@ -46,6 +47,10 @@ signals:
 
     void substractMaxDepthSignal(int delta);
     void addMaxDepthSignal(int delta);
+
+    void moveVerticalSignal(int delta);
+    void moveHorizontalSignal(int delta);
+
 };
 
 #endif // MAINWINDOW_H

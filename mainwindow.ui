@@ -7,7 +7,7 @@
     <x>0</x>
     <y>0</y>
     <width>1280</width>
-    <height>600</height>
+    <height>718</height>
    </rect>
   </property>
   <property name="minimumSize">
@@ -87,14 +87,14 @@
    <widget class="QGroupBox" name="groupBox">
     <property name="geometry">
      <rect>
-      <x>250</x>
-      <y>480</y>
-      <width>441</width>
-      <height>51</height>
+      <x>640</x>
+      <y>530</y>
+      <width>191</width>
+      <height>61</height>
      </rect>
     </property>
     <property name="title">
-     <string>GroupBox</string>
+     <string>max depth</string>
     </property>
     <widget class="QPushButton" name="addMaxDepth">
      <property name="geometry">
