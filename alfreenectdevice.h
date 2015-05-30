@@ -89,10 +89,10 @@ private:
     int moveX = -12;
     int moveY = -32;
 
-    int minDepth = 200;
-//    int minDepth = 555;
-    int maxDepth = 900;
-//    int maxDepth = 1005;
+//    int minDepth = 200;
+    int minDepth = 555;
+//    int maxDepth = 900;
+    int maxDepth = 1005;
 
 
 //    int max_depth;

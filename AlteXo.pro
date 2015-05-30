@@ -16,13 +16,14 @@ CONFIG += link_pkgconfig compile_libtool
 INCLUDEPATH += /usr/include/gstreamer-1.0
 INCLUDEPATH += /usr/include/glib-2.0
 INCLUDEPATH += /usr/lib/x86_64-linux-gnu/glib-2.0/include/
+INCLUDEPATH += /usr/include/libfreenect/
 
-PKGCONFIG = gstreamer-1.0 gstreamer-video-1.0 libusb-1.0
+PKGCONFIG = gstreamer-1.0 libusb-1.0
 
-LIBS += -pthread -lgstreamer-1.0 -lgobject-2.0 -lgmodule-2.0 -lgthread-2.0 -lrt -lglib-2.0 -lgstgl-1.0 -lgstvideo-1.0 -lGLU \
-    -lGL -lglut -lGLEW -lfreenect
+LIBS += -pthread -lgstreamer-1.0 -lgobject-2.0 -lgmodule-2.0 -lgthread-2.0 -lrt -lglib-2.0 \
+    -lGL -lglut -lfreenect -lGLU
 
-
+#-lgstgl-1.0 # -lgstvideo-1.0  \-lGLEW
 
 LIBS += -pthread -I/usr/include/gstreamer-1.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
 
@@ -40,7 +41,6 @@ HEADERS  += mainwindow.h \
     alglwidget.h \
     alfreenectdevice.h \
     alkinectinterface.h \
-    utils/HSV2RGB.h \
     alcolor.h
 
 FORMS    += mainwindow.ui

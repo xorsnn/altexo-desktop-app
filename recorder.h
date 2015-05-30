@@ -16,7 +16,7 @@ class Recorder : public QObject
     Q_OBJECT
 public:
     explicit Recorder(QWidget* mainWin, QObject *parent = 0);
-
+    ~Recorder();
 signals:
 
 public slots:

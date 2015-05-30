@@ -1,5 +1,6 @@
 #include "recorder.h"
 #include "mainwindow.h"
+#include <QApplication>
 
 Recorder::Recorder(QWidget* mainWin, QObject *parent) :
     QObject(parent)
@@ -8,8 +9,14 @@ Recorder::Recorder(QWidget* mainWin, QObject *parent) :
     this->loop = NULL;
 }
 
+Recorder::~Recorder() {
+    qDebug() << "destruction";
+}
+
 void Recorder::start() {
     gboolean res;
+    GstBus *bus;
+    GstMessage *msgg;
     /* init GStreamer */
     gst_init (NULL, NULL);
 //    this->loop = g_main_loop_new (NULL, FALSE);
@@ -123,17 +130,51 @@ void Recorder::start() {
 
     /* play */
     gst_element_set_state (pipeline, GST_STATE_PLAYING);
-
+    qDebug() << "1";
     //fixme don't know if needed
-    //    g_main_loop_run (this->loop);
+//        g_main_loop_run (this->loop);
+
+
+//    /* Wait until error or EOS */
+//    bus = gst_element_get_bus (pipeline);
+//    qDebug() << "2";
+//    msgg = gst_bus_timed_pop_filtered (bus, GST_CLOCK_TIME_NONE, (GstMessageType)(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
+//    qDebug() << "3";
+
+////    /* Free resources */
+//    if (msgg != NULL)
+//        gst_message_unref (msgg);
+//    gst_object_unref (bus);
+//    gst_element_set_state (pipeline, GST_STATE_NULL);
+//    gst_object_unref (pipeline);
+//    QApplication::quit();
 }
 
 void Recorder::stop() {
     qDebug() << "stop fired";
+    GstBus *bus;
+    GstMessage *msgg;
     /* clean up */
+//    gst_element_set_state (pipeline, GST_STATE_PAUSED);
+//    gst_element_send_event(this->pipeline, gst_event_new_eos());
+    qDebug() << "1";
+    msgg = gst_bus_timed_pop_filtered (bus, GST_CLOCK_TIME_NONE, (GstMessageType)(GST_MESSAGE_ERROR | GST_MESSAGE_EOS));
+    if (msgg != NULL) {
+
+        gst_message_unref (msgg);
+        qDebug() << "2";
+    }
+    gst_object_unref (bus);
+    qDebug() << "3";
     gst_element_set_state (pipeline, GST_STATE_NULL);
-    gst_object_unref (GST_OBJECT (pipeline));
-    g_main_loop_unref (this->loop);
+    qDebug() << "4";
+    gst_object_unref (pipeline);
+    qDebug() << "5";
+    QApplication::quit();
+//    gst_element_set_state (pipeline, GST_STATE_NULL);
+//    gst_object_unref (GST_OBJECT (pipeline));
+//    QApplication::quit();
+//    g_main_loop_unref (this->loop);
 }
 
 QWidget* Recorder::getMainWindowLink() {
