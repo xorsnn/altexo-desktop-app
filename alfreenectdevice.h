@@ -1,7 +1,6 @@
 #ifndef ALFREENECTDEVICE_H
 #define ALFREENECTDEVICE_H
 
-//#include <QObject>
 #include "libfreenect.hpp"
 #include <pthread.h>
 #include <stdio.h>
@@ -9,8 +8,6 @@
 #include <string.h>
 #include <cmath>
 #include <vector>
-//#include "utils/HSL2RGB.h"
-//#include "utils/HSV2RGB.h"
 #include <QDebug>
 #include "alcolor.h"
 

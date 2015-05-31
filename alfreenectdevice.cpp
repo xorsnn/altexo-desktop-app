@@ -3,19 +3,12 @@
 ALFreenectDevice::ALFreenectDevice(freenect_context *_ctx, int _index) :
     Freenect::FreenectDevice(_ctx, _index),
     m_buffer_depth(freenect_find_depth_mode(FREENECT_RESOLUTION_MEDIUM, FREENECT_DEPTH_REGISTERED).bytes / 2),
-//    m_buffer_depth(freenect_find_depth_mode(FREENECT_RESOLUTION_MEDIUM, FREENECT_DEPTH_11BIT).bytes),
     m_buffer_video(freenect_find_video_mode(FREENECT_RESOLUTION_MEDIUM, FREENECT_VIDEO_RGB).bytes),
     m_buffer_depth_new(480*640*3),
-//    m_gamma(2048),
     m_new_rgb_frame(false),
     m_new_depth_frame(false)
 {
     setDepthFormat(FREENECT_DEPTH_REGISTERED);
-//    for( unsigned int i = 0 ; i < 2048 ; i++) {
-//        float v = i/2048.0;
-//        v = std::pow(v, 3)* 6;
-//        m_gamma[i] = v*6*256;
-//    }
 }
 
 int ALFreenectDevice::getMaxDepth() {
@@ -84,11 +77,9 @@ float ALFreenectDevice::ofMap(float value, float inputMin, float inputMax, float
 ALColor ALFreenectDevice::huePixelForDepth(uint16_t pix) {
     ALColor color;
     color.set(0,255);
-
     if(pix == 0 || pix < this->minDepth || pix > this->maxDepth ) {
         return color;
     }
-//    unsigned int HSLtoRGB(const unsigned int& h, const unsigned int& s, const unsigned int& l);
     float alignedPix = ALFreenectDevice::ofMap(pix, this->minDepth, this->maxDepth, 0, 255, true);
 
     color.setHsb(alignedPix, 255, 255, 255);
@@ -100,115 +91,12 @@ void ALFreenectDevice::DepthCallback(void* _depth, uint32_t timestamp) {
     Mutex::ScopedLock lock(m_depth_mutex);
     uint16_t* depth = static_cast<uint16_t*>(_depth);
     std::copy(depth, depth+getDepthBufferSize()/2, m_buffer_depth.begin());
-//    qDebug() << m_buffer_depth.size();
     for( unsigned int i = 0 ; i < 640*480 ; i++) {
-//                RGB_t color = this->huePixelForDepth(depth[i]);
-
-                ALColor color = this->huePixelForDepth(depth[i]);
-//                int k = 0;
-        //        k+=1;
-                m_buffer_depth_new[3*i+0] = (int) floorf(color.r);
-                m_buffer_depth_new[3*i+1] = (int) floorf(color.g);
-                m_buffer_depth_new[3*i+2] = (int) floorf(color.b);
+        ALColor color = this->huePixelForDepth(depth[i]);
+        m_buffer_depth_new[3*i+0] = (int) floorf(color.r);
+        m_buffer_depth_new[3*i+1] = (int) floorf(color.g);
+        m_buffer_depth_new[3*i+2] = (int) floorf(color.b);
     }
-        //        int pval = m_gamma[depth[i]];
-        //        int lb = pval & 0xff;
-        //xors experiment
-        //default color
-        //        switch (pval>>8) {
-        //            case 0:
-        //                m_buffer_depth[3*i+0] = 255;
-        //                m_buffer_depth[3*i+1] = 255-lb;
-        //                m_buffer_depth[3*i+2] = 255-lb;
-        //                break;
-        //            case 1:
-        //                m_buffer_depth[3*i+0] = 255;
-        //                m_buffer_depth[3*i+1] = lb;
-        //                m_buffer_depth[3*i+2] = 0;
-        //                break;
-        //            case 2:
-        //                m_buffer_depth[3*i+0] = 255-lb;
-        //                m_buffer_depth[3*i+1] = 255;
-        //                m_buffer_depth[3*i+2] = 0;
-        //                break;
-        //            default:
-        //                m_buffer_depth[3*i+0] = 0;
-        //                m_buffer_depth[3*i+1] = 0;
-        //                m_buffer_depth[3*i+2] = 0;
-        //                break;
-        //        }
-
-        //~default color
-        //color from mr. doob
-        //        switch (pval>>8) {
-        //            case 0:
-        //                m_buffer_depth[3*i+0] = 255-lb;
-        //                m_buffer_depth[3*i+1] = 255;
-        //                m_buffer_depth[3*i+2] = 255;
-        //                break;
-        //            case 1:
-        //                m_buffer_depth[3*i+0] = 0;
-        //                m_buffer_depth[3*i+1] = 255-lb;
-        //                m_buffer_depth[3*i+2] = 255;
-        //                break;
-        //            case 2:
-        //                m_buffer_depth[3*i+0] = 0;
-        //                m_buffer_depth[3*i+1] = 0;
-        //                m_buffer_depth[3*i+2] = 255-lb;
-        //                break;
-        //            default:
-        //                m_buffer_depth[3*i+0] = 0;
-        //                m_buffer_depth[3*i+1] = 0;
-        //                m_buffer_depth[3*i+2] = 0;
-        //                break;
-        //        }
-        //from depth kit
-
-        //        int lookup = depth[i] / (max_depth / 256);
-        //        //int lookup = ofMap( depthPixels.getPixels()[i], 0, max_depth, 0, 255, true);
-        //        m_buffer_depth[(i*3)+0] = LUTR[lookup];
-        //        m_buffer_depth[(i*3)+1] = LUTG[lookup];
-        //        m_buffer_depth[(i*3)+2] = LUTB[lookup];
-        //~from depth kit
-        //~xors experiment
-        //        switch (pval>>8) {
-        //        case 0:
-        //            m_buffer_depth[3*i+0] = 255;
-        //            m_buffer_depth[3*i+1] = 255-lb;
-        //            m_buffer_depth[3*i+2] = 255-lb;
-        //            break;
-        //        case 1:
-        //            m_buffer_depth[3*i+0] = 255;
-        //            m_buffer_depth[3*i+1] = lb;
-        //            m_buffer_depth[3*i+2] = 0;
-        //            break;
-        //        case 2:
-        //            m_buffer_depth[3*i+0] = 255-lb;
-        //            m_buffer_depth[3*i+1] = 255;
-        //            m_buffer_depth[3*i+2] = 0;
-        //            break;
-        //        case 3:
-        //            m_buffer_depth[3*i+0] = 0;
-        //            m_buffer_depth[3*i+1] = 255;
-        //            m_buffer_depth[3*i+2] = lb;
-        //            break;
-        //        case 4:
-        //            m_buffer_depth[3*i+0] = 0;
-        //            m_buffer_depth[3*i+1] = 255-lb;
-        //            m_buffer_depth[3*i+2] = 255;
-        //            break;
-        //        case 5:
-        //            m_buffer_depth[3*i+0] = 0;
-        //            m_buffer_depth[3*i+1] = 0;
-        //            m_buffer_depth[3*i+2] = 255-lb;
-        //            break;
-        //        default:
-        //            m_buffer_depth[3*i+0] = 0;
-        //            m_buffer_depth[3*i+1] = 0;
-        //            m_buffer_depth[3*i+2] = 0;
-        //            break;
-        //        }
-//    }
     m_new_depth_frame = true;
 }
 
