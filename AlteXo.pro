@@ -11,21 +11,48 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = AlteXo
 TEMPLATE = app
 
-CONFIG += link_pkgconfig compile_libtool
+!macx {
+    CONFIG += link_pkgconfig compile_libtool
+}
 
-INCLUDEPATH += /usr/include/gstreamer-1.0
-INCLUDEPATH += /usr/include/glib-2.0
-INCLUDEPATH += /usr/lib/x86_64-linux-gnu/glib-2.0/include/
-INCLUDEPATH += /usr/include/libfreenect/
+CONFIG -= silent
 
-PKGCONFIG = gstreamer-1.0 libusb-1.0
+macx {
+    INCLUDEPATH += /opt/local/include/gstreamer-1.0
+    INCLUDEPATH += /opt/local/include/glib-2.0
+    INCLUDEPATH += /opt/local/lib/glib-2.0/include/
+    INCLUDEPATH += /usr/local/Cellar/libfreenect/0.5.1/include/libfreenect
+    INCLUDEPATH += /usr/local/Cellar/libusb/1.0.19/include/libusb-1.0/
 
-LIBS += -pthread -lgstreamer-1.0 -lgobject-2.0 -lgmodule-2.0 -lgthread-2.0 -lrt -lglib-2.0 \
-    -lGL -lglut -lfreenect -lGLU
+    #LIBS += -L/opt/local/lib/gstreamer-1.0
+    LIBS += -L/opt/local/lib/ -lgstreamer-1.0
+    LIBS += -L/opt/local/lib -lgobject-2.0
+    LIBS += -L/usr/local/lib -lfreenect
+    LIBS += -L/usr/local/lib -lglut
+    LIBS += -pthread \
+            -lgmodule-2.0 \
+            -lgthread-2.0 \
+            #-lrt \
+            -lglib-2.0 \
+            #-lGL \
+
+#            -lfreenect \
+#            -lGLU
+}
+
+!macx {
+    INCLUDEPATH += /usr/include/gstreamer-1.0
+    INCLUDEPATH += /usr/include/glib-2.0
+    INCLUDEPATH += /usr/lib/x86_64-linux-gnu/glib-2.0/include/
+    INCLUDEPATH += /usr/include/libfreenect/
+
+    LIBS += -pthread -lgstreamer-1.0 -lgobject-2.0 -lgmodule-2.0 -lgthread-2.0 -lrt -lglib-2.0 \
+        -lGL -lglut -lfreenect -lGLU
+}
 
 #-lgstgl-1.0 # -lgstvideo-1.0  \-lGLEW
 
-LIBS += -pthread -I/usr/include/gstreamer-1.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
+#LIBS += -pthread -I/usr/include/gstreamer-1.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
 
 
 SOURCES += main.cpp\
@@ -44,3 +71,4 @@ HEADERS  += mainwindow.h \
     alcolor.h
 
 FORMS    += mainwindow.ui
+CONFIG -= silent
