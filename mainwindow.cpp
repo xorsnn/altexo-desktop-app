@@ -9,8 +9,8 @@ MainWindow::MainWindow(QWidget *parent) :
     connect(this, SIGNAL(addMaxDepthSignal(int)), ui->alGLWidget->getALKinectInterface(), SLOT(changeMaxDepth(int)));
     connect(this, SIGNAL(substractMaxDepthSignal(int)), ui->alGLWidget->getALKinectInterface(), SLOT(changeMaxDepth(int)));
 
-    connect(this, SIGNAL(moveHorizontalSignal(int)), ui->alGLWidget->getALKinectInterface(), SLOT(moveHorizontalSlot(int)));
-    connect(this, SIGNAL(moveVerticalSignal(int)), ui->alGLWidget->getALKinectInterface(), SLOT(moveVerticalSlot(int)));
+//    connect(this, SIGNAL(moveHorizontalSignal(int)), ui->alGLWidget->getALKinectInterface(), SLOT(moveHorizontalSlot(int)));
+//    connect(this, SIGNAL(moveVerticalSignal(int)), ui->alGLWidget->getALKinectInterface(), SLOT(moveVerticalSlot(int)));
 
 }
 
@@ -20,8 +20,11 @@ MainWindow::~MainWindow()
 }
 
 QByteArray MainWindow::getFrame() {
-//    qDebug() << "test slot";
     return ui->alGLWidget->getFrame();
+}
+
+void MainWindow::bufferFill(quint8 *buffer, uint size) {
+    ui->alGLWidget->bufferFill(buffer, size);
 }
 
 void MainWindow::gstBufferFill(GstBuffer *buffer, guint size) {
@@ -47,4 +50,8 @@ void MainWindow::on_substractMaxDepth_clicked()
 void MainWindow::on_addMaxDepth_clicked()
 {
     emit this->addMaxDepthSignal(100);
+}
+
+ALGLWidget* MainWindow::getALGLWidget() {
+    return this->ui->alGLWidget;
 }

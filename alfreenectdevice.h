@@ -64,11 +64,6 @@ public:
     int getMaxDepth();
     void setMaxDepth(int newDepth);
 
-    int getMoveX();
-    void setMoveX(int newMoveX);
-    int getMoveY();
-    void setMoveY(int newMoveY);
-
     ALColor huePixelForDepth(uint16_t pix);
     float ofMap(float value, float inputMin, float inputMax, float outputMin, float outputMax, bool clamp);
 //    RGB_t hsv2rgb(HSV_t hsv);
@@ -82,9 +77,6 @@ private:
     Mutex m_depth_mutex;
     bool m_new_rgb_frame;
     bool m_new_depth_frame;
-
-    int moveX = -12;
-    int moveY = -32;
 
 //    int minDepth = 200;
     int minDepth = 555;

@@ -5,6 +5,7 @@
 #include <QDebug>
 #include <QByteArray>
 #include "alkinectinterface.h"
+#include "alglwidget.h"
 #include <gst/gst.h>
 namespace Ui {
 class MainWindow;
@@ -25,6 +26,9 @@ public slots:
 
     QByteArray getFrame();
     void gstBufferFill(GstBuffer *buffer, guint size);
+    void bufferFill(quint8 *buffer, uint size);
+
+    ALGLWidget* getALGLWidget();
 
 
 private slots:

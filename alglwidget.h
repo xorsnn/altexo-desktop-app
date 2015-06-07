@@ -4,9 +4,16 @@
 #define ALGLWIDGET_H
 
 #include "alkinectinterface.h"
+
+#if QT_VERSION >= 0x050000
 #include <QGLWidget>
+#else
+#include <QtOpenGL/QGLWidget>
+#endif
+
 #include <QByteArray>
 #include <QMutex>
+#include <QImage>
 #include <gst/gst.h>
 
 class ALGLWidget : public QGLWidget
@@ -17,6 +24,7 @@ public:
     ~ALGLWidget();
 
 signals:
+    void pushDataSignal();
 
 public slots:
     void ALUpdateGL();
@@ -40,7 +48,11 @@ public slots:
     void ReSizeGLScene(int width, int height);
 
     void updateTimerFired();
+
+    void bufferFill(quint8 *buffer, uint size);
     void gstBufferFill(GstBuffer *buffer, guint size);
+
+    void needDataSlot(uint length, char* data);
 
 
     ALKinectInterface* getALKinectInterface();

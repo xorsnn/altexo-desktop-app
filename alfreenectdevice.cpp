@@ -24,31 +24,6 @@ void ALFreenectDevice::VideoCallback(void* _rgb, uint32_t timestamp) {
     Mutex::ScopedLock lock(m_rgb_mutex);
     uint8_t* rgb = static_cast<uint8_t*>(_rgb);
     std::copy(rgb, rgb+getVideoBufferSize(), m_buffer_video.begin());
-//    std::rotate(m_buffer_video.begin(),m_buffer_video.begin()+this->moveX*3,m_buffer_video.end());
-
-//    int move_x = this->moveX;
-    //xors
-//    int xx = 100;
-//    for(int i = 0 ; i < 640*480 ; i++) {
-////        if (i > this->moveX) {
-////            if ((m_buffer_depth[3*(i-this->moveX + (this->moveY*640)) + 0] == 0) &&
-//////                    (m_buffer_depth[3*(i-this->moveX + (this->moveY*640)) + 1] == 0) &&
-//////                    (m_buffer_depth[3*(i-this->moveX + (this->moveY*640)) + 2] == 0)) {
-//            if ((m_buffer_depth[3*i + 0] == 0) &&
-//                    (m_buffer_depth[3*i + 1] == 0) &&
-//                    (m_buffer_depth[3*i + 2] == 0)) {
-
-//                m_buffer_video[3*i+0] = 0;
-//                m_buffer_video[3*i+1] = 0;
-//                m_buffer_video[3*i+2] = 0;
-//            }
-////        } else {
-////            m_buffer_video[3*i+0] = 0;
-////            m_buffer_video[3*i+1] = 0;
-////            m_buffer_video[3*i+2] = 0;
-////        }
-//    }
-    //~xors
     m_new_rgb_frame = true;
 }
 
@@ -116,21 +91,4 @@ bool ALFreenectDevice::getDepth(std::vector<uint8_t> &buffer) {
     buffer.swap(m_buffer_depth_new);
     m_new_depth_frame = false;
     return true;
-}
-
-int ALFreenectDevice::getMoveX() {
-    return this->moveX;
-}
-
-void ALFreenectDevice::setMoveX(int newMoveX) {
-    Mutex::ScopedLock lock(m_rgb_mutex);
-    this->moveX = newMoveX;
-}
-
-int ALFreenectDevice::getMoveY() {
-    return this->moveY;
-}
-
-void ALFreenectDevice::setMoveY(int newMoveY) {
-    this->moveY = newMoveY;
 }

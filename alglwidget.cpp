@@ -271,8 +271,44 @@ void ALGLWidget::ALUpdateGL() {
     updateGL();
 }
 
+void ALGLWidget::bufferFill(quint8 *buffer, uint size) {
+    mutex.lock();
+    qDebug() << "start copy";
+    std::copy (this->output, this->output+size, buffer);
+    qDebug() << "copied";
+    mutex.unlock();
+}
+
 void ALGLWidget::gstBufferFill(GstBuffer *buffer, guint size) {
     mutex.lock();
     gst_buffer_fill (buffer, 0, this->output, size);
     mutex.unlock();
+}
+
+void ALGLWidget::needDataSlot(uint length, char *data) {
+
+    static std::vector<uint8_t> rgb_(640*480*3);
+    this->interface->getRGBDt(rgb_);
+    static std::vector<uint8_t> depth_(640*480*3);
+    this->interface->getDepthDt(depth_);
+
+    QImage image_rgb((&(rgb_[0])), 640, 480, QImage::Format_RGB888);
+//    image_rgb.save("rgb.jpg");
+
+    QImage image_depth((&(depth_[0])), 640, 480, QImage::Format_RGB888);
+//    image_depth.save("depth.jpg");
+
+    QImage image(1280, 480, QImage::Format_RGB888);
+    QPainter painter;
+    painter.begin(&image);
+    painter.drawImage(0, 0, image_depth);
+    painter.drawImage(640, 0, image_rgb);
+    painter.end();
+//    image.save("com.jpg",0,100);
+
+//    std::copy (this->output, this->output+length, data);
+//    image.convertToFormat(QImage::Format_RGBA8888);
+//    image.convertToFormat(QImage::Format_RGB32);
+    std::copy (image.bits(), image.bits()+(1280*480*3), data);
+    emit this->pushDataSignal();
 }

@@ -27,7 +27,6 @@ void Recorder::start() {
 //    webmmux name=mux ! filesink location=test.webm
     this->webmmux = gst_element_factory_make ("webmmux", "mux");
     this->video_0 = gst_element_factory_make ("mux.video_0", "mux.video_0");
-//    this->audio_0 = gst_element_factory_make ("mux.audio_0", "mux.audio_0");
     this->queue = gst_element_factory_make ("queue", "queue");
     this->appsrc = gst_element_factory_make ("appsrc", "source");
     this->conv = gst_element_factory_make ("videoconvert", "conv");

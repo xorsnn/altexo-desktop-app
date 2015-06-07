@@ -24,11 +24,6 @@ signals:
     void newFrameArrivedSignal();
 
 public slots:
-    static void DrawGLScene();
-//    void keyPressed(unsigned char key, int x, int y);
-    void ReSizeGLScene(int Width, int Height);
-    void InitGL(int Width, int Height);
-    void *gl_threadfunc(void *arg);
 
     void getDepthDt(std::vector<uint8_t> &depth);
     void getRGBDt(std::vector<uint8_t> &rgb);
@@ -36,8 +31,6 @@ public slots:
     void updateDeviceState();
 
     void changeMaxDepth(int delta);
-    void moveVerticalSlot(int delta);
-    void moveHorizontalSlot(int delta);
 
 public:
     ALFreenectDevice* device;
