@@ -15,8 +15,6 @@ TEMPLATE = app
 !macx {
     CONFIG += link_pkgconfig compile_libtool
     PKGCONFIG += gstreamer-1.0 libusb-1.0 gstreamer-audio-1.0 gstreamer-video-1.0 gstreamer-pbutils-1.0 gobject-2.0
-# QtGStreamer-1.0
-#gstreamer-audio-1.0 gstreamer-video-1.0 gstreamer-pbutils-1.0
 }
 
 macx {
@@ -25,13 +23,19 @@ macx {
     INCLUDEPATH += /opt/local/lib/glib-2.0/include/
     INCLUDEPATH += /usr/local/Cellar/libfreenect/0.5.1/include/libfreenect
     INCLUDEPATH += /usr/local/Cellar/libusb/1.0.19/include/libusb-1.0/
+    INCLUDEPATH += /Users/alexpasch/workspace/LIBS/QT_GSTREAMER/include/Qt5GStreamer
+    INCLUDEPATH += /opt/local/include
 
-
-    #LIBS += -L/opt/local/lib/gstreamer-1.0
     LIBS += -L/opt/local/lib/ -lgstreamer-1.0
     LIBS += -L/opt/local/lib -lgobject-2.0
     LIBS += -L/usr/local/lib -lfreenect
     LIBS += -L/usr/local/lib -lglut
+
+
+    LIBS += -L/Users/alexpasch/workspace/LIBS/QT_GSTREAMER/lib -lQt5GStreamer-1.0
+    LIBS += -L/Users/alexpasch/workspace/LIBS/QT_GSTREAMER/lib -lQt5GStreamerUtils-1.0
+    LIBS += -L/Users/alexpasch/workspace/LIBS/QT_GSTREAMER/lib -lQt5GLib-2.0
+
     LIBS += -pthread \
             -lgmodule-2.0 \
             -lgthread-2.0 \
@@ -48,8 +52,6 @@ macx {
     INCLUDEPATH += /usr/include/glib-2.0
     INCLUDEPATH += /usr/lib/x86_64-linux-gnu/glib-2.0/include/
     INCLUDEPATH += /usr/include/libfreenect/
-#    INCLUDEPATH += /usr/include/QtGStreamer
-#    INCLUDEPATH += /usr/include/QtGStreamer/QGlib
     INCLUDEPATH += /home/xors/workspace/LIBS/INSTALL/include/Qt5GStreamer
 
     LIBS += -pthread -lgstreamer-1.0 -lgobject-2.0 -lgmodule-2.0 -lgthread-2.0 -lglib-2.0 \
@@ -58,20 +60,11 @@ macx {
         -lglut \
         -lfreenect \
         -lGLU
-#        -lgstreamer-audio-1.0 \
-#        -lgstreamer-video-1.0 \
-#        -lgstreamer-pbutils-1.0 \
-#        -lQtGLib-2.0 \
-#        -lQtGStreamer-1.0
+
     LIBS += -L/home/xors/workspace/LIBS/INSTALL/lib -lQt5GLib-2.0
     LIBS += -L/home/xors/workspace/LIBS/INSTALL/lib -lQt5GStreamer-1.0
     LIBS += -L/home/xors/workspace/LIBS/INSTALL/lib -lQt5GStreamerUtils-1.0
 }
-
-#-lgstgl-1.0 # -lgstvideo-1.0  \-lGLEW
-
-#LIBS += -pthread -I/usr/include/gstreamer-1.0 -I/usr/include/glib-2.0 -I/usr/lib/x86_64-linux-gnu/glib-2.0/include
-
 
 SOURCES += main.cpp\
         mainwindow.cpp \
