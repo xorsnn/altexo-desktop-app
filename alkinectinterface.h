@@ -2,6 +2,8 @@
 #define ALKINECTINTERFACE_H
 
 #include <QObject>
+#include <QImage>
+#include <QPainter>
 #include "alfreenectdevice.h"
 #if defined(__APPLE__)
 #include <GLUT/glut.h>
@@ -21,9 +23,15 @@ public:
     explicit ALKinectInterface(QObject *parent = 0);
 
 signals:
-    void newFrameArrivedSignal();
+    void newFrameSignal(QImage image);
 
 public slots:
+
+    void init();
+    void start();
+    void stop();
+
+    void needDataSlot();
 
     void getDepthDt(std::vector<uint8_t> &depth);
     void getRGBDt(std::vector<uint8_t> &rgb);
@@ -43,10 +51,10 @@ private:
     Freenect::Freenect freenect;
     freenect_video_format requested_format;
 
-    int window;
+//    int window;
 
-    int g_argc;
-    char **g_argv;
+//    int g_argc;
+//    char **g_argv;
 
 };
 

@@ -1,5 +1,4 @@
 #include "mainwindow.h"
-#include "recorder.h"
 #include "alkinectinterface.h"
 #include "alrecorder.h"
 #include <QApplication>
@@ -41,12 +40,25 @@ int main(int argc, char *argv[])
 //    thread->start();
 
     ALRecorder* alRecorder = new ALRecorder();
-    alRecorder->setMainWindow(&w);
+//    alRecorder->setMainWindow(&w);
 //    QObject::connect(alRecorder->si)
 
-    alRecorder->startSlot();
 
-    QTimer::singleShot(20000, alRecorder, SLOT(stopSlot()));
+//    QTimer::singleShot(10000, alRecorder, SLOT(stopSlot()));
+
+    //kinect interface
+    ALKinectInterface * kinectInterface = new ALKinectInterface();
+    QThread* kinectThread = new QThread();
+    kinectInterface->moveToThread(kinectThread);
+    kinectThread->start();
+    QTimer::singleShot(0, kinectInterface, SLOT(init()));
+//    QTimer::singleShot(0, kinectInterface, SLOT(start()));
+    //~kinect interface
+
+    QObject::connect(alRecorder->getAppSrcRef(), SIGNAL(needDataSignal()), kinectInterface, SLOT(needDataSlot()));
+    QObject::connect(kinectInterface, SIGNAL(newFrameSignal(QImage)), alRecorder->getAppSrcRef(), SLOT(newFrameSlot(QImage)));
+
+    alRecorder->startSlot();
 
     return a.exec();
 

@@ -3,6 +3,7 @@
 
 #include <QObject>
 #include <QByteArray>
+#include <QImage>
 
 #include <QGst/Memory>
 #include <QGst/Buffer>
@@ -18,9 +19,12 @@ public:
     virtual void enoughData();
 
 signals:
-    void sigNeedData(uint length, char* data);
+
+    void sigNeedData(uint length, char* data);//deprecated
+    void needDataSignal();
 
 public slots:
+    void newFrameSlot(QImage image);
     void pushVideoBuffer();
 
 private:

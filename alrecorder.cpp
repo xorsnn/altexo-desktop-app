@@ -23,7 +23,6 @@ void ALRecorder::stopSlot() {
 QGst::BinPtr ALRecorder::createAudioSrcBin() {
     QGst::BinPtr audioBin;
 
-
     try {
         audioBin = QGst::Bin::fromDescription("autoaudiosrc name=\"audiosrc\" ! audioconvert ! "
                                               "audioresample ! audiorate ! vorbisenc ! queue");
@@ -44,11 +43,10 @@ QGst::BinPtr ALRecorder::createVideoSrcBin() {
 //    g_object_set(G_OBJECT(this->appsrc), "block", TRUE, NULL); //+
     QString rawvideocaps = QString("video/x-raw,format=RGB,width=1280,height=480,framerate=25/1,pixel-aspect-ratio=1/1");
     QString rawaudiocaps = QString("audio/x-raw,format=F32LE,rate=48000,layout=interleaved,channels=2");
-    QString outputPipeDesc = QString(" appsrc name=videosrc caps=\"%1\" is-live=true blocksize=%2 format=time do-timestamp=true ! videorate !"
-                                     " videoconvert ! vp8enc threads=4 deadline=35000 ! queue")
+    QString outputPipeDesc = QString(" appsrc name=videosrc caps=\"%1\" is-live=true format=time do-timestamp=true ! videorate !"
+                                     " videoconvert ! vp8enc threads=4 deadline=1 cpu-used=15 ! queue")
 //            .arg(rawaudiocaps)
-            .arg(rawvideocaps)
-            .arg(1280*480*3);
+            .arg(rawvideocaps);
 
     try {
         videoBin = QGst::Bin::fromDescription(outputPipeDesc);

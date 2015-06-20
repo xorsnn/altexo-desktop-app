@@ -1,5 +1,4 @@
 #include "alkinectinterface.h"
-#include "recorder.h"
 
 ALKinectInterface* thisObject;
 
@@ -10,14 +9,22 @@ ALKinectInterface::ALKinectInterface(QObject *parent) :
     this->requested_format = FREENECT_VIDEO_RGB;
     this->freenect_angle = 0;
     this->got_frames = 0;
-    this->window = 0;
+    this->device = NULL;
+}
 
+void ALKinectInterface::init() {
     this->device = &freenect.createDevice<ALFreenectDevice>(0);
+    this->start();
+}
+
+void ALKinectInterface::start() {
     this->device->startVideo();
     this->device->startDepth();
+}
 
-//    this->device->stopVideo();
-//    this->device->stopDepth();
+void ALKinectInterface::stop() {
+    this->device->stopVideo();
+    this->device->stopDepth();
 }
 
 void ALKinectInterface::changeMaxDepth(int delta) {
@@ -85,14 +92,36 @@ void ALKinectInterface::changeMaxDepth(int delta) {
 //    device->setTiltDegrees(freenect_angle);
 //}
 
+//deprecated
 void ALKinectInterface::getDepthDt(std::vector<uint8_t> &depth) {
     this->device->getDepth(depth);
 }
-
+//deprecated
 void ALKinectInterface::getRGBDt(std::vector<uint8_t> &rgb) {
     this->device->getRGB(rgb);
 }
 
 void ALKinectInterface::updateDeviceState() {
 //    this->device->updateState();
+}
+
+void ALKinectInterface::needDataSlot() {
+
+    static std::vector<uint8_t> rgb_(640*480*3);
+    this->device->getRGB(rgb_);
+    static std::vector<uint8_t> depth_(640*480*3);
+    this->device->getDepth(depth_);
+
+    QImage image_rgb((&(rgb_[0])), 640, 480, QImage::Format_RGB888);
+
+    QImage image_depth((&(depth_[0])), 640, 480, QImage::Format_RGB888);
+
+    QImage image(1280, 480, QImage::Format_RGB888);
+    QPainter painter;
+    painter.begin(&image);
+    painter.drawImage(0, 0, image_depth);
+    painter.drawImage(640, 0, image_rgb);
+    painter.end();
+
+    emit this->newFrameSignal(image);
 }

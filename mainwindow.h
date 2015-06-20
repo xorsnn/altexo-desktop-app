@@ -24,11 +24,11 @@ public slots:
 
 //    void setKinectDeviceInterface(ALKinectInterface * alKinectInterface);
 
-    QByteArray getFrame();
-    void gstBufferFill(GstBuffer *buffer, guint size);
-    void bufferFill(quint8 *buffer, uint size);
+//    QByteArray getFrame();
+//    void gstBufferFill(GstBuffer *buffer, guint size);
+//    void bufferFill(quint8 *buffer, uint size);
 
-    ALGLWidget* getALGLWidget();
+//    ALGLWidget* getALGLWidget();
 
 
 private slots:

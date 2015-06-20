@@ -7,8 +7,6 @@
 #include <QDialog>
 #include <QApplication>
 
-
-
 #include <QGlib/Error>
 #include <QGlib/Connect>
 #include <QGst/Init>
@@ -21,7 +19,6 @@
 #include <QGst/Bus>
 #include <QGst/Utils/ApplicationSource>
 #include <QGst/Buffer>
-
 
 #include <gst/app/gstappsrc.h>
 
@@ -46,8 +43,12 @@ public slots:
 
     void setMainWindow(MainWindow * mw) {
 //        this->m_src.setMainWindow(mw);
-        QObject::connect(&this->m_src, SIGNAL(sigNeedData(uint,char*)), mw->getALGLWidget(), SLOT(needDataSlot(uint,char*)));
-        QObject::connect(mw->getALGLWidget(), SIGNAL(pushDataSignal()), &this->m_src, SLOT(pushVideoBuffer()));
+//        QObject::connect(&this->m_src, SIGNAL(sigNeedData(uint,char*)), mw->getALGLWidget(), SLOT(needDataSlot(uint,char*)));
+//        QObject::connect(mw->getALGLWidget(), SIGNAL(pushDataSignal()), &this->m_src, SLOT(pushVideoBuffer()));
+    }
+
+    ALVideoAppSrc * getAppSrcRef() {
+        return &(this->m_src);
     }
 
 private:

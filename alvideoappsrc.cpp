@@ -9,7 +9,7 @@ void ALVideoAppSrc::needData(uint length)
 {
     Q_UNUSED(length);
 
-//    qDebug() << "VideoAppSrc NEED DATA. Length:" << length;
+    qDebug() << "VideoAppSrc NEED DATA. Length:" << length;
 
     if (!buffer.isNull())
     {
@@ -18,7 +18,8 @@ void ALVideoAppSrc::needData(uint length)
     buffer = QGst::Buffer::create(1280*480*3);
     buffer->map(mapInfo, QGst::MapWrite);
 
-    emit sigNeedData(buffer->size(), (char*)mapInfo.data());
+    emit sigNeedData(buffer->size(), (char*)mapInfo.data());//deprecated
+    emit this->needDataSignal();
 }
 
 void ALVideoAppSrc::enoughData()
@@ -35,6 +36,11 @@ void ALVideoAppSrc::pushVideoBuffer()
 
     buffer->unmap(mapInfo);
 
-//    qDebug() << "VideoAppSrc PUSHBUFFER Length:" << buffer->size();
+    qDebug() << "VideoAppSrc PUSHBUFFER Length:" << buffer->size();
     pushBuffer(buffer);
+}
+
+void ALVideoAppSrc::newFrameSlot(QImage image) {
+    std::copy (image.bits(), image.bits()+(1280*480*3), mapInfo.data());
+    this->pushVideoBuffer();
 }

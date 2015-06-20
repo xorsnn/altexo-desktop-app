@@ -5,7 +5,7 @@
 #-------------------------------------------------
 QT_VERSION = 5
 
-QT += core gui opengl
+QT += core gui opengl multimedia multimediawidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -68,21 +68,21 @@ macx {
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    recorder.cpp \
     alglwidget.cpp \
     alfreenectdevice.cpp \
     alkinectinterface.cpp \
     alcolor.cpp \
     alrecorder.cpp \
-    alvideoappsrc.cpp
+    alvideoappsrc.cpp \
+    alvideosurface.cpp
 
 HEADERS  += mainwindow.h \
-    recorder.h \
     alglwidget.h \
     alfreenectdevice.h \
     alkinectinterface.h \
     alcolor.h \
     alrecorder.h \
-    alvideoappsrc.h
+    alvideoappsrc.h \
+    alvideosurface.h
 
 FORMS    += mainwindow.ui
