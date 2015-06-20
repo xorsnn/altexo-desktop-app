@@ -4,6 +4,7 @@
 #include <QMainWindow>
 #include <QDebug>
 #include <QByteArray>
+#include <alvideosurface.h>
 #include "alkinectinterface.h"
 #include "alglwidget.h"
 #include <gst/gst.h>
@@ -29,7 +30,7 @@ public slots:
 //    void bufferFill(quint8 *buffer, uint size);
 
 //    ALGLWidget* getALGLWidget();
-
+    ALVideoSurface* getVideoSurfaceRef();
 
 private slots:
     void on_startRecorder_clicked();
@@ -43,7 +44,7 @@ private slots:
 private:
     Ui::MainWindow *ui;
 
-
+    ALVideoSurface * videoSurface;
 
 signals:
     void startRecorder();
