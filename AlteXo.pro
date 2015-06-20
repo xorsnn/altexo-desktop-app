@@ -73,8 +73,7 @@ SOURCES += main.cpp\
     alkinectinterface.cpp \
     alcolor.cpp \
     alrecorder.cpp \
-    alvideoappsrc.cpp \
-    alvideosurface.cpp
+    alvideoappsrc.cpp
 
 HEADERS  += mainwindow.h \
     alglwidget.h \
@@ -82,7 +81,6 @@ HEADERS  += mainwindow.h \
     alkinectinterface.h \
     alcolor.h \
     alrecorder.h \
-    alvideoappsrc.h \
-    alvideosurface.h
+    alvideoappsrc.h
 
 FORMS    += mainwindow.ui
