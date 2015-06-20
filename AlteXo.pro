@@ -68,7 +68,6 @@ macx {
 
 SOURCES += main.cpp\
         mainwindow.cpp \
-    alglwidget.cpp \
     alfreenectdevice.cpp \
     alkinectinterface.cpp \
     alcolor.cpp \
@@ -77,7 +76,6 @@ SOURCES += main.cpp\
     alvideosurface.cpp
 
 HEADERS  += mainwindow.h \
-    alglwidget.h \
     alfreenectdevice.h \
     alkinectinterface.h \
     alcolor.h \
