@@ -57,10 +57,15 @@ int main(int argc, char *argv[])
 
     QObject::connect(alRecorder->getAppSrcRef(), SIGNAL(needDataSignal()), kinectInterface, SLOT(needDataSlot()));
     QObject::connect(kinectInterface, SIGNAL(newFrameSignal(QImage)), alRecorder->getAppSrcRef(), SLOT(newFrameSlot(QImage)));
+
     //main win
     QObject::connect(kinectInterface, SIGNAL(newFrameSignal(QImage)), w.getVideoSurfaceRef(), SLOT(newFrameSlot(QImage)));
+    QObject::connect(kinectInterface, SIGNAL(newWFrameSignal(QImage)), w.getVideoSurfaceRef(), SLOT(newFrameSlot(QImage)));
+    QObject::connect(&w, SIGNAL(requestNewFrameSignal()), kinectInterface, SLOT(needWDataSlot()));
 
-    alRecorder->startSlot();
+    QObject::connect(&w, SIGNAL(startRecorderSignal()), alRecorder, SLOT(startSlot()));
+    QObject::connect(&w, SIGNAL(stopRecorderSignal()), alRecorder, SLOT(stopSlot()));
+//    alRecorder->startSlot();
 
     return a.exec();
 

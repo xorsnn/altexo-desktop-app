@@ -125,3 +125,23 @@ void ALKinectInterface::needDataSlot() {
 
     emit this->newFrameSignal(image);
 }
+
+void ALKinectInterface::needWDataSlot() {
+    static std::vector<uint8_t> rgb_(640*480*3);
+    this->device->getRGB(rgb_);
+    static std::vector<uint8_t> depth_(640*480*3);
+    this->device->getDepth(depth_);
+
+    QImage image_rgb((&(rgb_[0])), 640, 480, QImage::Format_RGB888);
+
+    QImage image_depth((&(depth_[0])), 640, 480, QImage::Format_RGB888);
+
+    QImage image(1280, 480, QImage::Format_RGB888);
+    QPainter painter;
+    painter.begin(&image);
+    painter.drawImage(0, 0, image_depth);
+    painter.drawImage(640, 0, image_rgb);
+    painter.end();
+
+    emit this->newWFrameSignal(image);
+}

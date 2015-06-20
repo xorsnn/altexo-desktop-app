@@ -24,7 +24,7 @@ public:
 
 signals:
     void newFrameSignal(QImage image);
-
+    void newWFrameSignal(QImage image);
 public slots:
 
     void init();
@@ -32,6 +32,7 @@ public slots:
     void stop();
 
     void needDataSlot();
+    void needWDataSlot();
 
     void getDepthDt(std::vector<uint8_t> &depth);
     void getRGBDt(std::vector<uint8_t> &rgb);
