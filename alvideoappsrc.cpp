@@ -9,7 +9,7 @@ void ALVideoAppSrc::needData(uint length)
 {
     Q_UNUSED(length);
 
-    qDebug() << "VideoAppSrc NEED DATA. Length:" << length;
+//    qDebug() << "VideoAppSrc NEED DATA. Length:" << length;
 
     if (!buffer.isNull())
     {
@@ -36,7 +36,7 @@ void ALVideoAppSrc::pushVideoBuffer()
 
     buffer->unmap(mapInfo);
 
-    qDebug() << "VideoAppSrc PUSHBUFFER Length:" << buffer->size();
+//    qDebug() << "VideoAppSrc PUSHBUFFER Length:" << buffer->size();
     pushBuffer(buffer);
 }
 
