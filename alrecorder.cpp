@@ -39,25 +39,22 @@ QGst::BinPtr ALRecorder::createAudioSrcBin() {
 
 QGst::BinPtr ALRecorder::createVideoSrcBin() {
     QGst::BinPtr videoBin;
-//appsrc!!!!!
-//    g_object_set(G_OBJECT(this->appsrc), "block", TRUE, NULL); //+
     QString rawvideocaps = QString("video/x-raw,format=RGB,width=1280,height=480,framerate=25/1,pixel-aspect-ratio=1/1");
-    QString rawaudiocaps = QString("audio/x-raw,format=F32LE,rate=48000,layout=interleaved,channels=2");
+    //live (high compression for online streaming)
+//    8192000
+//    16384000
+//    32768000
     QString outputPipeDesc = QString(" appsrc name=videosrc caps=\"%1\" is-live=true format=time do-timestamp=true ! videorate !"
-                                     " videoconvert ! vp8enc threads=4 deadline=1 cpu-used=15 ! queue")
-//            .arg(rawaudiocaps)
+                                     " videoconvert ! vp8enc threads=2 deadline=1 cpu-used=15 target-bitrate=32768000 ! queue")
             .arg(rawvideocaps);
-
     try {
         videoBin = QGst::Bin::fromDescription(outputPipeDesc);
-//        videoBin->getElementByName("videoflip")->setProperty("method", 5);
         this->m_src.setElement(videoBin->getElementByName("videosrc"));
         return videoBin;
     } catch (const QGlib::Error & error) {
         qCritical() << "Failed to create video source bin:" << error;
         return QGst::BinPtr();
     }
-
     return videoBin;
 }
 

@@ -49,3 +49,8 @@ void MainWindow::on_startRecorder_clicked()
         this->ui->startRecorder->setStyleSheet("QPushButton {color: black;}");
     }
 }
+
+void MainWindow::on_actionSettings_triggered()
+{
+    qDebug() << "aaaa";
+}

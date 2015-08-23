@@ -5,7 +5,7 @@
 #-------------------------------------------------
 QT_VERSION = 5
 
-QT += core gui opengl multimedia multimediawidgets
+QT += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -73,7 +73,8 @@ SOURCES += main.cpp\
     alcolor.cpp \
     alrecorder.cpp \
     alvideoappsrc.cpp \
-    alvideosurface.cpp
+    alvideosurface.cpp \
+    settingsdialog.cpp
 
 HEADERS  += mainwindow.h \
     alfreenectdevice.h \
@@ -81,6 +82,8 @@ HEADERS  += mainwindow.h \
     alcolor.h \
     alrecorder.h \
     alvideoappsrc.h \
-    alvideosurface.h
+    alvideosurface.h \
+    settingsdialog.h
 
-FORMS    += mainwindow.ui
+FORMS    += mainwindow.ui \
+    settingsdialog.ui

@@ -27,6 +27,8 @@ public slots:
 private slots:
     void on_startRecorder_clicked();
 
+    void on_actionSettings_triggered();
+
 private:
     Ui::MainWindow *ui;
     ALVideoSurface * videoSurface;
