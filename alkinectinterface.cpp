@@ -145,3 +145,8 @@ void ALKinectInterface::needWDataSlot() {
 
     emit this->newWFrameSignal(image);
 }
+
+void ALKinectInterface::updateSettingsSlot()
+{
+    this->device->updateSettings();
+}

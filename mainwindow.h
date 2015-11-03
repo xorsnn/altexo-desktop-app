@@ -5,7 +5,10 @@
 #include <QDebug>
 #include <QByteArray>
 #include <QTimer>
+#include <QDialogButtonBox>
 #include "alvideosurface.h"
+#include "settingsdialog.h"
+
 //#include "alkinectinterface.h"
 //#include "alglwidget.h"
 //#include <gst/gst.h>
@@ -24,9 +27,10 @@ public:
 public slots:
     ALVideoSurface* getVideoSurfaceRef();
     void requestNewFrameSlot();
+    void settingsChangedSlot();
+
 private slots:
     void on_startRecorder_clicked();
-
     void on_actionSettings_triggered();
 
 private:
@@ -34,6 +38,8 @@ private:
     ALVideoSurface * videoSurface;
     QTimer *timer;
 signals:
+    void settingsChangedSignal();
+
     void startRecorderSignal();
     void stopRecorderSignal();
 

@@ -9,6 +9,9 @@ ALFreenectDevice::ALFreenectDevice(freenect_context *_ctx, int _index) :
     m_new_depth_frame(false)
 {
     setDepthFormat(FREENECT_DEPTH_REGISTERED);
+    QSettings settings;
+    this->minDepth = settings.value("altexo/minDepth", 555).toInt();
+    this->maxDepth = settings.value("altexo/maxDepth", 1005).toInt();
 }
 
 int ALFreenectDevice::getMaxDepth() {
@@ -91,4 +94,10 @@ bool ALFreenectDevice::getDepth(std::vector<uint8_t> &buffer) {
     buffer.swap(m_buffer_depth_new);
     m_new_depth_frame = false;
     return true;
+}
+
+void ALFreenectDevice::updateSettings() {
+    QSettings settings;
+    this->minDepth = settings.value("altexo/minDepth", 555).toInt();
+    this->maxDepth = settings.value("altexo/maxDepth", 1005).toInt();
 }

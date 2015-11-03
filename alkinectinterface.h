@@ -41,6 +41,8 @@ public slots:
 
     void changeMaxDepth(int delta);
 
+    void updateSettingsSlot();
+
 public:
     ALFreenectDevice* device;
     GLuint gl_depth_tex;

@@ -24,8 +24,10 @@ QGst::BinPtr ALRecorder::createAudioSrcBin() {
     QGst::BinPtr audioBin;
 
     try {
+//        audioBin = QGst::Bin::fromDescription("autoaudiosrc name=\"audiosrc\" ! audioconvert ! "
+//                                              "audioresample ! audiorate ! vorbisenc ! queue");
         audioBin = QGst::Bin::fromDescription("autoaudiosrc name=\"audiosrc\" ! audioconvert ! "
-                                              "audioresample ! audiorate ! vorbisenc ! queue");
+                                              "audioresample ! audiorate ! lamemp3enc ! queue");
     } catch (const QGlib::Error & error) {
         qCritical() << "Failed to create audio source bin:" << error;
         return QGst::BinPtr();
@@ -44,9 +46,13 @@ QGst::BinPtr ALRecorder::createVideoSrcBin() {
 //    8192000
 //    16384000
 //    32768000
+//    QString outputPipeDesc = QString(" appsrc name=videosrc caps=\"%1\" is-live=true format=time do-timestamp=true ! videorate !"
+//                                     " videoconvert ! vp8enc threads=2 deadline=1 cpu-used=15 target-bitrate=32768000 ! queue")
     QString outputPipeDesc = QString(" appsrc name=videosrc caps=\"%1\" is-live=true format=time do-timestamp=true ! videorate !"
-                                     " videoconvert ! vp8enc threads=2 deadline=1 cpu-used=15 target-bitrate=32768000 ! queue")
+                                     " videoconvert ! x264enc pass=5 qp-min=0 ! queue")
             .arg(rawvideocaps);
+//    pass=\"qual\" qp-min=0
+//    pass=5 quantizer=22 speed-preset=4 // live stream
     try {
         videoBin = QGst::Bin::fromDescription(outputPipeDesc);
         this->m_src.setElement(videoBin->getElementByName("videosrc"));
@@ -59,14 +65,18 @@ QGst::BinPtr ALRecorder::createVideoSrcBin() {
 }
 
 void ALRecorder::start() {
+    QDateTime now = QDateTime::currentDateTime();
+
+    qDebug() << now.toString("yyyy_MM_dd-hh:mm:ss");
+    this->outputFilePath = QDir::currentPath() + QDir::separator() + "out" + QDir::separator() + now.toString("yyyy_MM_dd-hh:mm:ss") + ".mp4";
+
     QGst::BinPtr audioSrcBin = createAudioSrcBin();
     QGst::BinPtr videoSrcBin = createVideoSrcBin();
-    QGst::ElementPtr mux = QGst::ElementFactory::make("webmmux");
+//    QGst::ElementPtr mux = QGst::ElementFactory::make("webmmux");
+    QGst::ElementPtr mux = QGst::ElementFactory::make("matroskamux");
     QGst::ElementPtr sink = QGst::ElementFactory::make("filesink");
 
     if (!audioSrcBin || !videoSrcBin || !mux || !sink) {
-//        QMessageBox::critical(this, tr("Error"), tr("One or more elements could not be created. "
-//                                                    "Verify that you have all the necessary element plugins installed."));
         qDebug() << tr("One or more elements could not be created. Verify that you have all the necessary element plugins installed.");
         return;
     }

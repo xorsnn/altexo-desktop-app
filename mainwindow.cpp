@@ -52,5 +52,32 @@ void MainWindow::on_startRecorder_clicked()
 
 void MainWindow::on_actionSettings_triggered()
 {
-    qDebug() << "aaaa";
+    SettingsDialog sDialog;
+    this->connect(&sDialog, SIGNAL(settingsChangedSignal()), this, SLOT(settingsChangedSlot()));
+    sDialog.setModal(true);
+    int ret = sDialog.exec();
+    qDebug() << ret;
+    switch (ret) {
+        case QDialog::Accepted:
+        {
+            qDebug() << "ok clicked";
+            break;
+        }
+        case QDialog::Rejected:
+        {
+            qDebug() << "cancel clicked";
+            break;
+        }
+        default:
+            // should never be reached
+            qDebug() << "default behaviour";
+            qDebug() << QDialogButtonBox::Ok;
+            qDebug() << QDialogButtonBox::Cancel;
+            break;
+    }
+}
+
+void MainWindow::settingsChangedSlot()
+{
+    emit this->settingsChangedSignal();
 }

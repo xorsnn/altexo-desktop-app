@@ -9,6 +9,7 @@
 #include <cmath>
 #include <vector>
 #include <QDebug>
+#include <QSettings>
 #include "alcolor.h"
 
 #define FLT_EPSILON 1.19209290E-07F
@@ -66,7 +67,8 @@ public:
 
     ALColor huePixelForDepth(uint16_t pix);
     float ofMap(float value, float inputMin, float inputMax, float outputMin, float outputMax, bool clamp);
-//    RGB_t hsv2rgb(HSV_t hsv);
+
+    void updateSettings();
 private:
     std::vector<uint8_t> m_buffer_depth;
     std::vector<uint8_t> m_buffer_depth_new;

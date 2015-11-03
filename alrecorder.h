@@ -6,6 +6,7 @@
 #include <QDir>
 #include <QDialog>
 #include <QApplication>
+#include <QDateTime>
 
 #include <QGlib/Error>
 #include <QGlib/Connect>

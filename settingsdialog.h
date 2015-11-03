@@ -2,6 +2,8 @@
 #define SETTINGSDIALOG_H
 
 #include <QDialog>
+#include <QSettings>
+#include <QDebug>
 
 namespace Ui {
 class SettingsDialog;
@@ -17,6 +19,13 @@ public:
 
 private:
     Ui::SettingsDialog *ui;
+
+signals:
+    void settingsChangedSignal();
+
+private slots:
+    void on_minDepthSpinBox_valueChanged(int arg1);
+    void on_maxDepthSpinBox_valueChanged(int arg1);
 };
 
 #endif // SETTINGSDIALOG_H

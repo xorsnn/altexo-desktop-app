@@ -52,18 +52,22 @@ macx {
     INCLUDEPATH += /usr/include/glib-2.0
     INCLUDEPATH += /usr/lib/x86_64-linux-gnu/glib-2.0/include/
     INCLUDEPATH += /usr/include/libfreenect/
-    INCLUDEPATH += /home/xors/workspace/LIBS/INSTALL/include/Qt5GStreamer
+    INCLUDEPATH += /usr/include/Qt5GStreamer
 
     LIBS += -pthread -lgstreamer-1.0 -lgobject-2.0 -lgmodule-2.0 -lgthread-2.0 -lglib-2.0 \
         -lrt \
         -lGL \
         -lglut \
         -lfreenect \
-        -lGLU
+        -lGLU \
+        -lQt5GLib-2.0 \
+        -lQt5GStreamer-1.0 \
+        -lQt5GStreamerUtils-1.0
 
-    LIBS += -L/home/xors/workspace/LIBS/INSTALL/lib -lQt5GLib-2.0
-    LIBS += -L/home/xors/workspace/LIBS/INSTALL/lib -lQt5GStreamer-1.0
-    LIBS += -L/home/xors/workspace/LIBS/INSTALL/lib -lQt5GStreamerUtils-1.0
+
+#    LIBS += -L/home/xors/workspace/LIBS/INSTALL/lib -lQt5GLib-2.0
+#    LIBS += -L/home/xors/workspace/LIBS/INSTALL/lib -lQt5GStreamer-1.0
+#    LIBS += -L/home/xors/workspace/LIBS/INSTALL/lib -lQt5GStreamerUtils-1.0
 }
 
 SOURCES += main.cpp\

@@ -65,6 +65,7 @@ int main(int argc, char *argv[])
 
     QObject::connect(&w, SIGNAL(startRecorderSignal()), alRecorder, SLOT(startSlot()));
     QObject::connect(&w, SIGNAL(stopRecorderSignal()), alRecorder, SLOT(stopSlot()));
+    QObject::connect(&w, SIGNAL(settingsChangedSignal()), kinectInterface, SLOT(updateSettingsSlot()));
 //    alRecorder->startSlot();
 
     return a.exec();
