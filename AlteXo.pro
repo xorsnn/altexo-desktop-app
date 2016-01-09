@@ -78,7 +78,8 @@ SOURCES += main.cpp\
     alrecorder.cpp \
     alvideoappsrc.cpp \
     alvideosurface.cpp \
-    settingsdialog.cpp
+    settingsdialog.cpp \
+    extra/ofxKinectExtras.cpp
 
 HEADERS  += mainwindow.h \
     alfreenectdevice.h \
@@ -87,7 +88,8 @@ HEADERS  += mainwindow.h \
     alrecorder.h \
     alvideoappsrc.h \
     alvideosurface.h \
-    settingsdialog.h
+    settingsdialog.h \
+    extra/ofxKinectExtras.h
 
 FORMS    += mainwindow.ui \
     settingsdialog.ui

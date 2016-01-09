@@ -26,8 +26,10 @@ QGst::BinPtr ALRecorder::createAudioSrcBin() {
     try {
 //        audioBin = QGst::Bin::fromDescription("autoaudiosrc name=\"audiosrc\" ! audioconvert ! "
 //                                              "audioresample ! audiorate ! vorbisenc ! queue");
+
         audioBin = QGst::Bin::fromDescription("autoaudiosrc name=\"audiosrc\" ! audioconvert ! "
                                               "audioresample ! audiorate ! lamemp3enc ! queue");
+
     } catch (const QGlib::Error & error) {
         qCritical() << "Failed to create audio source bin:" << error;
         return QGst::BinPtr();
@@ -42,17 +44,14 @@ QGst::BinPtr ALRecorder::createAudioSrcBin() {
 QGst::BinPtr ALRecorder::createVideoSrcBin() {
     QGst::BinPtr videoBin;
     QString rawvideocaps = QString("video/x-raw,format=RGB,width=1280,height=480,framerate=25/1,pixel-aspect-ratio=1/1");
-    //live (high compression for online streaming)
-//    8192000
-//    16384000
-//    32768000
+
 //    QString outputPipeDesc = QString(" appsrc name=videosrc caps=\"%1\" is-live=true format=time do-timestamp=true ! videorate !"
 //                                     " videoconvert ! vp8enc threads=2 deadline=1 cpu-used=15 target-bitrate=32768000 ! queue")
+
     QString outputPipeDesc = QString(" appsrc name=videosrc caps=\"%1\" is-live=true format=time do-timestamp=true ! videorate !"
-                                     " videoconvert ! x264enc pass=5 qp-min=0 ! queue")
+                                     " videoconvert ! x264enc quantizer=0 pass=5 speed-preset=1 ! queue")
             .arg(rawvideocaps);
-//    pass=\"qual\" qp-min=0
-//    pass=5 quantizer=22 speed-preset=4 // live stream
+
     try {
         videoBin = QGst::Bin::fromDescription(outputPipeDesc);
         this->m_src.setElement(videoBin->getElementByName("videosrc"));
