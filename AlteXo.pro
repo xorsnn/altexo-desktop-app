@@ -13,7 +13,9 @@ TARGET = AlteXo
 TEMPLATE = app
 
 !macx {
-    CONFIG += link_pkgconfig compile_libtool
+    CONFIG += link_pkgconfig
+#        compile_libtool
+
     PKGCONFIG += gstreamer-1.0 libusb-1.0 gstreamer-audio-1.0 gstreamer-video-1.0 gstreamer-pbutils-1.0 gobject-2.0
 }
 
@@ -41,6 +43,7 @@ macx {
             -lgthread-2.0 \
             #-lrt \
             -lglib-2.0
+
             #-lGL \
 
 #            -lfreenect \
@@ -79,7 +82,8 @@ SOURCES += main.cpp\
     alvideoappsrc.cpp \
     alvideosurface.cpp \
     settingsdialog.cpp \
-    extra/ofxKinectExtras.cpp
+    extra/ofxKinectExtras.cpp \
+    broadcast/alsharedmemorybroadcaster.cpp
 
 HEADERS  += mainwindow.h \
     alfreenectdevice.h \
@@ -89,7 +93,8 @@ HEADERS  += mainwindow.h \
     alvideoappsrc.h \
     alvideosurface.h \
     settingsdialog.h \
-    extra/ofxKinectExtras.h
+    extra/ofxKinectExtras.h \
+    broadcast/alsharedmemorybroadcaster.h
 
 FORMS    += mainwindow.ui \
     settingsdialog.ui
