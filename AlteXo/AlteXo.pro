@@ -25,65 +25,19 @@ TARGET = AlteXo
 TEMPLATE = app
 
 
-AL_QTGSTREAMER_PATH=/home/xors/PROGS/LIBS/
-
-!macx {
-    CONFIG += link_pkgconfig
-#        compile_libtool
-
-    PKGCONFIG += gstreamer-1.0 libusb-1.0 gstreamer-audio-1.0 gstreamer-video-1.0 gstreamer-pbutils-1.0 gobject-2.0
-}
+#include(../al-ext-libs.pri)
 
 macx {
-    INCLUDEPATH += /opt/local/include/gstreamer-1.0
-    INCLUDEPATH += /opt/local/include/glib-2.0
-    INCLUDEPATH += /opt/local/lib/glib-2.0/include/
-    INCLUDEPATH += /usr/local/Cellar/libfreenect/0.5.1/include/libfreenect
-    INCLUDEPATH += /usr/local/Cellar/libusb/1.0.19/include/libusb-1.0/
-    INCLUDEPATH += /Users/alexpasch/workspace/LIBS/QT_GSTREAMER/include/Qt5GStreamer
-    INCLUDEPATH += /opt/local/include
-
-    LIBS += -L/opt/local/lib/ -lgstreamer-1.0
-    LIBS += -L/opt/local/lib -lgobject-2.0
-    LIBS += -L/usr/local/lib -lfreenect
-    LIBS += -L/usr/local/lib -lglut
-
-
-    LIBS += -L/Users/alexpasch/workspace/LIBS/QT_GSTREAMER/lib -lQt5GStreamer-1.0
-    LIBS += -L/Users/alexpasch/workspace/LIBS/QT_GSTREAMER/lib -lQt5GStreamerUtils-1.0
-    LIBS += -L/Users/alexpasch/workspace/LIBS/QT_GSTREAMER/lib -lQt5GLib-2.0
-
-    LIBS += -pthread \
-            -lgmodule-2.0 \
-            -lgthread-2.0 \
-            #-lrt \
-            -lglib-2.0
-
-            #-lGL \
-
-#            -lfreenect \
-#            -lGLU
+    include(mac-deps.pri)
 }
 
 !macx {
-    INCLUDEPATH += /usr/include/gstreamer-1.0
-    INCLUDEPATH += /usr/include/glib-2.0
-    INCLUDEPATH += /usr/lib/x86_64-linux-gnu/glib-2.0/include/
-    INCLUDEPATH += /usr/include/libfreenect/
-    INCLUDEPATH += $$AL_QTGSTREAMER_PATH/include/Qt5GStreamer
-
-    LIBS += -pthread -lgstreamer-1.0 -lgobject-2.0 -lgmodule-2.0 -lgthread-2.0 -lglib-2.0 \
-        -lrt \
-        -lGL \
-        -lglut \
-        -lfreenect \
-        -lGLU
-
-
-    LIBS += -L$$AL_QTGSTREAMER_PATH/lib -lQt5GLib-2.0
-    LIBS += -L$$AL_QTGSTREAMER_PATH/lib -lQt5GStreamer-1.0
-    LIBS += -L$$AL_QTGSTREAMER_PATH/lib -lQt5GStreamerUtils-1.0
+    include(unix-deps.pri)
 }
+
+
+INCLUDEPATH += ../live_streamer
+LIBS += -L$$ROOT_DIRECTORY/streamer/build -lal-live-streamer
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -110,3 +64,4 @@ HEADERS  += mainwindow.h \
 
 FORMS    += mainwindow.ui \
     settingsdialog.ui
+
