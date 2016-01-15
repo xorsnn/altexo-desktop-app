@@ -5,6 +5,18 @@
 #-------------------------------------------------
 QT_VERSION = 5
 
+ROOT_DIRECTORY = ../../al_build
+LIB_DIRECTORY = $${ROOT_DIRECTORY}/lib
+BUILD_DIRECTORY = $${ROOT_DIRECTORY}/build
+TESTS_DIRECTORY = $${BUILD_DIRECTORY}/tests
+EXAMPLES_DIRECTORY = $${BUILD_DIRECTORY}/examples
+EXEC_DIRECTORY = $${BUILD_DIRECTORY}
+
+DESTDIR = $${EXEC_DIRECTORY}
+OBJECTS_DIR = $${BUILD_DIRECTORY}
+MOC_DIR = $${BUILD_DIRECTORY}
+RCC_DIR = $${BUILD_DIRECTORY}
+
 QT += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
@@ -66,9 +78,6 @@ macx {
         -lglut \
         -lfreenect \
         -lGLU
-#        -lQt5GLib-2.0 \
-#        -lQt5GStreamer-1.0 \
-#        -lQt5GStreamerUtils-1.0
 
 
     LIBS += -L$$AL_QTGSTREAMER_PATH/lib -lQt5GLib-2.0
