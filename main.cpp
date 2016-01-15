@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
 
-    AlSharedMemoryBroadcaster* alBroadcaster = new AlSharedMemoryBroadcaster();
+//    AlSharedMemoryBroadcaster* alBroadcaster = new AlSharedMemoryBroadcaster();
 
     ALRecorder* alRecorder = new ALRecorder();
 

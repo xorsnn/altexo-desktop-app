@@ -12,6 +12,9 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = AlteXo
 TEMPLATE = app
 
+
+AL_QTGSTREAMER_PATH=/home/xors/PROGS/LIBS/
+
 !macx {
     CONFIG += link_pkgconfig
 #        compile_libtool
@@ -55,22 +58,22 @@ macx {
     INCLUDEPATH += /usr/include/glib-2.0
     INCLUDEPATH += /usr/lib/x86_64-linux-gnu/glib-2.0/include/
     INCLUDEPATH += /usr/include/libfreenect/
-    INCLUDEPATH += /usr/include/Qt5GStreamer
+    INCLUDEPATH += $$AL_QTGSTREAMER_PATH/include/Qt5GStreamer
 
     LIBS += -pthread -lgstreamer-1.0 -lgobject-2.0 -lgmodule-2.0 -lgthread-2.0 -lglib-2.0 \
         -lrt \
         -lGL \
         -lglut \
         -lfreenect \
-        -lGLU \
-        -lQt5GLib-2.0 \
-        -lQt5GStreamer-1.0 \
-        -lQt5GStreamerUtils-1.0
+        -lGLU
+#        -lQt5GLib-2.0 \
+#        -lQt5GStreamer-1.0 \
+#        -lQt5GStreamerUtils-1.0
 
 
-#    LIBS += -L/home/xors/workspace/LIBS/INSTALL/lib -lQt5GLib-2.0
-#    LIBS += -L/home/xors/workspace/LIBS/INSTALL/lib -lQt5GStreamer-1.0
-#    LIBS += -L/home/xors/workspace/LIBS/INSTALL/lib -lQt5GStreamerUtils-1.0
+    LIBS += -L$$AL_QTGSTREAMER_PATH/lib -lQt5GLib-2.0
+    LIBS += -L$$AL_QTGSTREAMER_PATH/lib -lQt5GStreamer-1.0
+    LIBS += -L$$AL_QTGSTREAMER_PATH/lib -lQt5GStreamerUtils-1.0
 }
 
 SOURCES += main.cpp\
