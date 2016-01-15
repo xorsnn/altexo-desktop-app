@@ -22,10 +22,11 @@ RCC_DIR = $${BUILD_DIRECTORY}
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = al-live-streamer
-#TEMPLATE = app
-TEMPLATE = lib
-CONFIG += staticlib
-
+TEMPLATE = app
+#TEMPLATE = lib
+#CONFIG += staticlib
+#TEMPLATE = lib
+#CONFIG += plugin
 
 
 DEFINES += POSIX
@@ -39,6 +40,8 @@ unix: CONFIG += link_pkgconfig
 
 include(../al-ext-libs.pri)
 
+INCLUDEPATH+=../AlteXo
+
 QMAKE_CXXFLAGS += -fno-rtti
 
 
@@ -48,7 +51,9 @@ SOURCES += main.cpp \
     alconductor/alconductor.cpp \
     alconductor/alvideocapturer.cpp \
     alinterface/widgetstreamer.cpp \
-    alconductor/alvideocapturerthread.cpp
+    alconductor/alvideocapturerthread.cpp \
+    alstreamer.cpp \
+    streamerplugin.cpp
 
 HEADERS  += \
     defaults.h \
@@ -57,7 +62,10 @@ HEADERS  += \
     alconductor/alconductor.h \
     alconductor/alvideocapturer.h \
     alinterface/widgetstreamer.h \
-    alconductor/alvideocapturerthread.h
+    alconductor/alvideocapturerthread.h \
+    customsocketserver.h \
+    alstreamer.h \
+    streamerplugin.h
 
 FORMS    += \
     alinterface/almainwindow.ui

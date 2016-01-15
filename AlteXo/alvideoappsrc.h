@@ -18,12 +18,10 @@ public:
     virtual void needData (uint length);
     virtual void enoughData();
 
-signals:
-
-    void sigNeedData(uint length, char* data);//deprecated
+Q_SIGNALS:
     void needDataSignal();
 
-public slots:
+public Q_SLOTS:
     void newFrameSlot(QImage image);
     void pushVideoBuffer();
 

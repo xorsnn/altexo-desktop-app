@@ -123,7 +123,7 @@ void ALKinectInterface::needDataSlot() {
     painter.drawImage(640, 0, image_rgb);
     painter.end();
 
-    emit this->newFrameSignal(image);
+    Q_EMIT this->newFrameSignal(image);
 }
 
 void ALKinectInterface::needWDataSlot() {
@@ -143,7 +143,7 @@ void ALKinectInterface::needWDataSlot() {
     painter.drawImage(640, 0, image_rgb);
     painter.end();
 
-    emit this->newWFrameSignal(image);
+    Q_EMIT this->newWFrameSignal(image);
 }
 
 void ALKinectInterface::updateSettingsSlot()

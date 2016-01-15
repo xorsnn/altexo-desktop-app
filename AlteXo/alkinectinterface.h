@@ -22,10 +22,10 @@ class ALKinectInterface : public QObject
 public:
     explicit ALKinectInterface(QObject *parent = 0);
 
-signals:
+Q_SIGNALS:
     void newFrameSignal(QImage image);
     void newWFrameSignal(QImage image);
-public slots:
+public Q_SLOTS:
 
     void init();
     void start();

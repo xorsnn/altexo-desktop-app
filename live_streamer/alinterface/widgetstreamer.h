@@ -8,13 +8,15 @@ class WidgetStreamer : public QObject
 {
     Q_OBJECT
 public:
-    WidgetStreamer(QWidget *pRenderWidget, AlConductor *pStreamWidget);
+    WidgetStreamer(QWidget *pRenderWidget, rtc::scoped_refptr<AlConductor> pStreamWidget);
     ~WidgetStreamer();
 private Q_SLOTS:
     void onTimeout();
+public Q_SLOTS:
+    void startSlot();
 private:
     QWidget *m_pRenderWidget;
-    AlConductor *m_pStreamWidget;
+    rtc::scoped_refptr<AlConductor> m_pStreamWidget;
 
 };
 

@@ -13,9 +13,7 @@ class ALVideoSurface : public QWidget
 public:
     explicit ALVideoSurface(QWidget *parent = 0);
 
-signals:
-
-public slots:
+public Q_SLOTS:
     void newFrameSlot(QImage image);
 private:
     void paintEvent(QPaintEvent *);

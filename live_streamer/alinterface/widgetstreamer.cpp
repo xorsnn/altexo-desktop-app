@@ -5,18 +5,22 @@
 
 using namespace std;
 
-WidgetStreamer::WidgetStreamer(QWidget *pRenderWidget, AlConductor *pStreamWidget)
+WidgetStreamer::WidgetStreamer(QWidget *pRenderWidget, rtc::scoped_refptr<AlConductor> pStreamWidget)
 {
     m_pRenderWidget = pRenderWidget;
     m_pStreamWidget = pStreamWidget;
 
-    QTimer *pTimer = new QTimer(this);
-    QObject::connect(pTimer, SIGNAL(timeout()), this, SLOT(onTimeout()));
-    pTimer->start(40);
+
 }
 
 WidgetStreamer::~WidgetStreamer()
 {
+}
+
+void WidgetStreamer::startSlot() {
+    QTimer *pTimer = new QTimer(this);
+    QObject::connect(pTimer, SIGNAL(timeout()), this, SLOT(onTimeout()));
+    pTimer->start(40);
 }
 
 void WidgetStreamer::onTimeout()

@@ -24,12 +24,12 @@ void SettingsDialog::on_minDepthSpinBox_valueChanged(int arg1)
 {
     QSettings settings;
     settings.setValue("altexo/minDepth", arg1);
-    emit this->settingsChangedSignal();
+    Q_EMIT this->settingsChangedSignal();
 }
 
 void SettingsDialog::on_maxDepthSpinBox_valueChanged(int arg1)
 {
     QSettings settings;
     settings.setValue("altexo/maxDepth", arg1);
-    emit this->settingsChangedSignal();
+    Q_EMIT this->settingsChangedSignal();
 }

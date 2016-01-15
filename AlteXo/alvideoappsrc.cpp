@@ -18,8 +18,7 @@ void ALVideoAppSrc::needData(uint length)
     buffer = QGst::Buffer::create(1280*480*3);
     buffer->map(mapInfo, QGst::MapWrite);
 
-    emit sigNeedData(buffer->size(), (char*)mapInfo.data());//deprecated
-    emit this->needDataSignal();
+    Q_EMIT this->needDataSignal();
 }
 
 void ALVideoAppSrc::enoughData()

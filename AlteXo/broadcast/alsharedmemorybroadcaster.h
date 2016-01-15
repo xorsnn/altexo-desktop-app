@@ -11,9 +11,7 @@ class AlSharedMemoryBroadcaster : public QObject
 public:
     explicit AlSharedMemoryBroadcaster(QObject *parent = 0);
 
-signals:
-
-public slots:
+public Q_SLOTS:
     void slotNewFrame(QImage img);
 private:
     QSharedMemory sharedMemory;

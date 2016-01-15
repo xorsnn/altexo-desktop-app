@@ -20,10 +20,10 @@ public:
 private:
     Ui::SettingsDialog *ui;
 
-signals:
+Q_SIGNALS:
     void settingsChangedSignal();
 
-private slots:
+private Q_SLOTS:
     void on_minDepthSpinBox_valueChanged(int arg1);
     void on_maxDepthSpinBox_valueChanged(int arg1);
 };

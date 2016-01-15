@@ -24,8 +24,13 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = AlteXo
 TEMPLATE = app
 
+#DEFINES += POSIX
+#DEFINES += LINUX
+#DEFINES += WEBRTC_POSIX
 
-#include(../al-ext-libs.pri)
+#CONFIG += c++11
+#CONFIG += no_keywords
+
 
 macx {
     include(mac-deps.pri)
@@ -36,8 +41,10 @@ macx {
 }
 
 
-INCLUDEPATH += ../live_streamer
-LIBS += -L$$ROOT_DIRECTORY/streamer/build -lal-live-streamer
+#INCLUDEPATH += ../live_streamer
+#LIBS += -L$$ROOT_DIRECTORY/streamer/build -lal-live-streamer
+
+
 
 SOURCES += main.cpp\
         mainwindow.cpp \
@@ -60,7 +67,8 @@ HEADERS  += mainwindow.h \
     alvideosurface.h \
     settingsdialog.h \
     extra/ofxKinectExtras.h \
-    broadcast/alsharedmemorybroadcaster.h
+    broadcast/alsharedmemorybroadcaster.h \
+    interfaces/AlStreamerInterface.h
 
 FORMS    += mainwindow.ui \
     settingsdialog.ui

@@ -36,9 +36,7 @@ class ALRecorder : public QObject
 public:
     explicit ALRecorder(QObject *parent = 0);
 
-signals:
-
-public slots:
+public Q_SLOTS:
     void startSlot();
     void stopSlot();
 

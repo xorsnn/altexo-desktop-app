@@ -24,12 +24,12 @@ public:
     explicit MainWindow(QWidget *parent = 0);
     ~MainWindow();
 
-public slots:
+public Q_SLOTS:
     ALVideoSurface* getVideoSurfaceRef();
     void requestNewFrameSlot();
     void settingsChangedSlot();
 
-private slots:
+private Q_SLOTS:
     void on_startRecorder_clicked();
     void on_actionSettings_triggered();
 
@@ -37,7 +37,7 @@ private:
     Ui::MainWindow *ui;
     ALVideoSurface * videoSurface;
     QTimer *timer;
-signals:
+Q_SIGNALS:
     void settingsChangedSignal();
 
     void startRecorderSignal();
