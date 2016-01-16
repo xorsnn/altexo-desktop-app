@@ -43,8 +43,15 @@
          </property>
         </widget>
        </item>
-       <item row="1" column="1">
+       <item row="1" column="2">
         <widget class="QLCDNumber" name="lcdNumber"/>
+       </item>
+       <item row="1" column="1">
+        <widget class="QPushButton" name="streamButton">
+         <property name="text">
+          <string>Stream</string>
+         </property>
+        </widget>
        </item>
       </layout>
      </widget>

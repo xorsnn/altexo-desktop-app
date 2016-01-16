@@ -33,6 +33,8 @@ private Q_SLOTS:
     void on_startRecorder_clicked();
     void on_actionSettings_triggered();
 
+    void on_streamButton_clicked();
+
 private:
     Ui::MainWindow *ui;
     ALVideoSurface * videoSurface;

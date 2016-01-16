@@ -1,5 +1,8 @@
 #include "mainwindow.h"
 #include "ui_mainwindow.h"
+#include <QPluginLoader>
+#include <QDir>
+#include "interfaces/AlStreamerInterface.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -80,4 +83,33 @@ void MainWindow::on_actionSettings_triggered()
 void MainWindow::settingsChangedSlot()
 {
     Q_EMIT this->settingsChangedSignal();
+}
+
+void MainWindow::on_streamButton_clicked()
+{
+    qDebug() << "stream";
+//    QDir pluginsDir(qApp->applicationDirPath());
+//#if defined(Q_OS_WIN)
+//    if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
+//        pluginsDir.cdUp();
+//#elif defined(Q_OS_MAC)
+//    if (pluginsDir.dirName() == "MacOS") {
+//        pluginsDir.cdUp();
+//        pluginsDir.cdUp();
+//        pluginsDir.cdUp();
+//    }
+//#endif
+//    pluginsDir.cd("plugins");
+//    foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
+        QPluginLoader pluginLoader("/home/xors/workspace/QT/al_build/streamer/build/libal-live-streamer.so");
+        QObject *plugin = pluginLoader.instance();
+        if (plugin) {
+            qDebug() << "yahoo!!! 1";
+            AlStreamerInterface* streamerInterface = qobject_cast<AlStreamerInterface *>(plugin);
+            if (streamerInterface) {
+                qDebug() << "yahoo!!! 2";
+                qDebug() << streamerInterface->echo("fuck!!!!");
+            }
+        }
+//    }
 }

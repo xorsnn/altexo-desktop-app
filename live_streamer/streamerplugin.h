@@ -3,17 +3,19 @@
 
 #include <QObject>
 #include <QtPlugin>
-#include "interfaces/AlStreamerInterface.h"
+#include "AlStreamerInterface.h"
 
 //! [0]
 class StreamerPlugin : public QObject, AlStreamerInterface
 {
     Q_OBJECT
     Q_PLUGIN_METADATA(IID "org.altexo.AlStreamerInterface")
-    Q_INTERFACES(StreamerPlugin)
+    Q_INTERFACES(AlStreamerInterface)
 
 public:
-    QString echo(const QString &message) Q_DECL_OVERRIDE;
+    void initStreamer() Q_DECL_OVERRIDE;
+    void runStreamer() Q_DECL_OVERRIDE;
+    QObject* getConductor() Q_DECL_OVERRIDE;
 };
 
 #endif // STREAMERPLUGIN_H

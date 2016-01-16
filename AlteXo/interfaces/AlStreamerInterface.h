@@ -1,13 +1,17 @@
 #ifndef ALSTREAMERINTERFACE_H
 #define ALSTREAMERINTERFACE_H
-#include <QString>
+
+#include <QObject>
 
 //! [0]
 class AlStreamerInterface
 {
 public:
     virtual ~AlStreamerInterface() {}
-    virtual QString echo(const QString &message) = 0;
+
+    virtual void initStreamer() = 0;
+    virtual void runStreamer() = 0;
+    virtual QObject* getConductor() = 0;
 };
 
 

@@ -1,6 +1,16 @@
 #include "streamerplugin.h"
 
-QString StreamerPlugin::echo(const QString &message)
+void StreamerPlugin::initStreamer()
 {
-    return message;
+    qDebug() << "init streamer";
+}
+
+void StreamerPlugin::runStreamer()
+{
+    qDebug() << "run streamer";
+}
+
+QObject* StreamerPlugin::getConductor()
+{
+    return NULL;
 }

@@ -22,12 +22,13 @@ RCC_DIR = $${BUILD_DIRECTORY}
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 TARGET = al-live-streamer
-TEMPLATE = app
+#TEMPLATE = app
 #TEMPLATE = lib
 #CONFIG += staticlib
-#TEMPLATE = lib
-#CONFIG += plugin
+TEMPLATE = lib
+CONFIG += plugin
 
+#EXAMPLE_FILES = mymetadata.json
 
 DEFINES += POSIX
 DEFINES += LINUX
@@ -40,7 +41,7 @@ unix: CONFIG += link_pkgconfig
 
 include(../al-ext-libs.pri)
 
-INCLUDEPATH+=../AlteXo
+INCLUDEPATH+=../AlteXo/interfaces/
 
 QMAKE_CXXFLAGS += -fno-rtti
 
