@@ -56,7 +56,8 @@ SOURCES += main.cpp\
     alvideosurface.cpp \
     settingsdialog.cpp \
     extra/ofxKinectExtras.cpp \
-    alwsclient.cpp
+    alwsclient.cpp \
+    alsettingsdialog.cpp
 
 HEADERS  += mainwindow.h \
     alfreenectdevice.h \
@@ -69,8 +70,10 @@ HEADERS  += mainwindow.h \
     extra/ofxKinectExtras.h \
     interfaces/AlStreamerInterface.h \
     alwsclient.h \
-    extra/alstreamerconnector.h
+    extra/alstreamerconnector.h \
+    alsettingsdialog.h
 
 FORMS    += mainwindow.ui \
-    settingsdialog.ui
+    settingsdialog.ui \
+    alsettingsdialog.ui
 

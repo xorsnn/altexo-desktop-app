@@ -4,6 +4,7 @@
 #include <QDir>
 #include <QJsonDocument>
 #include "interfaces/AlStreamerInterface.h"
+#include "alsettingsdialog.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
@@ -56,7 +57,7 @@ void MainWindow::on_startRecorder_clicked()
 
 void MainWindow::on_actionSettings_triggered()
 {
-    SettingsDialog sDialog;
+    AlSettingsDialog sDialog;
     this->connect(&sDialog, SIGNAL(settingsChangedSignal()), this, SLOT(settingsChangedSlot()));
     sDialog.setModal(true);
     int ret = sDialog.exec();
