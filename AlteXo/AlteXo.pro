@@ -17,7 +17,7 @@ OBJECTS_DIR = $${BUILD_DIRECTORY}
 MOC_DIR = $${BUILD_DIRECTORY}
 RCC_DIR = $${BUILD_DIRECTORY}
 
-QT += core gui
+QT += core gui websockets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -56,7 +56,7 @@ SOURCES += main.cpp\
     alvideosurface.cpp \
     settingsdialog.cpp \
     extra/ofxKinectExtras.cpp \
-    broadcast/alsharedmemorybroadcaster.cpp
+    alwsclient.cpp
 
 HEADERS  += mainwindow.h \
     alfreenectdevice.h \
@@ -67,8 +67,9 @@ HEADERS  += mainwindow.h \
     alvideosurface.h \
     settingsdialog.h \
     extra/ofxKinectExtras.h \
-    broadcast/alsharedmemorybroadcaster.h \
-    interfaces/AlStreamerInterface.h
+    interfaces/AlStreamerInterface.h \
+    alwsclient.h \
+    extra/alstreamerconnector.h
 
 FORMS    += mainwindow.ui \
     settingsdialog.ui

@@ -26,6 +26,7 @@ Q_SIGNALS:
 private Q_SLOTS:
     void on_minDepthSpinBox_valueChanged(int arg1);
     void on_maxDepthSpinBox_valueChanged(int arg1);
+    void on_wsEdit_textChanged(const QString &arg1);
 };
 
 #endif // SETTINGSDIALOG_H

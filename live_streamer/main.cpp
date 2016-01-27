@@ -23,7 +23,7 @@ int main(int argc, char *argv[])
     AlStreamer streamer;
     streamer.initSlot(&qtApp);
     qDebug() << "test 1";
-    w.setConductor(streamer.getConductorSlot());
+//    w.setConductor(streamer.getConductorSlot());
     QObject::connect(&w, SIGNAL(signalStartButton_clicked()), streamer.getConductorSlot(), SLOT(StartAll()));
     QObject::connect(&w, SIGNAL(signalProcessAnswerButton_clicked(QString)), streamer.getConductorSlot(), SLOT(slotProcessAnswer(QString)));
     QObject::connect(&w, SIGNAL(signalProcessRemoteICEButton_clicked(QString)), streamer.getConductorSlot(), SLOT(slotProcessRemoteICE(QString)));

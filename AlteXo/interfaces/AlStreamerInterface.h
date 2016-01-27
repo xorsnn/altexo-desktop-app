@@ -2,6 +2,7 @@
 #define ALSTREAMERINTERFACE_H
 
 #include <QObject>
+#include <QApplication>
 
 //! [0]
 class AlStreamerInterface
@@ -9,7 +10,7 @@ class AlStreamerInterface
 public:
     virtual ~AlStreamerInterface() {}
 
-    virtual void initStreamer() = 0;
+    virtual void initStreamer(QApplication* app) = 0;
     virtual void runStreamer() = 0;
     virtual QObject* getConductor() = 0;
 };

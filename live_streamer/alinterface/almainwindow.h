@@ -32,7 +32,7 @@ private Q_SLOTS:
 private:
     Ui::AlMainWindow *ui;
 
-    rtc::scoped_refptr<AlConductor> conductor_;
+//    rtc::scoped_refptr<AlConductor> conductor_;
 
 Q_SIGNALS:
     void signalStartButton_clicked();

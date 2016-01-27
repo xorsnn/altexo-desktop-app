@@ -58,6 +58,8 @@ public Q_SLOTS:
     void slotProcessRemoteICE(QString iceStr);
     void slotSetNewFrame(const QImage &img);
 
+    void onJsonMsgSlot(QString msg);
+
 protected:
     rtc::scoped_refptr<webrtc::PeerConnectionInterface> peer_connection_;
     rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface> peer_connection_factory_;

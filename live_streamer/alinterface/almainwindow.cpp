@@ -3,7 +3,7 @@
 
 #include <QDebug>
 AlMainWindow::AlMainWindow(QWidget *parent) :
-    QMainWindow(parent), conductor_(NULL),
+    QMainWindow(parent),
     ui(new Ui::AlMainWindow)
 {
     ui->setupUi(this);
@@ -21,9 +21,9 @@ void AlMainWindow::on_StartButton_clicked()
     Q_EMIT this->signalStartButton_clicked();
 }
 
-void AlMainWindow::setConductor(rtc::scoped_refptr<AlConductor> conductor) {
-    this->conductor_ = conductor;
-}
+//void AlMainWindow::setConductor(rtc::scoped_refptr<AlConductor> conductor) {
+//    this->conductor_ = conductor;
+//}
 
 void AlMainWindow::slotSDPText(const QString &sdp) {
     qDebug() << "AlMainWindow::slotSDPText";

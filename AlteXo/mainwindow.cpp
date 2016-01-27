@@ -2,6 +2,7 @@
 #include "ui_mainwindow.h"
 #include <QPluginLoader>
 #include <QDir>
+#include <QJsonDocument>
 #include "interfaces/AlStreamerInterface.h"
 
 MainWindow::MainWindow(QWidget *parent) :
@@ -88,28 +89,51 @@ void MainWindow::settingsChangedSlot()
 void MainWindow::on_streamButton_clicked()
 {
     qDebug() << "stream";
-//    QDir pluginsDir(qApp->applicationDirPath());
-//#if defined(Q_OS_WIN)
-//    if (pluginsDir.dirName().toLower() == "debug" || pluginsDir.dirName().toLower() == "release")
-//        pluginsDir.cdUp();
-//#elif defined(Q_OS_MAC)
-//    if (pluginsDir.dirName() == "MacOS") {
-//        pluginsDir.cdUp();
-//        pluginsDir.cdUp();
-//        pluginsDir.cdUp();
-//    }
-//#endif
-//    pluginsDir.cd("plugins");
-//    foreach (QString fileName, pluginsDir.entryList(QDir::Files)) {
-        QPluginLoader pluginLoader("/home/xors/workspace/QT/al_build/streamer/build/libal-live-streamer.so");
-        QObject *plugin = pluginLoader.instance();
-        if (plugin) {
-            qDebug() << "yahoo!!! 1";
-            AlStreamerInterface* streamerInterface = qobject_cast<AlStreamerInterface *>(plugin);
-            if (streamerInterface) {
-                qDebug() << "yahoo!!! 2";
-                qDebug() << streamerInterface->echo("fuck!!!!");
-            }
-        }
-//    }
+//    Q_EMIT this->signalStartButton_clicked();
+}
+
+void MainWindow::on_StartButton_clicked()
+{
+    Q_EMIT this->signalStartButton_clicked();
+}
+
+void MainWindow::on_pProcessAnswerButton_clicked()
+{
+    Q_EMIT this->signalProcessAnswerButton_clicked(this->ui->pAnswerText->toPlainText());
+
+}
+
+void MainWindow::on_pProcessRemoteICEButton_clicked()
+{
+    Q_EMIT this->signalProcessRemoteICEButton_clicked(this->ui->pRemoteICEText->toPlainText());
+}
+
+void MainWindow::slotSDPText(const QString &sdp) {
+    qDebug() << "AlMainWindow::slotSDPText";
+    this->ui->pOfferText->setPlainText(sdp);
+}
+
+void MainWindow::slotOnLocalIceCandidate(const QString &iceCandidate)
+{
+    QString str = this->ui->pOwnICEText->toPlainText();
+    str += iceCandidate + "\n";
+    this->ui->pOwnICEText->setPlainText(str);
+}
+
+void MainWindow::onJsonMsgSlot(QString msg) {
+    qDebug() << "MainWindow::onJsonMsgSlot";
+    QJsonDocument doc = QJsonDocument::fromJson(msg.toUtf8());
+    QJsonObject jsonObj = doc.object();
+    if (jsonObj["type"].toString() == "SDP") {
+        this->ui->pAnswerText->setPlainText(jsonObj["body"].toString());
+        QTimer::singleShot(1000, this, SLOT(sendIceCandidatesSlot()));
+    } else if (jsonObj["type"].toString() == "ICE") {
+        this->ui->pRemoteICEText->setPlainText(jsonObj["body"].toString());
+        Q_EMIT this->readyToStreamSignal();
+    }
+}
+
+void MainWindow::sendIceCandidatesSlot() {
+    qDebug() << "MainWindow::sendIceCandidatesSlot";
+    Q_EMIT this->sendIceCandidatesSignal(this->ui->pOwnICEText->toPlainText());
 }

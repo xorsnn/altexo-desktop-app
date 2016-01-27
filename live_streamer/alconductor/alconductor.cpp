@@ -3,6 +3,8 @@
 #include "talk/app/webrtc/videosourceinterface.h"
 #include <string.h>
 #include <QImage>
+#include <QJsonDocument>
+#include <QJsonObject>
 
 using namespace std;
 
@@ -289,5 +291,19 @@ void AlConductor::OnSuccess(webrtc::SessionDescriptionInterface* desc) {
 
 void AlConductor::OnFailure(const std::string& error) {
     qDebug() << "AlConductor::OnFailure";
+}
 
+void AlConductor::onJsonMsgSlot(QString msg)
+{
+    QJsonDocument doc = QJsonDocument::fromJson(msg.toUtf8());
+    QJsonObject jsonObj = doc.object();
+    if (jsonObj["type"].toString() == "SDP") {
+        this->slotProcessAnswer(jsonObj["body"].toString());
+    } else if (jsonObj["type"].toString() == "ICE") {
+        this->slotProcessRemoteICE(jsonObj["body"].toString());
+    }
+
+//    qDebug() << "<<<<<<<<<<";
+//    qDebug() << doc.object().keys();
+//    qDebug() << ">>>>>>>>>>";
 }

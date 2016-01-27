@@ -29,11 +29,24 @@ public Q_SLOTS:
     void requestNewFrameSlot();
     void settingsChangedSlot();
 
+//streamer
+    void slotSDPText(const QString &sdp);
+    void slotOnLocalIceCandidate(const QString &iceCandidate);
+
+    void onJsonMsgSlot(QString msg);
+    void sendIceCandidatesSlot();
+
 private Q_SLOTS:
     void on_startRecorder_clicked();
     void on_actionSettings_triggered();
 
     void on_streamButton_clicked();
+
+    void on_StartButton_clicked();
+
+    void on_pProcessAnswerButton_clicked();
+
+    void on_pProcessRemoteICEButton_clicked();
 
 private:
     Ui::MainWindow *ui;
@@ -46,6 +59,17 @@ Q_SIGNALS:
     void stopRecorderSignal();
 
     void requestNewFrameSignal();
+
+//======================
+//==============streamer
+//======================
+    void signalStartButton_clicked();
+    void signalProcessAnswerButton_clicked(QString msg);
+    void signalProcessRemoteICEButton_clicked(QString msg);
+
+    void sendIceCandidatesSignal(QString msg);
+
+    void readyToStreamSignal();
 };
 
 #endif // MAINWINDOW_H
