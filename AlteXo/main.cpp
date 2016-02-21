@@ -57,9 +57,14 @@ int main(int argc, char *argv[])
 
 
 
+    // TODO sometimes open settins just doesn't work
+    SettingsDialog sDialog;
+    sDialog.setModal(true);
+    int ret = sDialog.exec();
 //==================
 //==========streamer
 //==================
+
     AlStreamerConnector connector;
     QPluginLoader pluginLoader("/home/xors/workspace/QT/al_build/streamer/build/libal-live-streamer.so");
     QObject *plugin = pluginLoader.instance();

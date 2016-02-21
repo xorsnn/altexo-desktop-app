@@ -17,6 +17,7 @@ AlWsClient::AlWsClient(bool debug, QObject *parent) :
     if (m_debug)
         qDebug() << "WebSocket server:" << wsLink;
     m_webSocket.open(QUrl(wsLink));
+
 }
 
 void AlWsClient::onConnected()
@@ -25,6 +26,14 @@ void AlWsClient::onConnected()
         qDebug() << "WebSocket connected";
     connect(&m_webSocket, &QWebSocket::textMessageReceived,
             this, &AlWsClient::onTextMessageReceived);
+
+    QSettings settings;
+    QString room = settings.value("altexo/alRoom", "altexo-chat").toString();
+    QJsonObject obj;
+    obj["room"] = room;
+    obj["msg_to"] = "server";
+    QJsonDocument doc(obj);
+    this->sendTextMessageSlot(doc.toJson());
 }
 
 void AlWsClient::onTextMessageReceived(QString message)
@@ -50,18 +59,22 @@ void AlWsClient::closeSlot()
 
 void AlWsClient::sendSdpSlot(QString message)
 {
+    QSettings settings;
+    QString room = settings.value("altexo/alRoom", "altexo-chat").toString();
     QJsonObject obj;
+    obj["room"] = room;
     obj["type"] = "SDP";
     obj["body"] = message;
     QJsonDocument doc(obj);
-
     this->sendTextMessageSlot(doc.toJson());
 }
 
 void AlWsClient::sendIceCandidatesSlot(QString msg)
 {
-    qDebug() << "QQQQQQQQQQQQQQQQQQQQQQQQQQ~~~~~~~~~~~~~~";
+    QSettings settings;
+    QString room = settings.value("altexo/alRoom", "altexo-chat").toString();
     QJsonObject obj;
+    obj["room"] = room;
     obj["type"] = "ICE";
     obj["body"] = msg;
     QJsonDocument doc(obj);

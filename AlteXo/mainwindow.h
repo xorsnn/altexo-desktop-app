@@ -48,6 +48,8 @@ private Q_SLOTS:
 
     void on_pProcessRemoteICEButton_clicked();
 
+    void on_roomEdit_textChanged(const QString &arg1);
+
 private:
     Ui::MainWindow *ui;
     ALVideoSurface * videoSurface;

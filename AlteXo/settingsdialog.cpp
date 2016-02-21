@@ -8,14 +8,14 @@ SettingsDialog::SettingsDialog(QWidget *parent) :
     qDebug() << "set 1";
     ui->setupUi(this);
     qDebug() << "set 2";
-//    QSettings settings;
-//    int minDepth = settings.value("altexo/minDepth", 555).toInt();
-//    int maxDepth = settings.value("altexo/maxDepth", 1005).toInt();
-//    QString wsLink = settings.value("altexo/wsLink", "ws://altexo.com:8889/ws").toString();
+    QSettings settings;
+    int minDepth = settings.value("altexo/minDepth", 555).toInt();
+    int maxDepth = settings.value("altexo/maxDepth", 1005).toInt();
+    QString wsLink = settings.value("altexo/wsLink", "ws://altexo.com:8889/ws").toString();
 
-//    ui->minDepthSpinBox->setValue(minDepth);
-//    ui->maxDepthSpinBox->setValue(maxDepth);
-//    ui->wsEdit->setText(wsLink);
+    ui->minDepthSpinBox->setValue(minDepth);
+    ui->maxDepthSpinBox->setValue(maxDepth);
+    ui->wsEdit->setText(wsLink);
 }
 
 SettingsDialog::~SettingsDialog()

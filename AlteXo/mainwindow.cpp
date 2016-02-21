@@ -4,13 +4,17 @@
 #include <QDir>
 #include <QJsonDocument>
 #include "interfaces/AlStreamerInterface.h"
-#include "alsettingsdialog.h"
 
 MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
     ui->setupUi(this);
+
+    QSettings settings;
+    QString room = settings.value("altexo/alRoom", "altexo-chat").toString();
+    this->ui->roomEdit->setText(room);
+
 //    connect(this, SIGNAL(addMaxDepthSignal(int)), ui->alGLWidget->getALKinectInterface(), SLOT(changeMaxDepth(int)));
 //    connect(this, SIGNAL(substractMaxDepthSignal(int)), ui->alGLWidget->getALKinectInterface(), SLOT(changeMaxDepth(int)));
 
@@ -57,7 +61,7 @@ void MainWindow::on_startRecorder_clicked()
 
 void MainWindow::on_actionSettings_triggered()
 {
-    AlSettingsDialog sDialog;
+    SettingsDialog sDialog;
     this->connect(&sDialog, SIGNAL(settingsChangedSignal()), this, SLOT(settingsChangedSlot()));
     sDialog.setModal(true);
     int ret = sDialog.exec();
@@ -90,7 +94,7 @@ void MainWindow::settingsChangedSlot()
 void MainWindow::on_streamButton_clicked()
 {
     qDebug() << "stream";
-//    Q_EMIT this->signalStartButton_clicked();
+    Q_EMIT this->signalStartButton_clicked();
 }
 
 void MainWindow::on_StartButton_clicked()
@@ -137,4 +141,10 @@ void MainWindow::onJsonMsgSlot(QString msg) {
 void MainWindow::sendIceCandidatesSlot() {
     qDebug() << "MainWindow::sendIceCandidatesSlot";
     Q_EMIT this->sendIceCandidatesSignal(this->ui->pOwnICEText->toPlainText());
+}
+
+void MainWindow::on_roomEdit_textChanged(const QString &arg1)
+{
+    QSettings settings;
+    settings.setValue("altexo/alRoom", arg1);
 }

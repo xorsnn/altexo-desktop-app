@@ -5,6 +5,8 @@
 #include <QImage>
 #include <QJsonDocument>
 #include <QJsonObject>
+#include <QBuffer>
+#include <QByteArray>
 
 using namespace std;
 
@@ -138,10 +140,11 @@ void AlConductor::slotProcessRemoteICE(QString iceStr) {
 }
 
 void AlConductor::slotSetNewFrame(const QImage &img) {
-//    qDebug() << "ping";
-//    img.save("res.png", "PNG");
-    int width = img.width();
-    int height = img.height();
+    // kind of bottleneck, need to take a look later
+    QImage image = img.scaled(640,240);
+
+    int width = image.width();
+    int height = image.height();
 
     if (width <= 0 || height <= 0)
         return;
@@ -151,23 +154,8 @@ void AlConductor::slotSetNewFrame(const QImage &img) {
     int numBytes = width*height*4;
     uint8_t *pData = new uint8_t[numBytes];
 
-    for (int y = 0 ; y < height ; y++)
-    {
-        for (int x = 0 ; x < width ; x++)
-        {
-            QRgb pixel = img.pixel(x,y);
-
-            int offset = (x+y*width)*4;
-            pData[offset+3] = qAlpha(pixel);
-            pData[offset+2] = qBlue(pixel);
-            pData[offset+1] = qGreen(pixel);
-            pData[offset+0] = qRed(pixel);
-        }
-    }
+    memcpy(pData, image.convertToFormat(QImage::Format_RGBA8888).bits(), numBytes);
     this->videoCapturer_->setImageData(pData, numBytes, width, height);
-
-
-//    m_pCapturer->setImageData(pData, numBytes, width, height);
 }
 
 void AlConductor::StartAll() {
