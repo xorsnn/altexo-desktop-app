@@ -12,10 +12,6 @@
 
 #include "talk/app/webrtc/mediastreaminterface.h"
 #include "talk/app/webrtc/peerconnectioninterface.h"
-//#include "webrtc/examples/peerconnection/client/main_wnd.h"
-//#include "conductor/mainwndcallback.h"
-//#include "webrtc/examples/peerconnection/client/peer_connection_client.h"
-//#include "conductor/peerconnectionclient.h"
 #include "webrtc/base/scoped_ptr.h"
 
 #include "alconductor/alvideocapturer.h"
@@ -23,9 +19,6 @@
 class AlConductor : public QObject,
         public webrtc::PeerConnectionObserver,
         public webrtc::CreateSessionDescriptionObserver
-
-        //        public PeerConnectionClientObserver,
-        //        public MainWndCallback
 {
     Q_OBJECT
 public:
@@ -56,6 +49,7 @@ public Q_SLOTS:
     void addStreams();
     void slotProcessAnswer(QString sdpInfo);
     void slotProcessRemoteICE(QString iceStr);
+    void slotProcessRemoteICELine(QString iceLine);
     void slotSetNewFrame(const QImage &img);
 
     void onJsonMsgSlot(QString msg);

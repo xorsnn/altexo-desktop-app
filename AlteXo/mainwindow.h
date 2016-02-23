@@ -50,6 +50,8 @@ private Q_SLOTS:
 
     void on_roomEdit_textChanged(const QString &arg1);
 
+    void readyToStreamSlot();
+
 private:
     Ui::MainWindow *ui;
     ALVideoSurface * videoSurface;
@@ -70,6 +72,8 @@ Q_SIGNALS:
     void signalProcessRemoteICEButton_clicked(QString msg);
 
     void sendIceCandidatesSignal(QString msg);
+
+    void sendTextMessageSignal(QString msg);
 
     void readyToStreamSignal();
 };

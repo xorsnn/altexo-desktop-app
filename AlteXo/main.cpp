@@ -81,13 +81,19 @@ int main(int argc, char *argv[])
             QObject::connect(streamerInterface->getConductor(), SIGNAL(signalSDPText(QString)), &w, SLOT(slotSDPText(QString)));
             QObject::connect(streamerInterface->getConductor(), SIGNAL(signalOnLocalIceCandidate(QString)), &w, SLOT(slotOnLocalIceCandidate(QString)));
 
+
+
             //socket
             QObject::connect(streamerInterface->getConductor(), SIGNAL(signalSDPText(QString)), &client, SLOT(sendSdpSlot(QString)));
             QObject::connect(&w, SIGNAL(sendIceCandidatesSignal(QString)), &client, SLOT(sendIceCandidatesSlot(QString)));
+            QObject::connect(&w, SIGNAL(sendTextMessageSignal(QString)), &client, SLOT(sendTextMessageSlot(QString)));
+
 
             QObject::connect(&client, SIGNAL(onTextMessageReceivedSignal(QString)), streamerInterface->getConductor(), SLOT(onJsonMsgSlot(QString)));
 
             QObject::connect(&client, SIGNAL(onTextMessageReceivedSignal(QString)), &w, SLOT(onJsonMsgSlot(QString)));
+
+
 
 //            QObject::connect(kinectInterface, SIGNAL(newWFrameSignal(QImage)), streamerInterface->getConductor(), SLOT(slotSetNewFrame(QImage)));
             connector.setStreamignObj(kinectInterface);

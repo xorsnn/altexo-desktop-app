@@ -81,17 +81,24 @@ void AlConductor::slotProcessAnswer(QString sdpInfo) {
     this->peer_connection_->SetRemoteDescription(DummySetSessionDescriptionObserver::Create(), pSessionDescription);
 }
 
-void AlConductor::slotProcessRemoteICE(QString iceStr) {
-    QStringList iceInfo = iceStr.split('\n');
+void AlConductor::slotProcessRemoteICELine(QString iceLine) {
+    qDebug() << "slotProcessRemoteICELine()";
+    qDebug() << iceLine;
+    QJsonDocument doc = QJsonDocument::fromJson(iceLine.toUtf8());
+    QJsonObject jsonObj = doc.object();
 
-    for (int i = 0 ; i < iceInfo.size() ; i++)
-    {
-        QString iceLine = iceInfo.at(i);
+//    QStringList iceInfo = iceStr.split('\n');
+
+//    for (int i = 0 ; i < iceInfo.size() ; i++)
+//    {
+//        QString iceLine = iceInfo.at(i);
 
         //cerr << iceLine.toStdString() << endl;
 
         QStringList parts = iceLine.split(',');
         QStringList remainingParts;
+        qDebug() << "PARTS";
+        qDebug() << parts.size();
         for (int j = 0 ; j < parts.size() ; j++)
         {
             QString part = parts.at(j);
@@ -106,16 +113,21 @@ void AlConductor::slotProcessRemoteICE(QString iceStr) {
             }
         }
 
-        if (remainingParts.size() == 3)
+//        TODO 3 normaly 5 for curento
+        if (remainingParts.size() == 5)
         {
-            int sdpMLineIndex = atoi(remainingParts.at(0).toLatin1());
-            string sdpMid = remainingParts.at(1).toStdString();
-            QString candidate = remainingParts.at(2);
+//            int sdpMLineIndex = atoi(remainingParts.at(3).toLatin1());
+//            string sdpMid = remainingParts.at(4).toStdString();
+//            QString candidate = remainingParts.at(2);
+            int sdpMLineIndex = jsonObj["sdpMLineIndex"].toInt();
+            string sdpMid = jsonObj["sdpMid"].toString().toStdString();
+            QString candidate = jsonObj["candidate"].toString();
 
             webrtc::SdpParseError error;
 
             candidate.replace(QString("\\r\\n"),QString(""));
 
+            qDebug() << "OOOOOOO";
             qDebug() << "ICE: " << QString(sdpMLineIndex) << " " <<  QString::fromUtf8(sdpMid.c_str()) << " " << candidate;
 
             rtc::scoped_ptr<webrtc::IceCandidateInterface> c(
@@ -136,10 +148,71 @@ void AlConductor::slotProcessRemoteICE(QString iceStr) {
                 }
             }
         }
+//    }
+}
+
+void AlConductor::slotProcessRemoteICE(QString iceStr) {
+    qDebug() << "slotProcessRemoteICE()";
+    QStringList iceInfo = iceStr.split('\n');
+
+    for (int i = 0 ; i < iceInfo.size() ; i++)
+    {
+        this->slotProcessRemoteICELine(iceInfo.at(i));
+//        QString iceLine = iceInfo.at(i);
+
+//        //cerr << iceLine.toStdString() << endl;
+
+//        QStringList parts = iceLine.split(',');
+//        QStringList remainingParts;
+//        for (int j = 0 ; j < parts.size() ; j++)
+//        {
+//            QString part = parts.at(j);
+//            qDebug() << part;
+
+//            QStringList values = part.split('"', QString::SkipEmptyParts);
+
+//            if (values.size() > 2)
+//            {
+//                remainingParts << values.at(2);
+//                //cerr << values.at(0).toStdString() << " " << values.at(2).toStdString() << endl;
+//            }
+//        }
+
+//        if (remainingParts.size() == 3)
+//        {
+//            int sdpMLineIndex = atoi(remainingParts.at(0).toLatin1());
+//            string sdpMid = remainingParts.at(1).toStdString();
+//            QString candidate = remainingParts.at(2);
+
+//            webrtc::SdpParseError error;
+
+//            candidate.replace(QString("\\r\\n"),QString(""));
+
+//            qDebug() << "ICE: " << QString(sdpMLineIndex) << " " <<  QString::fromUtf8(sdpMid.c_str()) << " " << candidate;
+
+//            rtc::scoped_ptr<webrtc::IceCandidateInterface> c(
+//                        webrtc::CreateIceCandidate(sdpMid, sdpMLineIndex, candidate.toStdString(), NULL));
+
+//            if (!c.get())
+//            {
+//                qDebug() << "Can't parse candidate message";
+//            }
+//            else
+//            {
+//                if (!this->peer_connection_->AddIceCandidate(c.get()))
+//                {
+//                    qDebug() << "Failed to apply the received candidate";
+//                }
+//                else {
+//                    qDebug() << "YAHOOOO!!!!!";
+//                }
+//            }
+//        }
     }
 }
 
 void AlConductor::slotSetNewFrame(const QImage &img) {
+//    qDebug() << "aaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaaa";
     // kind of bottleneck, need to take a look later
     QImage image = img.scaled(640,240);
 
@@ -283,12 +356,25 @@ void AlConductor::OnFailure(const std::string& error) {
 
 void AlConductor::onJsonMsgSlot(QString msg)
 {
+
+//    TODO copy processing from main window
     QJsonDocument doc = QJsonDocument::fromJson(msg.toUtf8());
     QJsonObject jsonObj = doc.object();
     if (jsonObj["type"].toString() == "SDP") {
         this->slotProcessAnswer(jsonObj["body"].toString());
     } else if (jsonObj["type"].toString() == "ICE") {
         this->slotProcessRemoteICE(jsonObj["body"].toString());
+    } else if (jsonObj["id"].toString() == "iceCandidate") {
+        QJsonDocument doc(jsonObj["candidate"].toObject());
+        this->slotProcessRemoteICELine(doc.toJson());
+//        QString str = this->ui->pRemoteICEText->toPlainText();
+//        str += doc.toJson();
+//        this->ui->pRemoteICEText->setPlainText(str);
+    } else if (jsonObj["id"].toString() == "presenterResponse") {
+        this->slotProcessAnswer(jsonObj["sdpAnswer"].toString());
+//        this->ui->pAnswerText->setPlainText(jsonObj["sdpAnswer"].toString());
+//        Q_EMIT this->readyToStreamSignal();
+//        QTimer::singleShot(2000, this, SLOT(readyToStreamSlot()));
     }
 
 //    qDebug() << "<<<<<<<<<<";

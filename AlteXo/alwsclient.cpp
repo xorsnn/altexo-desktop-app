@@ -33,7 +33,8 @@ void AlWsClient::onConnected()
     obj["room"] = room;
     obj["msg_to"] = "server";
     QJsonDocument doc(obj);
-    this->sendTextMessageSlot(doc.toJson());
+    //TODO "one to many"
+//    this->sendTextMessageSlot(doc.toJson());
 }
 
 void AlWsClient::onTextMessageReceived(QString message)
@@ -62,11 +63,16 @@ void AlWsClient::sendSdpSlot(QString message)
     QSettings settings;
     QString room = settings.value("altexo/alRoom", "altexo-chat").toString();
     QJsonObject obj;
-    obj["room"] = room;
-    obj["type"] = "SDP";
-    obj["body"] = message;
+//    TODO one to many
+
+//    obj["room"] = room;
+//    obj["type"] = "SDP";
+//    obj["body"] = message;
+    obj["id"] = "presenter";
+    obj["sdpOffer"] = message;
     QJsonDocument doc(obj);
     this->sendTextMessageSlot(doc.toJson());
+//    this->sendTextMessageSlot(message);
 }
 
 void AlWsClient::sendIceCandidatesSlot(QString msg)
@@ -78,5 +84,7 @@ void AlWsClient::sendIceCandidatesSlot(QString msg)
     obj["type"] = "ICE";
     obj["body"] = msg;
     QJsonDocument doc(obj);
-    this->sendTextMessageSlot(doc.toJson());
+//    TODO one to many
+//    this->sendTextMessageSlot(doc.toJson());
+    this->sendTextMessageSlot(msg);
 }
