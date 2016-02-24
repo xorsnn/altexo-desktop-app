@@ -12,6 +12,7 @@ public:
     virtual void initStreamer(QApplication* app) = 0;
     virtual void runStreamer() = 0;
     virtual QObject* getConductor() = 0;
+
 };
 
 

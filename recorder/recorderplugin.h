@@ -6,8 +6,15 @@
 
 class RecorderPlugin : public AlRecorder, AlRecorderInterface
 {
+    Q_OBJECT
+    Q_PLUGIN_METADATA(IID "org.altexo.AlRecorderInterface")
+    Q_INTERFACES(AlRecorderInterface)
+
 public:
-    RecorderPlugin();
+    void init(QApplication* app) Q_DECL_OVERRIDE;
+    void run() Q_DECL_OVERRIDE;
+    QObject* getObj() Q_DECL_OVERRIDE;
+    QObject* getAppSrcRef() Q_DECL_OVERRIDE;
 };
 
 #endif // RECORDERPLUGIN_H

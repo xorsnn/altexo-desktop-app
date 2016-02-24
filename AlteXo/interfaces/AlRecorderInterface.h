@@ -9,9 +9,10 @@ class AlRecorderInterface
 public:
     virtual ~AlRecorderInterface() {}
 
-    virtual void initStreamer(QApplication* app) = 0;
-    virtual void runStreamer() = 0;
-    virtual QObject* getConductor() = 0;
+    virtual void init(QApplication* app) = 0;
+    virtual void run() = 0;
+    virtual QObject* getObj() = 0;
+    virtual QObject* getAppSrcRef() = 0;
 };
 
 

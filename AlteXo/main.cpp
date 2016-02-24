@@ -1,6 +1,7 @@
 #include "mainwindow.h"
 #include "alkinectinterface.h"
 //#include "alrecorder.h"
+
 #include <QApplication>
 #include <QThread>
 #include <QGst/Init>
@@ -8,6 +9,7 @@
 #include <QTimer>
 #include <QDebug>
 #include <QPluginLoader>
+#include "interfaces/AlRecorderInterface.h"
 #include "interfaces/AlStreamerInterface.h"
 #include "alwsclient.h"
 #include "extra/alstreamerconnector.h"
@@ -25,9 +27,6 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
 
-//    TODO curent recorder
-//    ALRecorder* alRecorder = new ALRecorder();
-
     //kinect interface
     ALKinectInterface * kinectInterface = new ALKinectInterface();
     QThread* kinectThread = new QThread();
@@ -36,10 +35,7 @@ int main(int argc, char *argv[])
     QTimer::singleShot(0, kinectInterface, SLOT(init()));
     //~kinect interface
 
-//    TODO curent recorder
-//    QObject::connect(alRecorder->getAppSrcRef(), SIGNAL(needDataSignal()), kinectInterface, SLOT(needDataSlot()));
-//    QObject::connect(kinectInterface, SIGNAL(newFrameSignal(QImage)), alRecorder->getAppSrcRef(), SLOT(newFrameSlot(QImage)));
-//    ~
+
     //main win
 //    QObject::connect(kinectInterface, SIGNAL(newFrameSignal(QImage)), w.getVideoSurfaceRef(), SLOT(newFrameSlot(QImage)));
 
@@ -47,12 +43,6 @@ int main(int argc, char *argv[])
     QObject::connect(&w, SIGNAL(requestNewFrameSignal()), kinectInterface, SLOT(needWDataSlot()));
 
     //broadcaster
-
-    //    TODO curent recorder
-//    QObject::connect(&w, SIGNAL(startRecorderSignal()), alRecorder, SLOT(startSlot()));
-//    QObject::connect(&w, SIGNAL(stopRecorderSignal()), alRecorder, SLOT(stopSlot()));
-//    ~
-
     QObject::connect(&w, SIGNAL(settingsChangedSignal()), kinectInterface, SLOT(updateSettingsSlot()));
 
 //==================
@@ -62,23 +52,48 @@ int main(int argc, char *argv[])
 //    QObject::connect(&w, SIGNAL(sendTextMsgSignal(QString)), &client, SLOT(sendTextMessageSlot(QString)));
 
 
+    // **
+    // * RECORDER
+    // *
+
+    QPluginLoader pluginLoader("/home/xors/workspace/QT/al_build/recorder/build/librecorder.so");
+    QObject *plugin = pluginLoader.instance();
+    if (plugin) {
+        qDebug() << "recorder loaded";
+        AlRecorderInterface* recorderInterface = qobject_cast<AlRecorderInterface *>(plugin);
+        if (recorderInterface) {
+            qDebug() << "1";
+            QObject* alRecorder = recorderInterface->getObj();
+            qDebug() << "2";
+
+            QObject::connect(recorderInterface->getAppSrcRef(), SIGNAL(needDataSignal()), kinectInterface, SLOT(needDataSlot()));
+            QObject::connect(kinectInterface, SIGNAL(newFrameSignal(QImage)), recorderInterface->getAppSrcRef(), SLOT(newFrameSlot(QImage)));
+            qDebug() << "3";
+            QObject::connect(&w, SIGNAL(startRecorderSignal()), alRecorder, SLOT(startSlot()));
+            QObject::connect(&w, SIGNAL(stopRecorderSignal()), alRecorder, SLOT(stopSlot()));
+            qDebug() << "recorder initiated";
+        }
+    }
+    //    ~
+
 
     // TODO sometimes open settins just doesn't work
     SettingsDialog sDialog;
     sDialog.setModal(true);
     int ret = sDialog.exec();
-//==================
-//==========streamer
-//==================
+
+    // **
+    // * streamer
+    // *
 
     AlStreamerConnector connector;
-    QPluginLoader pluginLoader("/home/xors/workspace/QT/al_build/streamer/build/libal-live-streamer.so");
-    QObject *plugin = pluginLoader.instance();
-    if (plugin) {
-        qDebug() << "yahoo!!! 1";
-        AlStreamerInterface* streamerInterface = qobject_cast<AlStreamerInterface *>(plugin);
+    QPluginLoader streamerPluginLoader("/home/xors/workspace/QT/al_build/streamer/build/libal-live-streamer.so");
+    QObject *streamerPlugin = streamerPluginLoader.instance();
+    if (streamerPlugin) {
+        qDebug() << "Streamer plugin loaded";
+        AlStreamerInterface* streamerInterface = qobject_cast<AlStreamerInterface *>(streamerPlugin);
         if (streamerInterface) {
-            qDebug() << "yahoo!!! 2";
+            qDebug() << "Streamer interface loaded";
             streamerInterface->initStreamer(&a);
 
             QObject::connect(&w, SIGNAL(signalStartButton_clicked()), streamerInterface->getConductor(), SLOT(StartAll()));
@@ -87,21 +102,14 @@ int main(int argc, char *argv[])
             QObject::connect(streamerInterface->getConductor(), SIGNAL(signalSDPText(QString)), &w, SLOT(slotSDPText(QString)));
             QObject::connect(streamerInterface->getConductor(), SIGNAL(signalOnLocalIceCandidate(QString)), &w, SLOT(slotOnLocalIceCandidate(QString)));
 
-
-
             //socket
             QObject::connect(streamerInterface->getConductor(), SIGNAL(signalSDPText(QString)), &client, SLOT(sendSdpSlot(QString)));
             QObject::connect(&w, SIGNAL(sendIceCandidatesSignal(QString)), &client, SLOT(sendIceCandidatesSlot(QString)));
             QObject::connect(&w, SIGNAL(sendTextMessageSignal(QString)), &client, SLOT(sendTextMessageSlot(QString)));
 
-
             QObject::connect(&client, SIGNAL(onTextMessageReceivedSignal(QString)), streamerInterface->getConductor(), SLOT(onJsonMsgSlot(QString)));
-
             QObject::connect(&client, SIGNAL(onTextMessageReceivedSignal(QString)), &w, SLOT(onJsonMsgSlot(QString)));
 
-
-
-//            QObject::connect(kinectInterface, SIGNAL(newWFrameSignal(QImage)), streamerInterface->getConductor(), SLOT(slotSetNewFrame(QImage)));
             connector.setStreamignObj(kinectInterface);
             connector.setConductor(streamerInterface->getConductor());
             QObject::connect(&w, SIGNAL(readyToStreamSignal()), &connector, SLOT(start()));

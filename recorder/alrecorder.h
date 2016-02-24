@@ -37,13 +37,7 @@ public Q_SLOTS:
     void startSlot();
     void stopSlot();
 
-//    void setMainWindow(MainWindow * mw) {
-////        this->m_src.setMainWindow(mw);
-////        QObject::connect(&this->m_src, SIGNAL(sigNeedData(uint,char*)), mw->getALGLWidget(), SLOT(needDataSlot(uint,char*)));
-////        QObject::connect(mw->getALGLWidget(), SIGNAL(pushDataSignal()), &this->m_src, SLOT(pushVideoBuffer()));
-//    }
-
-    ALVideoAppSrc * getAppSrcRef() {
+    ALVideoAppSrc * _getAppSrcRef() {
         return &(this->m_src);
     }
 
