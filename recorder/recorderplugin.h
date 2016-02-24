@@ -11,7 +11,7 @@ class RecorderPlugin : public AlRecorder, AlRecorderInterface
     Q_INTERFACES(AlRecorderInterface)
 
 public:
-    void init(QApplication* app) Q_DECL_OVERRIDE;
+    void init(int argc, char *argv[]) Q_DECL_OVERRIDE;
     void run() Q_DECL_OVERRIDE;
     QObject* getObj() Q_DECL_OVERRIDE;
     QObject* getAppSrcRef() Q_DECL_OVERRIDE;

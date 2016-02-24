@@ -1,10 +1,13 @@
 #include "recorderplugin.h"
 
-void RecorderPlugin::init(QApplication* app)
+void RecorderPlugin::init(int argc, char *argv[])
 {
     qDebug() << "init streamer";
-//    this->initSlot(app);
-//    qDebug() << "init streamer fin";
+    try {
+        QGst::init(&argc, &argv);
+    } catch (QGlib::Error err) {
+        qDebug() << err;
+    }
 }
 
 void RecorderPlugin::run()

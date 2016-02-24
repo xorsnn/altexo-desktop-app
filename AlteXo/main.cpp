@@ -1,11 +1,10 @@
 #include "mainwindow.h"
 #include "alkinectinterface.h"
-//#include "alrecorder.h"
 
 #include <QApplication>
 #include <QThread>
-#include <QGst/Init>
-#include <QGlib/Error>
+//#include <QGst/Init>
+//#include <QGlib/Error>
 #include <QTimer>
 #include <QDebug>
 #include <QPluginLoader>
@@ -17,12 +16,6 @@
 int main(int argc, char *argv[])
 {
     QApplication a(argc, argv);
-
-    try {
-        QGst::init(&argc, &argv);
-    } catch (QGlib::Error err) {
-        qDebug() << err;
-    }
 
     MainWindow w;
     w.show();
@@ -47,9 +40,7 @@ int main(int argc, char *argv[])
 
 //==================
     AlWsClient client(true);
-//    AlWsClient client(QUrl(QStringLiteral("ws://127.0.0.1:8889/ws")), true);
     QObject::connect(&client, &AlWsClient::closed, &a, &QApplication::quit);
-//    QObject::connect(&w, SIGNAL(sendTextMsgSignal(QString)), &client, SLOT(sendTextMessageSlot(QString)));
 
 
     // **
@@ -62,20 +53,17 @@ int main(int argc, char *argv[])
         qDebug() << "recorder loaded";
         AlRecorderInterface* recorderInterface = qobject_cast<AlRecorderInterface *>(plugin);
         if (recorderInterface) {
-            qDebug() << "1";
+            recorderInterface->init(argc, argv);
             QObject* alRecorder = recorderInterface->getObj();
-            qDebug() << "2";
 
             QObject::connect(recorderInterface->getAppSrcRef(), SIGNAL(needDataSignal()), kinectInterface, SLOT(needDataSlot()));
             QObject::connect(kinectInterface, SIGNAL(newFrameSignal(QImage)), recorderInterface->getAppSrcRef(), SLOT(newFrameSlot(QImage)));
-            qDebug() << "3";
+
             QObject::connect(&w, SIGNAL(startRecorderSignal()), alRecorder, SLOT(startSlot()));
             QObject::connect(&w, SIGNAL(stopRecorderSignal()), alRecorder, SLOT(stopSlot()));
             qDebug() << "recorder initiated";
         }
     }
-    //    ~
-
 
     // TODO sometimes open settins just doesn't work
     SettingsDialog sDialog;
@@ -117,8 +105,6 @@ int main(int argc, char *argv[])
             streamerInterface->runStreamer();
         }
     }
-
-
 
     return a.exec();
 
