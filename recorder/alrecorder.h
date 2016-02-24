@@ -2,10 +2,7 @@
 #define ALRECORDER_H
 
 #include <QObject>
-#include <QMessageBox>
 #include <QDir>
-#include <QDialog>
-#include <QApplication>
 #include <QDateTime>
 
 #include <QGlib/Error>
@@ -27,24 +24,24 @@
 # include <QX11Info>
 #endif
 
-#include "mainwindow.h"
+//#include "mainwindow.h"
 #include "alvideoappsrc.h"
 
-class ALRecorder : public QObject
+class AlRecorder : public QObject
 {
     Q_OBJECT
 public:
-    explicit ALRecorder(QObject *parent = 0);
+    explicit AlRecorder(QObject *parent = 0);
 
 public Q_SLOTS:
     void startSlot();
     void stopSlot();
 
-    void setMainWindow(MainWindow * mw) {
-//        this->m_src.setMainWindow(mw);
-//        QObject::connect(&this->m_src, SIGNAL(sigNeedData(uint,char*)), mw->getALGLWidget(), SLOT(needDataSlot(uint,char*)));
-//        QObject::connect(mw->getALGLWidget(), SIGNAL(pushDataSignal()), &this->m_src, SLOT(pushVideoBuffer()));
-    }
+//    void setMainWindow(MainWindow * mw) {
+////        this->m_src.setMainWindow(mw);
+////        QObject::connect(&this->m_src, SIGNAL(sigNeedData(uint,char*)), mw->getALGLWidget(), SLOT(needDataSlot(uint,char*)));
+////        QObject::connect(mw->getALGLWidget(), SIGNAL(pushDataSignal()), &this->m_src, SLOT(pushVideoBuffer()));
+//    }
 
     ALVideoAppSrc * getAppSrcRef() {
         return &(this->m_src);

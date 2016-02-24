@@ -51,25 +51,20 @@ SOURCES += main.cpp\
     alfreenectdevice.cpp \
     alkinectinterface.cpp \
     alcolor.cpp \
-    alrecorder.cpp \
-    alvideoappsrc.cpp \
     alvideosurface.cpp \
     settingsdialog.cpp \
-    extra/ofxKinectExtras.cpp \
     alwsclient.cpp
 
 HEADERS  += mainwindow.h \
     alfreenectdevice.h \
     alkinectinterface.h \
     alcolor.h \
-    alrecorder.h \
-    alvideoappsrc.h \
     alvideosurface.h \
     settingsdialog.h \
-    extra/ofxKinectExtras.h \
     interfaces/AlStreamerInterface.h \
     alwsclient.h \
-    extra/alstreamerconnector.h
+    extra/alstreamerconnector.h \
+    interfaces/AlRecorderInterface.h
 
 FORMS    += mainwindow.ui \
     settingsdialog.ui

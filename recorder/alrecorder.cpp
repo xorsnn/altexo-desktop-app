@@ -1,16 +1,16 @@
 #include "alrecorder.h"
 
-ALRecorder::ALRecorder(QObject *parent) :
+AlRecorder::AlRecorder(QObject *parent) :
     QObject(parent)
 {
     this->outputFilePath = QDir::currentPath() + QDir::separator() + "ouy.webm";
 }
 
-void ALRecorder::startSlot() {
+void AlRecorder::startSlot() {
     this->start();
 }
 
-void ALRecorder::stopSlot() {
+void AlRecorder::stopSlot() {
     qDebug() << "stop fired";
     if (this->m_pipeline) { //pipeline exists - destroy it
             //send an end-of-stream event to flush metadata and cause an EosMessage to be delivered
@@ -20,7 +20,7 @@ void ALRecorder::stopSlot() {
     }
 }
 
-QGst::BinPtr ALRecorder::createAudioSrcBin() {
+QGst::BinPtr AlRecorder::createAudioSrcBin() {
     QGst::BinPtr audioBin;
 
     try {
@@ -41,7 +41,7 @@ QGst::BinPtr ALRecorder::createAudioSrcBin() {
     return audioBin;
 }
 
-QGst::BinPtr ALRecorder::createVideoSrcBin() {
+QGst::BinPtr AlRecorder::createVideoSrcBin() {
     QGst::BinPtr videoBin;
     QString rawvideocaps = QString("video/x-raw,format=RGB,width=1280,height=480,framerate=25/1,pixel-aspect-ratio=1/1");
 
@@ -63,7 +63,7 @@ QGst::BinPtr ALRecorder::createVideoSrcBin() {
     return videoBin;
 }
 
-void ALRecorder::start() {
+void AlRecorder::start() {
     QDateTime now = QDateTime::currentDateTime();
 
     qDebug() << now.toString("yyyy_MM_dd-hh:mm:ss");
@@ -97,14 +97,14 @@ void ALRecorder::start() {
 
     //connect the bus
     m_pipeline->bus()->addSignalWatch();
-    QGlib::connect(m_pipeline->bus(), "message", this, &ALRecorder::onBusMessage);
+    QGlib::connect(m_pipeline->bus(), "message", this, &AlRecorder::onBusMessage);
 
     //go!
     m_pipeline->setState(QGst::StatePlaying);
     this->statusText = tr("Stop recording");
 }
 
-void ALRecorder::stop() {
+void AlRecorder::stop() {
     //stop recording
     m_pipeline->setState(QGst::StateNull);
 
@@ -114,7 +114,7 @@ void ALRecorder::stop() {
     this->statusText = tr("Start recording");
 }
 
-void ALRecorder::onBusMessage(const QGst::MessagePtr & message)
+void AlRecorder::onBusMessage(const QGst::MessagePtr & message)
 {
     switch (message->type()) {
     case QGst::MessageEos:

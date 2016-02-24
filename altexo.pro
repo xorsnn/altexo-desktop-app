@@ -1,6 +1,7 @@
 TEMPLATE      = subdirs
 SUBDIRS       = \
                 live_streamer \
-                AlteXo 
+                AlteXo \ 
+    recorder
 
 #AlteXo.depends = live_streamer

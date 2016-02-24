@@ -4,7 +4,6 @@
 #include <QObject>
 #include <QApplication>
 
-//! [0]
 class AlStreamerInterface
 {
 public:

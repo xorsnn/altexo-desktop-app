@@ -1,6 +1,6 @@
 #include "mainwindow.h"
 #include "alkinectinterface.h"
-#include "alrecorder.h"
+//#include "alrecorder.h"
 #include <QApplication>
 #include <QThread>
 #include <QGst/Init>
@@ -25,7 +25,8 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
 
-    ALRecorder* alRecorder = new ALRecorder();
+//    TODO curent recorder
+//    ALRecorder* alRecorder = new ALRecorder();
 
     //kinect interface
     ALKinectInterface * kinectInterface = new ALKinectInterface();
@@ -35,18 +36,23 @@ int main(int argc, char *argv[])
     QTimer::singleShot(0, kinectInterface, SLOT(init()));
     //~kinect interface
 
-    QObject::connect(alRecorder->getAppSrcRef(), SIGNAL(needDataSignal()), kinectInterface, SLOT(needDataSlot()));
-    QObject::connect(kinectInterface, SIGNAL(newFrameSignal(QImage)), alRecorder->getAppSrcRef(), SLOT(newFrameSlot(QImage)));
-
+//    TODO curent recorder
+//    QObject::connect(alRecorder->getAppSrcRef(), SIGNAL(needDataSignal()), kinectInterface, SLOT(needDataSlot()));
+//    QObject::connect(kinectInterface, SIGNAL(newFrameSignal(QImage)), alRecorder->getAppSrcRef(), SLOT(newFrameSlot(QImage)));
+//    ~
     //main win
 //    QObject::connect(kinectInterface, SIGNAL(newFrameSignal(QImage)), w.getVideoSurfaceRef(), SLOT(newFrameSlot(QImage)));
+
     QObject::connect(kinectInterface, SIGNAL(newWFrameSignal(QImage)), w.getVideoSurfaceRef(), SLOT(newFrameSlot(QImage)));
     QObject::connect(&w, SIGNAL(requestNewFrameSignal()), kinectInterface, SLOT(needWDataSlot()));
 
     //broadcaster
 
-    QObject::connect(&w, SIGNAL(startRecorderSignal()), alRecorder, SLOT(startSlot()));
-    QObject::connect(&w, SIGNAL(stopRecorderSignal()), alRecorder, SLOT(stopSlot()));
+    //    TODO curent recorder
+//    QObject::connect(&w, SIGNAL(startRecorderSignal()), alRecorder, SLOT(startSlot()));
+//    QObject::connect(&w, SIGNAL(stopRecorderSignal()), alRecorder, SLOT(stopSlot()));
+//    ~
+
     QObject::connect(&w, SIGNAL(settingsChangedSignal()), kinectInterface, SLOT(updateSettingsSlot()));
 
 //==================
