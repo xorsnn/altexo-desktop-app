@@ -46,12 +46,10 @@ INCLUDEPATH+=../AlteXo/interfaces/
 QMAKE_CXXFLAGS += -fno-rtti
 
 
-SOURCES += main.cpp \
+SOURCES += \
     defaults.cc \
-    alinterface/almainwindow.cpp \
     alconductor/alconductor.cpp \
     alconductor/alvideocapturer.cpp \
-    alinterface/widgetstreamer.cpp \
     alconductor/alvideocapturerthread.cpp \
     alstreamer.cpp \
     streamerplugin.cpp
@@ -59,14 +57,11 @@ SOURCES += main.cpp \
 HEADERS  += \
     defaults.h \
     flagdefs.h \
-    alinterface/almainwindow.h \
     alconductor/alconductor.h \
     alconductor/alvideocapturer.h \
-    alinterface/widgetstreamer.h \
     alconductor/alvideocapturerthread.h \
     customsocketserver.h \
     alstreamer.h \
     streamerplugin.h
 
-FORMS    += \
-    alinterface/almainwindow.ui
+FORMS    +=
