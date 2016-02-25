@@ -1,5 +1,6 @@
 #include "mainwindow.h"
-#include "alkinectinterface.h"
+//#include "alkinectinterface.h"
+
 
 #include <QApplication>
 #include <QThread>
@@ -10,6 +11,7 @@
 #include <QPluginLoader>
 #include "interfaces/AlRecorderInterface.h"
 #include "interfaces/AlStreamerInterface.h"
+#include "interfaces/AlSensorInterface.h"
 #include "alwsclient.h"
 #include "extra/alstreamerconnector.h"
 
@@ -20,25 +22,32 @@ int main(int argc, char *argv[])
     MainWindow w;
     w.show();
 
-    //kinect interface
-    ALKinectInterface * kinectInterface = new ALKinectInterface();
-    QThread* kinectThread = new QThread();
-    kinectInterface->moveToThread(kinectThread);
-    kinectThread->start();
-    QTimer::singleShot(0, kinectInterface, SLOT(init()));
-    //~kinect interface
+    // **
+    // * KINECT
+    // *
 
+    AlSensorInterface* sensorInterface = NULL;
+    QPluginLoader sensorPluginLoader("/home/xors/workspace/QT/al_build/source/build/libkinect_source.so");
+    QObject *sensorPlugin = sensorPluginLoader.instance();
+    if (sensorPlugin) {
+        qDebug() << "sensor loaded";
+        sensorInterface = qobject_cast<AlSensorInterface *>(sensorPlugin);
+        if (sensorInterface) {
+            qDebug() << "sensor inctanced";
+            sensorInterface->init(argc, argv);
+        }
+    }
 
-    //main win
-//    QObject::connect(kinectInterface, SIGNAL(newFrameSignal(QImage)), w.getVideoSurfaceRef(), SLOT(newFrameSlot(QImage)));
-
-    QObject::connect(kinectInterface, SIGNAL(newWFrameSignal(QImage)), w.getVideoSurfaceRef(), SLOT(newFrameSlot(QImage)));
-    QObject::connect(&w, SIGNAL(requestNewFrameSignal()), kinectInterface, SLOT(needWDataSlot()));
+    QObject::connect(sensorInterface->getObj(), SIGNAL(newWFrameSignal(QImage)), w.getVideoSurfaceRef(), SLOT(newFrameSlot(QImage)));
+    QObject::connect(&w, SIGNAL(requestNewFrameSignal()), sensorInterface->getObj(), SLOT(needWDataSlot()));
 
     //broadcaster
-    QObject::connect(&w, SIGNAL(settingsChangedSignal()), kinectInterface, SLOT(updateSettingsSlot()));
+    QObject::connect(&w, SIGNAL(settingsChangedSignal()), sensorInterface->getObj(), SLOT(updateSettingsSlot()));
 
-//==================
+    // **
+    // * WEBSOCKET CLIENT
+    // *
+
     AlWsClient client(true);
     QObject::connect(&client, &AlWsClient::closed, &a, &QApplication::quit);
 
@@ -47,17 +56,17 @@ int main(int argc, char *argv[])
     // * RECORDER
     // *
 
-    QPluginLoader pluginLoader("/home/xors/workspace/QT/al_build/recorder/build/librecorder.so");
-    QObject *plugin = pluginLoader.instance();
-    if (plugin) {
+    QPluginLoader recorderPluginLoader("/home/xors/workspace/QT/al_build/recorder/build/librecorder.so");
+    QObject *recorderPlugin = recorderPluginLoader.instance();
+    if (recorderPlugin) {
         qDebug() << "recorder loaded";
-        AlRecorderInterface* recorderInterface = qobject_cast<AlRecorderInterface *>(plugin);
+        AlRecorderInterface* recorderInterface = qobject_cast<AlRecorderInterface *>(recorderPlugin);
         if (recorderInterface) {
             recorderInterface->init(argc, argv);
             QObject* alRecorder = recorderInterface->getObj();
 
-            QObject::connect(recorderInterface->getAppSrcRef(), SIGNAL(needDataSignal()), kinectInterface, SLOT(needDataSlot()));
-            QObject::connect(kinectInterface, SIGNAL(newFrameSignal(QImage)), recorderInterface->getAppSrcRef(), SLOT(newFrameSlot(QImage)));
+            QObject::connect(recorderInterface->getAppSrcRef(), SIGNAL(needDataSignal()), sensorInterface->getObj(), SLOT(needDataSlot()));
+            QObject::connect(sensorInterface->getObj(), SIGNAL(newFrameSignal(QImage)), recorderInterface->getAppSrcRef(), SLOT(newFrameSlot(QImage)));
 
             QObject::connect(&w, SIGNAL(startRecorderSignal()), alRecorder, SLOT(startSlot()));
             QObject::connect(&w, SIGNAL(stopRecorderSignal()), alRecorder, SLOT(stopSlot()));
@@ -98,7 +107,7 @@ int main(int argc, char *argv[])
             QObject::connect(&client, SIGNAL(onTextMessageReceivedSignal(QString)), streamerInterface->getConductor(), SLOT(onJsonMsgSlot(QString)));
             QObject::connect(&client, SIGNAL(onTextMessageReceivedSignal(QString)), &w, SLOT(onJsonMsgSlot(QString)));
 
-            connector.setStreamignObj(kinectInterface);
+            connector.setStreamignObj(sensorInterface->getObj());
             connector.setConductor(streamerInterface->getConductor());
             QObject::connect(&w, SIGNAL(readyToStreamSignal()), &connector, SLOT(start()));
 

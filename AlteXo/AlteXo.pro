@@ -41,30 +41,20 @@ macx {
 }
 
 
-#INCLUDEPATH += ../live_streamer
-#LIBS += -L$$ROOT_DIRECTORY/streamer/build -lal-live-streamer
-
-
-
 SOURCES += main.cpp\
         mainwindow.cpp \
-    alfreenectdevice.cpp \
-    alkinectinterface.cpp \
-    alcolor.cpp \
     alvideosurface.cpp \
     settingsdialog.cpp \
     alwsclient.cpp
 
 HEADERS  += mainwindow.h \
-    alfreenectdevice.h \
-    alkinectinterface.h \
-    alcolor.h \
     alvideosurface.h \
     settingsdialog.h \
     interfaces/AlStreamerInterface.h \
     alwsclient.h \
     extra/alstreamerconnector.h \
-    interfaces/AlRecorderInterface.h
+    interfaces/AlRecorderInterface.h \
+    interfaces/AlSensorInterface.h
 
 FORMS    += mainwindow.ui \
     settingsdialog.ui
