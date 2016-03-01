@@ -9,6 +9,8 @@ MainWindow::MainWindow(QWidget *parent) :
     QMainWindow(parent),
     ui(new Ui::MainWindow)
 {
+
+    this->one2one = true;
     ui->setupUi(this);
 
     QSettings settings;
@@ -124,16 +126,14 @@ void MainWindow::slotOnLocalIceCandidate(const QString &iceCandidate)
     QString str = this->ui->pOwnICEText->toPlainText();
     str += iceCandidate + "\n";
     this->ui->pOwnICEText->setPlainText(str);
-
-
-    QJsonDocument docR = QJsonDocument::fromJson(iceCandidate.toUtf8());
-    QJsonObject obj;
-    obj["id"] = "onIceCandidate";
-    obj["candidate"] = docR.object();
-    QJsonDocument doc(obj);
-//    Q_EMIT this->sendTextMessageSignal(iceCandidate);
-
-    Q_EMIT this->sendTextMessageSignal(doc.toJson());
+    if (!this->one2one) {
+        QJsonDocument docR = QJsonDocument::fromJson(iceCandidate.toUtf8());
+        QJsonObject obj;
+        obj["id"] = "onIceCandidate";
+        obj["candidate"] = docR.object();
+        QJsonDocument doc(obj);
+        Q_EMIT this->sendTextMessageSignal(doc.toJson());
+    }
 }
 
 void MainWindow::onJsonMsgSlot(QString msg) {

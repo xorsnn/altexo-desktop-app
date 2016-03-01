@@ -4,8 +4,6 @@
 
 #include <QApplication>
 #include <QThread>
-//#include <QGst/Init>
-//#include <QGlib/Error>
 #include <QTimer>
 #include <QDebug>
 #include <QPluginLoader>
@@ -84,7 +82,7 @@ int main(int argc, char *argv[])
     // *
 
     AlStreamerConnector connector;
-    QPluginLoader streamerPluginLoader("/home/xors/workspace/QT/al_build/streamer/build/libal-live-streamer.so");
+    QPluginLoader streamerPluginLoader("/home/xors/workspace/QT/al_build/streamer/build/libal-one2one-streamer.so");
     QObject *streamerPlugin = streamerPluginLoader.instance();
     if (streamerPlugin) {
         qDebug() << "Streamer plugin loaded";

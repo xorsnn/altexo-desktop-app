@@ -56,6 +56,7 @@ private:
     Ui::MainWindow *ui;
     ALVideoSurface * videoSurface;
     QTimer *timer;
+    bool one2one;
 Q_SIGNALS:
     void settingsChangedSignal();
 

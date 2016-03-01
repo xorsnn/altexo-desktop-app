@@ -9,6 +9,7 @@ AlWsClient::AlWsClient(bool debug, QObject *parent) :
     QObject(parent),
     m_debug(debug)
 {
+    this->one2one = true;
     QSettings settings;
 
     connect(&m_webSocket, &QWebSocket::connected, this, &AlWsClient::onConnected);
@@ -27,14 +28,16 @@ void AlWsClient::onConnected()
     connect(&m_webSocket, &QWebSocket::textMessageReceived,
             this, &AlWsClient::onTextMessageReceived);
 
-    QSettings settings;
-    QString room = settings.value("altexo/alRoom", "altexo-chat").toString();
-    QJsonObject obj;
-    obj["room"] = room;
-    obj["msg_to"] = "server";
-    QJsonDocument doc(obj);
-    //TODO "one to many"
-//    this->sendTextMessageSlot(doc.toJson());
+    // one2one streaming
+    if (this->one2one) {
+        QSettings settings;
+        QString room = settings.value("altexo/alRoom", "altexo-chat").toString();
+        QJsonObject obj;
+        obj["room"] = room;
+        obj["msg_to"] = "server";
+        QJsonDocument doc(obj);
+        this->sendTextMessageSlot(doc.toJson());
+    }
 }
 
 void AlWsClient::onTextMessageReceived(QString message)
@@ -47,8 +50,11 @@ void AlWsClient::onTextMessageReceived(QString message)
 
 void AlWsClient::sendTextMessageSlot(QString message)
 {
-    if (m_debug)
-        qDebug() << "sending message";
+    if (m_debug) {
+        qDebug() << "1 sending message:";
+        qDebug() << message;
+        qDebug() << "===================";
+    }
 
     this->m_webSocket.sendTextMessage(message);
 }
@@ -60,16 +66,19 @@ void AlWsClient::closeSlot()
 
 void AlWsClient::sendSdpSlot(QString message)
 {
-    QSettings settings;
-    QString room = settings.value("altexo/alRoom", "altexo-chat").toString();
     QJsonObject obj;
-//    TODO one to many
 
-//    obj["room"] = room;
-//    obj["type"] = "SDP";
-//    obj["body"] = message;
-    obj["id"] = "presenter";
-    obj["sdpOffer"] = message;
+    if (this->one2one) {
+        QSettings settings;
+        QString room = settings.value("altexo/alRoom", "altexo-chat").toString();
+        obj["room"] = room;
+        obj["type"] = "SDP";
+        obj["body"] = message;
+    } else {
+        obj["id"] = "presenter";
+        obj["sdpOffer"] = message;
+    }
+
     QJsonDocument doc(obj);
     this->sendTextMessageSlot(doc.toJson());
 //    this->sendTextMessageSlot(message);
@@ -77,6 +86,8 @@ void AlWsClient::sendSdpSlot(QString message)
 
 void AlWsClient::sendIceCandidatesSlot(QString msg)
 {
+    qDebug() << "2 send";
+    qDebug() << msg;
     QSettings settings;
     QString room = settings.value("altexo/alRoom", "altexo-chat").toString();
     QJsonObject obj;
@@ -85,6 +96,9 @@ void AlWsClient::sendIceCandidatesSlot(QString msg)
     obj["body"] = msg;
     QJsonDocument doc(obj);
 //    TODO one to many
-//    this->sendTextMessageSlot(doc.toJson());
-    this->sendTextMessageSlot(msg);
+    if (this->one2one) {
+        this->sendTextMessageSlot(doc.toJson());
+    } else {
+        this->sendTextMessageSlot(msg);
+    }
 }
