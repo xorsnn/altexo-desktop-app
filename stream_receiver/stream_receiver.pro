@@ -4,7 +4,7 @@
 #
 #-------------------------------------------------
 
-QT       += core gui webkitwidgets network
+QT       += qml quick core-private gui-private
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
@@ -12,9 +12,18 @@ TARGET = stream_receiver
 TEMPLATE = app
 
 
-SOURCES += main.cpp\
-        dialog.cpp
+SOURCES += main.cpp \
+    alvideorenderer.cpp \
+    threadrenderer.cpp
 
-HEADERS  += dialog.h
+HEADERS  += \
+    alvideorenderer.h \
+    threadrenderer.h
 
-FORMS    += dialog.ui
+FORMS    +=
+
+DISTFILES += \
+    main.qml
+
+RESOURCES += \
+    mail.qrc
