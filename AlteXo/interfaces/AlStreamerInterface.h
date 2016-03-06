@@ -9,7 +9,7 @@ class AlStreamerInterface
 public:
     virtual ~AlStreamerInterface() {}
 
-    virtual void initStreamer(QApplication* app) = 0;
+    virtual void initStreamer(QGuiApplication* app) = 0;
     virtual void runStreamer() = 0;
     virtual QObject* getConductor() = 0;
 

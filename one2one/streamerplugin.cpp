@@ -1,7 +1,7 @@
 #include "streamerplugin.h"
 #include <QDebug>
 
-void StreamerPlugin::initStreamer(QApplication* app)
+void StreamerPlugin::initStreamer(QGuiApplication* app)
 {
     qDebug() << "init streamer";
     this->initSlot(app);

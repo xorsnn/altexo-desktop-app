@@ -44,17 +44,16 @@ macx {
 SOURCES += main.cpp\
         mainwindow.cpp \
     alvideosurface.cpp \
-    settingsdialog.cpp \
-    alwsclient.cpp
+    settingsdialog.cpp
 
 HEADERS  += mainwindow.h \
     alvideosurface.h \
     settingsdialog.h \
     interfaces/AlStreamerInterface.h \
-    alwsclient.h \
     extra/alstreamerconnector.h \
     interfaces/AlRecorderInterface.h \
-    interfaces/AlSensorInterface.h
+    interfaces/AlSensorInterface.h \
+    interfaces/AlWsInterface.h
 
 FORMS    += mainwindow.ui \
     settingsdialog.ui

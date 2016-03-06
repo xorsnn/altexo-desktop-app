@@ -37,7 +37,7 @@ public:
     QOffscreenSurface *surface;
     QOpenGLContext *context;
 
-public slots:
+public Q_SLOTS:
     void renderNext()
     {
         context->makeCurrent(surface);
@@ -65,7 +65,7 @@ public slots:
         m_renderFbo->bindDefault();
         qSwap(m_renderFbo, m_displayFbo);
 
-        emit textureReady(m_displayFbo->texture(), m_size);
+        Q_EMIT textureReady(m_displayFbo->texture(), m_size);
     }
 
     void shutDown()
@@ -85,7 +85,7 @@ public slots:
         moveToThread(QGuiApplication::instance()->thread());
     }
 
-signals:
+Q_SIGNALS:
     void textureReady(int id, const QSize &size);
 
 private:
@@ -120,11 +120,11 @@ public:
         delete m_texture;
     }
 
-signals:
+Q_SIGNALS:
     void textureInUse();
     void pendingNewTexture();
 
-public slots:
+public Q_SLOTS:
 
     // This function gets called on the FBO rendering thread and will store the
     // texture id and size and schedule an update on the window.
@@ -136,7 +136,7 @@ public slots:
 
         // We cannot call QQuickWindow::update directly here, as this is only allowed
         // from the rendering thread or GUI thread.
-        emit pendingNewTexture();
+        Q_EMIT pendingNewTexture();
     }
 
 
@@ -158,7 +158,7 @@ public slots:
 
             // This will notify the rendering thread that the texture is now being rendered
             // and it can start rendering to the other one.
-            emit textureInUse();
+            Q_EMIT textureInUse();
         }
     }
 

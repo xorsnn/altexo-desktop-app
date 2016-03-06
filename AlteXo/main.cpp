@@ -10,7 +10,7 @@
 #include "interfaces/AlRecorderInterface.h"
 #include "interfaces/AlStreamerInterface.h"
 #include "interfaces/AlSensorInterface.h"
-#include "alwsclient.h"
+#include "interfaces/AlWsInterface.h"
 #include "extra/alstreamerconnector.h"
 
 int main(int argc, char *argv[])
@@ -46,8 +46,20 @@ int main(int argc, char *argv[])
     // * WEBSOCKET CLIENT
     // *
 
-    AlWsClient client(true);
-    QObject::connect(&client, &AlWsClient::closed, &a, &QApplication::quit);
+    AlWsInterface* wsInterface = NULL;
+    QObject* client = NULL;
+    QPluginLoader wsPluginLoader("/home/xors/workspace/QT/al_build/streamer/build/libmsg-handler.so");
+    QObject *wsPlugin = wsPluginLoader.instance();
+    if (wsPlugin) {
+        qDebug() << "ws loaded";
+        wsInterface = qobject_cast<AlWsInterface *>(wsPlugin);
+        if (wsInterface) {
+            qDebug() << "ws inctanced";
+            wsInterface->init();
+            client = wsInterface->getObj();
+        }
+    }
+    QObject::connect(client, SIGNAL(closed()), &a, SLOT(quit()));
 
 
     // **
@@ -91,6 +103,9 @@ int main(int argc, char *argv[])
             qDebug() << "Streamer interface loaded";
             streamerInterface->initStreamer(&a);
 
+            //TODO tmp connect for now
+            QObject::connect(streamerInterface->getConductor(), SIGNAL(onInitSignal()), streamerInterface->getConductor(), SLOT(startInitialExchangeSlot()));
+
             QObject::connect(&w, SIGNAL(signalStartButton_clicked()), streamerInterface->getConductor(), SLOT(StartAll()));
             QObject::connect(&w, SIGNAL(signalProcessAnswerButton_clicked(QString)), streamerInterface->getConductor(), SLOT(slotProcessAnswer(QString)));
             QObject::connect(&w, SIGNAL(signalProcessRemoteICEButton_clicked(QString)), streamerInterface->getConductor(), SLOT(slotProcessRemoteICE(QString)));
@@ -98,12 +113,12 @@ int main(int argc, char *argv[])
             QObject::connect(streamerInterface->getConductor(), SIGNAL(signalOnLocalIceCandidate(QString)), &w, SLOT(slotOnLocalIceCandidate(QString)));
 
             //socket
-            QObject::connect(streamerInterface->getConductor(), SIGNAL(signalSDPText(QString)), &client, SLOT(sendSdpSlot(QString)));
-            QObject::connect(&w, SIGNAL(sendIceCandidatesSignal(QString)), &client, SLOT(sendIceCandidatesSlot(QString)));
-            QObject::connect(&w, SIGNAL(sendTextMessageSignal(QString)), &client, SLOT(sendTextMessageSlot(QString)));
+            QObject::connect(streamerInterface->getConductor(), SIGNAL(signalSDPText(QString)), client, SLOT(sendSdpSlot(QString)));
+            QObject::connect(&w, SIGNAL(sendIceCandidatesSignal(QString)), client, SLOT(sendIceCandidatesSlot(QString)));
+            QObject::connect(&w, SIGNAL(sendTextMessageSignal(QString)), client, SLOT(sendTextMessageSlot(QString)));
 
-            QObject::connect(&client, SIGNAL(onTextMessageReceivedSignal(QString)), streamerInterface->getConductor(), SLOT(onJsonMsgSlot(QString)));
-            QObject::connect(&client, SIGNAL(onTextMessageReceivedSignal(QString)), &w, SLOT(onJsonMsgSlot(QString)));
+            QObject::connect(client, SIGNAL(onTextMessageReceivedSignal(QString)), streamerInterface->getConductor(), SLOT(onJsonMsgSlot(QString)));
+            QObject::connect(client, SIGNAL(onTextMessageReceivedSignal(QString)), &w, SLOT(onJsonMsgSlot(QString)));
 
             connector.setStreamignObj(sensorInterface->getObj());
             connector.setConductor(streamerInterface->getConductor());

@@ -1,7 +1,7 @@
 #ifndef CUSTOMSOCKETSERVER_H
 #define CUSTOMSOCKETSERVER_H
 #include "webrtc/base/physicalsocketserver.h"
-#include "alconductor/alconductor.h"
+#include "conductor.h"
 #include <QGuiApplication>
 
 class CustomSocketServer : public rtc::PhysicalSocketServer {
@@ -10,7 +10,7 @@ public:
         : thread_(thread), qtApp_(qtApp), conductor_(NULL) {}
     virtual ~CustomSocketServer() {}
 
-    void set_conductor(rtc::scoped_refptr<AlConductor> conductor) { conductor_ = conductor; }
+    void set_conductor(rtc::scoped_refptr<Conductor> conductor) { conductor_ = conductor; }
 
     // Override so that we can also pump the GTK message loop.
     virtual bool Wait(int cms, bool process_io) {
@@ -29,14 +29,14 @@ public:
                                                process_io);
     }
 
-    AlConductor* getConductor() {
+    Conductor* getConductor() {
         return this->conductor_;
     }
 
 protected:
     rtc::Thread* thread_;
     QGuiApplication* qtApp_;
-    rtc::scoped_refptr<AlConductor> conductor_;
+    rtc::scoped_refptr<Conductor> conductor_;
 };
 
 #endif // CUSTOMSOCKETSERVER_H

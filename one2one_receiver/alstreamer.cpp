@@ -14,8 +14,8 @@ void AlStreamer::initSlot(QGuiApplication* qtApp) {
     thread->set_socketserver(this->socket_server);
     rtc::InitializeSSL();
     // Must be constructed after we set the socketserver.
-    rtc::scoped_refptr<AlConductor> conductor(
-                new rtc::RefCountedObject<AlConductor>());
+    rtc::scoped_refptr<Conductor> conductor(
+                new rtc::RefCountedObject<Conductor>());
     this->socket_server->set_conductor(conductor);
 }
 
@@ -25,6 +25,6 @@ void AlStreamer::runSlot() {
     rtc::CleanupSSL();
 }
 
-rtc::scoped_refptr<AlConductor> AlStreamer::getConductorSlot() {
+rtc::scoped_refptr<Conductor> AlStreamer::getConductorSlot() {
     return this->socket_server->getConductor();
 }

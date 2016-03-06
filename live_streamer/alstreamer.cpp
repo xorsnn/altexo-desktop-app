@@ -7,7 +7,7 @@ AlStreamer::AlStreamer(QObject *parent) :
 {
 }
 
-void AlStreamer::initSlot(QApplication* qtApp) {
+void AlStreamer::initSlot(QGuiApplication* qtApp) {
     this->thread = rtc::Thread::Current();
     this->socket_server = new CustomSocketServer(thread, qtApp);
     thread->set_socketserver(this->socket_server);

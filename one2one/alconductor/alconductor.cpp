@@ -26,6 +26,7 @@ public:
     void OnFailure(const std::string& error)
     {
         qDebug() << "DummySetSessionDescriptionObserver::OnFailure";
+        qDebug() << QString::fromUtf8(error.c_str());
     }
 protected:
     DummySetSessionDescriptionObserver()
@@ -75,99 +76,56 @@ void AlConductor::slotProcessAnswer(QString sdpInfo) {
     webrtc::SdpParseError error;
 
     qDebug() << sdpInfo;
-
+    qDebug() << "< 0.9";
     webrtc::SessionDescriptionInterface* pSessionDescription(
                 webrtc::CreateSessionDescription("answer", sdpInfoStd, NULL));
-
+    qDebug() << "< 1";
     this->peer_connection_->SetRemoteDescription(DummySetSessionDescriptionObserver::Create(), pSessionDescription);
-
+    qDebug() << "< 2";
     this->sdpProcessed = true;
+    qDebug() << "< 3";
     this->processRemoteICEListSlot();
 }
 
 void AlConductor::slotProcessRemoteICELine(QJsonObject jsonMsg) {
     qDebug() << "slotProcessRemoteICELine()";
-//    QJsonDocument doc(jsonObj);
-//    qDebug() << ">>>>>>>>>>>>>>>>>>>>>>>>>>>>";
-//    qDebug() << doc.toJson();
-//    qDebug() << "<<<<<<<<<<<<<<<<<<<<<<<<<<<<";
-//    qDebug() << iceLine;
-//    QJsonDocument doc = QJsonDocument::fromJson(iceLine.toUtf8());
-//    QJsonObject jsonObj = doc.object();
     QJsonObject jsonObj = jsonMsg["candidate"].toObject();
 
+    int sdpMLineIndex = jsonObj["sdpMLineIndex"].toInt();
+    string sdpMid = jsonObj["sdpMid"].toString().toStdString();
+    QString candidate = jsonObj["candidate"].toString();
 
-//    QStringList parts = iceLine.split(',');
-//    QStringList remainingParts;
-//    qDebug() << "PARTS";
-//    qDebug() << parts.size();
-//    for (int j = 0 ; j < parts.size() ; j++)
-//    {
-//        QString part = parts.at(j);
-//        qDebug() << part;
+    webrtc::SdpParseError error;
 
-//        QStringList values = part.split('"', QString::SkipEmptyParts);
+    candidate.replace(QString("\\r\\n"),QString(""));
 
-//        if (values.size() > 2)
-//        {
-//            remainingParts << values.at(2);
-//            //cerr << values.at(0).toStdString() << " " << values.at(2).toStdString() << endl;
-//        }
-//    }
+    qDebug() << sdpMLineIndex;
+    qDebug() << "ICE: " << QString(sdpMLineIndex) << ";" <<  QString::fromUtf8(sdpMid.c_str()) << ";" << candidate;
 
-////        TODO 3 normaly 5 for curento
-//    if (remainingParts.size() == 5)
-//    {
-        int sdpMLineIndex = jsonObj["sdpMLineIndex"].toInt();
-        string sdpMid = jsonObj["sdpMid"].toString().toStdString();
-        QString candidate = jsonObj["candidate"].toString();
+    rtc::scoped_ptr<webrtc::IceCandidateInterface> c(
+                webrtc::CreateIceCandidate(sdpMid, sdpMLineIndex, candidate.toStdString(), NULL));
 
-        webrtc::SdpParseError error;
-
-        candidate.replace(QString("\\r\\n"),QString(""));
-
-        qDebug() << sdpMLineIndex;
-        qDebug() << "ICE: " << QString(sdpMLineIndex) << ";" <<  QString::fromUtf8(sdpMid.c_str()) << ";" << candidate;
-
-        rtc::scoped_ptr<webrtc::IceCandidateInterface> c(
-                    webrtc::CreateIceCandidate(sdpMid, sdpMLineIndex, candidate.toStdString(), NULL));
-
-        if (!c.get())
+    if (!c.get())
+    {
+        qDebug() << "Can't parse candidate message";
+    }
+    else
+    {
+        if (!this->peer_connection_->AddIceCandidate(c.get()))
         {
-            qDebug() << "Can't parse candidate message";
+            qDebug() << "Failed to apply the received candidate";
         }
-        else
-        {
-            if (!this->peer_connection_->AddIceCandidate(c.get()))
-            {
-                qDebug() << "Failed to apply the received candidate";
-            }
-            else {
-                qDebug() << "YAHOOOO!!!!!";
-            }
+        else {
+            qDebug() << "YAHOOOO!!!!!";
         }
-//    }
+    }
 }
 
 void AlConductor::processRemoteICEListSlot() {
     if (this->sdpProcessed) {
         while (!this->candidatesQueue.isEmpty()) {
-//            cout << queue.dequeue() << endl;
             this->slotProcessRemoteICELine(this->candidatesQueue.dequeue());
         }
-    }
-}
-
-
-//TODO remove if is not needed
-void AlConductor::slotProcessRemoteICE(QString iceStr) {
-    qDebug() << "slotProcessRemoteICE()";
-    QStringList iceInfo = iceStr.split('\n');
-
-
-    for (int i = 0 ; i < iceInfo.size() ; i++)
-    {
-//        this->slotProcessRemoteICELine(iceInfo.at(i));
     }
 }
 
@@ -206,7 +164,15 @@ void AlConductor::StartAll() {
     webrtc::FakeConstraints constraints;
     webrtc::PeerConnectionInterface::RTCConfiguration config;
 
-    constraints.SetAllowDtlsSctpDataChannels();
+//    constraints.SetAllowDtlsSctpDataChannels();
+    bool dtls = true;
+    if (dtls) {
+        constraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp,
+            "true");
+    } else {
+        constraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp,
+            "false");
+    }
 
     server.uri = "stun:stun.l.google.com:19302";
     config.servers.push_back(server);
@@ -245,12 +211,19 @@ void AlConductor::StartAll() {
     }
     qDebug() << "Successfully added stream";
 
+    Q_EMIT onInitSignal();
+
+}
+
+void AlConductor::startInitialExchangeSlot() {
     this->peer_connection_->CreateOffer(this, NULL);
 }
 
-//
-// PeerConnectionObserver implementation.
-//
+// **
+// * PeerConnectionObserver implementation.
+// *
+
+// Called when a remote stream is added
 void AlConductor::OnAddStream(webrtc::MediaStreamInterface* stream) {
     qDebug() << "AlConductor::OnAddStream";
 }
@@ -260,7 +233,6 @@ void AlConductor::OnRemoveStream(webrtc::MediaStreamInterface* stream) {
 }
 
 void AlConductor::OnIceCandidate(const webrtc::IceCandidateInterface* candidate) {
-    qDebug() << "===========================";
     qDebug() << "AlConductor::OnIceCandidate";
     string iceStr;
 
@@ -290,10 +262,10 @@ void AlConductor::OnSuccess(webrtc::SessionDescriptionInterface* desc) {
 
     desc->ToString(&sdpStr);
     qDebug() << QString(sdpStr.c_str());
-    qDebug() << "test 5!!!!";
 
     webrtc::SessionDescriptionInterface* pSessionDescription(webrtc::CreateSessionDescription("offer", sdpStr, NULL));
     this->peer_connection_->SetLocalDescription(DummySetSessionDescriptionObserver::Create(), pSessionDescription);
+
     Q_EMIT this->signalSDPText(QString(sdpStr.c_str()));
 }
 
@@ -310,7 +282,8 @@ void AlConductor::onJsonMsgSlot(QString msg)
     if (jsonObj["type"].toString() == "SDP") {
         this->slotProcessAnswer(jsonObj["body"].toString());
     } else if (jsonObj["type"].toString() == "ICE") {
-        this->slotProcessRemoteICE(jsonObj["body"].toString());
+        //TODO process somehow!!!
+//        this->slotProcessRemoteICE(jsonObj["body"].toString());
     } else if (jsonObj["id"].toString() == "iceCandidate") {
 //        QJsonDocument doc(jsonObj["candidate"].toObject());
         this->candidatesQueue.enqueue(jsonObj);
@@ -319,8 +292,4 @@ void AlConductor::onJsonMsgSlot(QString msg)
     } else if (jsonObj["id"].toString() == "presenterResponse") {
         this->slotProcessAnswer(jsonObj["sdpAnswer"].toString());
     }
-
-//    qDebug() << "<<<<<<<<<<";
-//    qDebug() << doc.object().keys();
-//    qDebug() << ">>>>>>>>>>";
 }

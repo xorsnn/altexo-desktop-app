@@ -13,7 +13,7 @@ class StreamerPlugin : public AlStreamer, AlStreamerInterface
     Q_INTERFACES(AlStreamerInterface)
 
 public:
-    void initStreamer(QApplication* app) Q_DECL_OVERRIDE;
+    void initStreamer(QGuiApplication* app) Q_DECL_OVERRIDE;
     void runStreamer() Q_DECL_OVERRIDE;
     QObject* getConductor() Q_DECL_OVERRIDE;
 };

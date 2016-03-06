@@ -12,7 +12,7 @@ public:
 
 
 public Q_SLOTS:
-    void initSlot(QApplication* atApp);
+    void initSlot(QGuiApplication* atApp);
     void runSlot();
 
     rtc::scoped_refptr<AlConductor> getConductorSlot();

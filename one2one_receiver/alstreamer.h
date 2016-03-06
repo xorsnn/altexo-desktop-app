@@ -15,7 +15,7 @@ public Q_SLOTS:
     void initSlot(QGuiApplication* atApp);
     void runSlot();
 
-    rtc::scoped_refptr<AlConductor> getConductorSlot();
+    rtc::scoped_refptr<Conductor> getConductorSlot();
 
 private:
     rtc::AutoThread auto_thread;

@@ -50,13 +50,15 @@ public Q_SLOTS:
     void StartAll();
     void addStreams();
     void slotProcessAnswer(QString sdpInfo);
-    void slotProcessRemoteICE(QString iceStr);
+//    void slotProcessRemoteICE(QString iceStr);
     void slotProcessRemoteICELine(QJsonObject jsonObj);
     void slotSetNewFrame(const QImage &img);
 
     void onJsonMsgSlot(QString msg);
 
     void processRemoteICEListSlot();
+
+    void startInitialExchangeSlot();
 
 protected:
     rtc::scoped_refptr<webrtc::PeerConnectionInterface> peer_connection_;
@@ -71,6 +73,7 @@ private:
 Q_SIGNALS:
     void signalSDPText(const QString &sdp);
     void signalOnLocalIceCandidate(const QString &iceCandidate);
+    void onInitSignal();
 };
 
 #endif // ALCONDUCTOR_H

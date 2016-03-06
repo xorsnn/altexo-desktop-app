@@ -19,6 +19,9 @@ private Q_SLOTS:
     void onTextMessageReceived(QString message);
 
 public Q_SLOTS:
+
+    void init_(QString address = "");
+
     void sendTextMessageSlot(QString message);
     void closeSlot();
 
@@ -30,6 +33,7 @@ private:
     QUrl m_url;
     bool m_debug;
     bool one2one;
+    QString connId;
 
 };
 

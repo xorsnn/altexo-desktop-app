@@ -6,7 +6,7 @@
 
 class CustomSocketServer : public rtc::PhysicalSocketServer {
 public:
-    CustomSocketServer(rtc::Thread* thread, QApplication* qtApp)
+    CustomSocketServer(rtc::Thread* thread, QGuiApplication* qtApp)
         : thread_(thread), qtApp_(qtApp), conductor_(NULL) {}
     virtual ~CustomSocketServer() {}
 
@@ -35,7 +35,7 @@ public:
 
 protected:
     rtc::Thread* thread_;
-    QApplication* qtApp_;
+    QGuiApplication* qtApp_;
     rtc::scoped_refptr<AlConductor> conductor_;
 };
 
