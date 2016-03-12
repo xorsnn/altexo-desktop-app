@@ -22,6 +22,8 @@ OBJECTS_DIR = $${BUILD_DIRECTORY}
 MOC_DIR = $${BUILD_DIRECTORY}
 RCC_DIR = $${BUILD_DIRECTORY}
 
+QMAKE_CXXFLAGS += -fPIC
+
 macx {
     include(mac-deps.pri)
 }

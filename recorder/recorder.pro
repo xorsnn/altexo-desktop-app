@@ -1,4 +1,3 @@
-
 QT_VERSION = 5
 
 QT += core gui
@@ -25,10 +24,20 @@ macx {
     include(unix-deps.pri)
 }
 
+#QMAKE_CFLAGS_SHLIB	+= -fPIC
+#QMAKE_CFLAGS_STATIC_LIB	+= -fPIC
+#QMAKE_CXXFLAGS_SHLIB	+= -fPIC
+#QMAKE_CXXFLAGS_STATIC_LIB	+= -fPIC
+
+#QMAKE_CXXFLAGS += -fPIC
+#QMAKE_CFLAGS_STATIC_LIB += -fPIC
+
+
 INCLUDEPATH += ../AlteXo/interfaces/
 
 TARGET = recorder
 TEMPLATE = lib
+CONFIG += plugin
 
 DEFINES += RECORDER_LIBRARY
 

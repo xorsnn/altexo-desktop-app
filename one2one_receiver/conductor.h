@@ -77,19 +77,19 @@ class Conductor
   // PeerConnectionClientObserver implementation.
   //
 
-  virtual void OnSignedIn();
+//  virtual void OnSignedIn();
 
-  virtual void OnDisconnected();
+//  virtual void OnDisconnected();
 
-  virtual void OnPeerConnected(int id, const std::string& name);
+//  virtual void OnPeerConnected(int id, const std::string& name);
 
-  virtual void OnPeerDisconnected(int id);
+//  virtual void OnPeerDisconnected(int id);
 
-  virtual void OnMessageFromPeer(int peer_id, const std::string& message);
+//  virtual void OnMessageFromPeer(int peer_id, const std::string& message);
 
-  virtual void OnMessageSent(int err);
+//  virtual void OnMessageSent(int err);
 
-  virtual void OnServerConnectionFailure();
+//  virtual void OnServerConnectionFailure();
 
   //
   // MainWndCallback implementation.
@@ -122,6 +122,10 @@ class Conductor
   std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface> >
       active_streams_;
   std::string server_;
+
+public Q_SLOTS:
+  void onJsonMsgSlot(QString msg);
+  void StartAll();
 };
 
 #endif  // WEBRTC_EXAMPLES_PEERCONNECTION_CLIENT_CONDUCTOR_H_

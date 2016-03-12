@@ -18,6 +18,7 @@ TEMPLATE = app
 #unix: CONFIG += link_pkgconfig
 
 #include(../al-ext-libs.pri)
+#QMAKE_CXXFLAGS += -fPIC
 
 INCLUDEPATH+=../AlteXo/interfaces/
 

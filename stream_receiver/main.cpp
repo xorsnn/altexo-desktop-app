@@ -10,6 +10,7 @@
 #include "threadrenderer.h"
 
 //#include <QDialog>
+#include <QTimer>
 #include <QPluginLoader>
 #include <QObject>
 #include "AlStreamerInterface.h"
@@ -55,6 +56,7 @@ int main(int argc, char *argv[])
 
 //        AlStreamerConnector connector;
         QPluginLoader streamerPluginLoader("/home/xors/workspace/QT/al_build/streamer2/build/libal-one2one-receiver.so");
+//        QPluginLoader streamerPluginLoader("/home/xors/workspace/QT/al_build/streamer/build/libal-one2one-streamer.so");
         QObject *streamerPlugin = streamerPluginLoader.instance();
         if (streamerPlugin) {
             qDebug() << "Streamer plugin loaded";
@@ -62,7 +64,7 @@ int main(int argc, char *argv[])
             if (streamerInterface) {
                 qDebug() << "Streamer interface loaded";
                 streamerInterface->initStreamer(&app);
-                QMetaObject::invokeMethod(streamerInterface->getConductor(), "StartAll", Qt::QueuedConnection);
+            //    QMetaObject::invokeMethod(this->getConductorSlot(), "alInit", Qt::QueuedConnection);
 //                QObject::connect(&w, SIGNAL(signalStartButton_clicked()), streamerInterface->getConductor(), SLOT(StartAll()));
 //                QObject::connect(&w, SIGNAL(signalProcessAnswerButton_clicked(QString)), streamerInterface->getConductor(), SLOT(slotProcessAnswer(QString)));
 //                QObject::connect(&w, SIGNAL(signalProcessRemoteICEButton_clicked(QString)), streamerInterface->getConductor(), SLOT(slotProcessRemoteICE(QString)));
@@ -80,6 +82,8 @@ int main(int argc, char *argv[])
 //                connector.setStreamignObj(sensorInterface->getObj());
 //                connector.setConductor(streamerInterface->getConductor());
 //                QObject::connect(&w, SIGNAL(readyToStreamSignal()), &connector, SLOT(start()));
+
+                QTimer::singleShot(3000, streamerInterface->getConductor(), SLOT(StartAll()));
 
                 streamerInterface->runStreamer();
             }

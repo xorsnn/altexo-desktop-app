@@ -3,7 +3,7 @@ QT_VERSION = 5
 
 QT += core gui websockets
 
-ROOT_DIRECTORY = ../../al_build/streamer
+ROOT_DIRECTORY = ../../al_build/msg_handler
 LIB_DIRECTORY = $${ROOT_DIRECTORY}/lib
 BUILD_DIRECTORY = $${ROOT_DIRECTORY}/build
 TESTS_DIRECTORY = $${BUILD_DIRECTORY}/tests
@@ -20,6 +20,8 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 TARGET = msg-handler
 TEMPLATE = lib
 CONFIG += plugin
+
+QMAKE_CXXFLAGS += -fPIC
 
 INCLUDEPATH+=../AlteXo/interfaces/
 

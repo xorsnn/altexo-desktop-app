@@ -34,16 +34,23 @@ include(../al-ext-libs.pri)
 INCLUDEPATH+=../AlteXo/interfaces/
 
 QMAKE_CXXFLAGS += -fno-rtti
+QMAKE_CXXFLAGS += -fPIC
 
 HEADERS += \
     conductor.h \
     alstreamer.h \
     streamerplugin.h \
     customsocketserver.h \
-    defaults.h
+    defaults.h \
+    alconductor.h \
+    alvideocapturer.h \
+    alvideocapturerthread.h
 
 SOURCES += \
     conductor.cc \
     alstreamer.cpp \
     streamerplugin.cpp \
-    defaults.cc
+    defaults.cc \
+    alconductor.cpp \
+    alvideocapturer.cpp \
+    alvideocapturerthread.cpp

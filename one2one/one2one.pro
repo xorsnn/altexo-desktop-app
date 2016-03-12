@@ -2,7 +2,7 @@ QT_VERSION = 5
 
 QT += core gui
 
-ROOT_DIRECTORY = ../../al_build/streamer
+ROOT_DIRECTORY = ../../al_build/one2one
 LIB_DIRECTORY = $${ROOT_DIRECTORY}/lib
 BUILD_DIRECTORY = $${ROOT_DIRECTORY}/build
 TESTS_DIRECTORY = $${BUILD_DIRECTORY}/tests
@@ -34,6 +34,7 @@ include(../al-ext-libs.pri)
 INCLUDEPATH+=../AlteXo/interfaces/
 
 QMAKE_CXXFLAGS += -fno-rtti
+QMAKE_CXXFLAGS += -fPIC
 
 SOURCES += \
     alconductor/alconductor.cpp \

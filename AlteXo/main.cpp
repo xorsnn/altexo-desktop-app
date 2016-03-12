@@ -94,7 +94,8 @@ int main(int argc, char *argv[])
     // *
 
     AlStreamerConnector connector;
-    QPluginLoader streamerPluginLoader("/home/xors/workspace/QT/al_build/streamer/build/libal-one2one-streamer.so");
+//    QPluginLoader streamerPluginLoader("/home/xors/workspace/QT/al_build/streamer/build/libal-one2one-streamer.so");
+    QPluginLoader streamerPluginLoader("/home/xors/workspace/QT/al_build/streamer2/build/libal-one2one-receiver.so");
     QObject *streamerPlugin = streamerPluginLoader.instance();
     if (streamerPlugin) {
         qDebug() << "Streamer plugin loaded";
