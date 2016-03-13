@@ -27,9 +27,10 @@ typedef std::map<int, std::string> Peers;
 struct PeerConnectionClientObserver {
   virtual void OnSignedIn() = 0;  // Called when we're logged on.
   virtual void OnDisconnected() = 0;
+  //TODO remove - the ui staff
   virtual void OnPeerConnected(QString id, const std::string& name) = 0;
   virtual void OnPeerDisconnected(QString peer_id) = 0;
-  virtual void OnMessageFromPeer(QString peer_id, const std::string& message) = 0;
+  virtual void OnMessageFromPeer(QString peer_id, const QString& message) = 0;
   virtual void OnMessageSent(int err) = 0;
   virtual void OnServerConnectionFailure() = 0;
 

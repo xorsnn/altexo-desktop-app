@@ -13,9 +13,9 @@ public:
 Q_SIGNALS:
     void OnSignedInSignal();
     void OnDisconnectedSignal();
-    void OnPeerConnectedSignal(int id, QString name);
+    void OnPeerConnectedSignal(QString id, QString name);
     void OnPeerDisconnectedSignal(int id);
-    void OnMessageFromPeerSignal(int peer_id, QString message);
+    void OnMessageFromPeerSignal(QString peer_id, QString message);
     void OnMessageSentSignal(int err);
     void OnServerConnectionFailureSignal();
 
@@ -30,10 +30,18 @@ public Q_SLOTS:
     void SendToPeerSlot(QString peer_id, const QString &message);
     void SendHangUpSlot(QString peer_id_);
 
+    QMap<QString, QString> getPeers() {
+        return this->m_peers;
+    }
+
 private:
     QWebSocket m_webSocket;
     bool m_debug;
     QString m_connId;
+    QMap<QString, QString> m_peers;
+
+    //TODO kind of a hack
+    bool m_receivedOffer;
 };
 
 #endif // ALCONNCLIENT_H

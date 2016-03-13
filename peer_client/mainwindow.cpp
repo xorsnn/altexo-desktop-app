@@ -11,11 +11,8 @@ MainWindow::MainWindow(QWidget *parent) :
     ui->setupUi(this);
 
     this->m_model = new QStringListModel();
-    QStringList list;
-    list << "a" << "b" << "c";
-    this->m_model->setStringList(list);
-
     this->ui->peerListView->setModel(this->m_model);
+    this->ui->peerListView->setEditTriggers(QAbstractItemView::NoEditTriggers);
 }
 
 MainWindow::~MainWindow()
@@ -130,10 +127,30 @@ void MainWindow::StopRemoteRenderer() {
 void MainWindow::QueueUIThreadCallback(int msg_id, void* data) {
     if (this->debug_) {
         qDebug() << "MainWindow::QueueUIThreadCallback";
-        qDebug() << msg_id;
+//        qDebug() << msg_id;
     }
     // todo some kind of a lame solution
     this->callback_->UIThreadCallback(msg_id, data);
+}
+
+// **
+// * WS CLIENT MANAGEMENT
+// *
+void MainWindow::OnPeerConnectedSlot(QString id, QString name) {
+    qDebug() << "MainWindow::OnPeerConnectedSlot";
+    QStringList list;
+    QMapIterator<QString, QString> i(this->m_cl->getPeers());
+
+    while (i.hasNext()) {
+        i.next();
+        list << i.key();
+    }
+
+    this->m_model->setStringList(list);
+}
+
+void MainWindow::setWsClient(AlConnClient* cl) {
+    this->m_cl = cl;
 }
 
 void MainWindow::on_startButton_clicked()
@@ -143,4 +160,12 @@ void MainWindow::on_startButton_clicked()
     this->port_ = "8888";
     int port = this->port_.length() ? atoi(this->port_.c_str()) : 0;
     callback_->StartLogin(this->server_, port);
+}
+
+
+
+void MainWindow::on_peerListView_doubleClicked(const QModelIndex &index)
+{
+    qDebug() << this->m_model->data(index, Qt::EditRole).toString();
+    Q_EMIT ConnectToPeerSignal(this->m_model->data(index, Qt::EditRole).toString());
 }

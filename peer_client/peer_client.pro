@@ -1,6 +1,6 @@
 QT_VERSION = 5
 
-QT += core gui websockets
+QT += core gui websockets qml quick core-private gui-private
 
 ROOT_DIRECTORY = ../../al_build/peer
 LIB_DIRECTORY = $${ROOT_DIRECTORY}/lib
@@ -60,7 +60,9 @@ SOURCES += main.cpp\
     defaults.cc \
     peer_connection_client.cc \
     VideoRenderer.cpp \
-    alconnclient.cpp
+    alconnclient.cpp \
+    quick_renderer/threadrenderer.cpp \
+    quick_renderer/alvideorenderer.cpp
 
 HEADERS  += mainwindow.h \
     conductor.h \
@@ -68,6 +70,14 @@ HEADERS  += mainwindow.h \
     flagdefs.h \
     peer_connection_client.h \
     VideoRenderer.h \
-    alconnclient.h
+    alconnclient.h \
+    quick_renderer/alvideorenderer.h \
+    quick_renderer/threadrenderer.h
 
 FORMS    += mainwindow.ui
+
+DISTFILES += \
+    quick_renderer/main.qml
+
+RESOURCES += \
+    renderer.qrc

@@ -10,6 +10,7 @@ AlConnClient::AlConnClient(QObject *parent) : QObject(parent), m_debug(true)
             this, &AlConnClient::onMessageSlot);
 
     this->connectToServerSlot();
+    this->m_receivedOffer = false;
 }
 
 void AlConnClient::connectToServerSlot() {
@@ -35,7 +36,7 @@ void AlConnClient::onConnectedToServerSlot() {
 
     // **
     // * LOGIN
-    //
+    // *
 
     QJsonObject obj;
     obj["action"] = "login";
@@ -62,7 +63,7 @@ void AlConnClient::sendMessageSlot(QString message) {
 void AlConnClient::onMessageSlot(const QString &message) {
     if (m_debug) {
         qDebug() << "AlConnClient::onMessageSlot";
-        qDebug() << message;
+//        qDebug() << message;
     }
     QJsonDocument doc = QJsonDocument::fromJson(message.toUtf8());
     QJsonObject jsonObj = doc.object();
@@ -81,6 +82,33 @@ void AlConnClient::onMessageSlot(const QString &message) {
 //        this->sendTextMessageSlot(doc.toJson());
     } else if (action == "connected") {
         qDebug() << "connected!!!!";
+    } else if (action == "peer_connected") {
+        this->m_peers[jsonObj["id"].toString()] = jsonObj["name"].toString();
+        Q_EMIT OnPeerConnectedSignal(jsonObj["id"].toString(), jsonObj["name"].toString());
+    } else if (action == "message_from_peer") {
+//        qDebug() << "======================================================!!!!!!!!!!";
+//        qDebug() << jsonObj["data"].toObject()["peer_id"].toString();
+//        qDebug() << jsonObj["data"].toObject()["message"].toString();
+        QString tmp_msg = jsonObj["data"].toObject()["message"].toString();
+
+        QJsonDocument tmp_doc = QJsonDocument::fromJson(tmp_msg.toUtf8());
+        QJsonObject tmp_jsonObj = tmp_doc.object();
+
+        // TODO HACK!!!!!!!!!!!!!!!
+//        QString type = tmp_jsonObj["type"].toString();
+//        if ((type == "offer" || type == "answer") && (this->m_receivedOffer == true)) {
+
+//        } else if (type == "offer") {
+//            this->m_receivedOffer = true;
+//            Q_EMIT OnMessageFromPeerSignal(jsonObj["data"].toObject()["peer_id"].toString(),
+//                    jsonObj["data"].toObject()["message"].toString());
+//        } else {
+            Q_EMIT OnMessageFromPeerSignal(jsonObj["data"].toObject()["sender_id"].toString(),
+                    jsonObj["data"].toObject()["message"].toString());
+//        }
+
+//        }
+
     } else {
 //        Q_EMIT this->onTextMessageReceivedSignal(message);
     }
@@ -91,6 +119,14 @@ void AlConnClient::SendToPeerSlot(QString peer_id, const QString &message) {
         qDebug() << "AlConnClient::SendToPeerSlot";
         qDebug() << message;
     }
+    QJsonObject obj;
+    obj["action"] = "send_to_peer";
+    QJsonObject msgData;
+    msgData["peer_id"] = peer_id;
+    msgData["message"] = message;
+    obj["data"] = msgData;
+    QJsonDocument doc(obj);
+    this->sendMessageSlot(doc.toJson());
 }
 
 void AlConnClient::SendHangUpSlot(QString peer_id_) {

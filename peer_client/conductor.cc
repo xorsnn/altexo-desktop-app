@@ -60,10 +60,13 @@ Conductor::Conductor(PeerConnectionClient* client, MainWnd* main_wnd, QObject *p
       client_(client),
       main_wnd_(main_wnd),
       debug_(true),
-      QObject(parent) {
+      QObject(parent),
+      m_processingMsg(false),
+      m_isAcceptingConnection(false) {
 
     client_->RegisterObserver(this);
     main_wnd->RegisterObserver(this);
+    connect(this, SIGNAL(DequeueMessagesFromPeerSignal()), this, SLOT(DequeueMessagesFromPeerSlot()));
 }
 
 Conductor::~Conductor() {
@@ -239,11 +242,12 @@ void Conductor::OnDisconnected() {
         main_wnd_->SwitchToConnectUI();
 }
 
+
 void Conductor::OnPeerConnected(QString id, const std::string& name) {
     LOG(INFO) << __FUNCTION__;
     // Refresh the list if we're showing it.
-    if (main_wnd_->current_ui() == MainWnd::LIST_PEERS)
-        main_wnd_->SwitchToPeerList(client_->peers());
+    //    if (main_wnd_->current_ui() == MainWnd::LIST_PEERS)
+    //        main_wnd_->SwitchToPeerList(client_->peers());
 }
 
 void Conductor::OnPeerDisconnected(QString id) {
@@ -258,28 +262,38 @@ void Conductor::OnPeerDisconnected(QString id) {
     }
 }
 
-void Conductor::OnMessageFromPeer(QString peer_id, const std::string& message) {
+void Conductor::OnMessageFromPeer(QString peer_id, const QString& message) {
     if (this->debug_) {
         qDebug() << "Conductor::OnMessageFromPeer";
-        qDebug() << QString::fromStdString(message);
+        qDebug() << peer_id_;
+        //        qDebug() << message;
     }
     ASSERT(peer_id_ == peer_id || peer_id_ == "-1");
-    ASSERT(!message.empty());
+    ASSERT(!message.toStdString().empty());
 
 
     if (!peer_connection_.get()) {
         ASSERT(peer_id_ == "-1");
+        qDebug() << "< 11";
+        qDebug() << peer_id;
         peer_id_ = peer_id;
+        //TODO HACK!
+        this->m_isAcceptingConnection = true;
 
         if (!InitializePeerConnection()) {
+            qDebug() << "< 12";
             LOG(LS_ERROR) << "Failed to initialize our PeerConnection instance";
+            qDebug() << "Failed to initialize our PeerConnection instance";
             client_->SignOut();
             return;
         }
+        qDebug() << "< 13";
     } else if (peer_id != peer_id_) {
         ASSERT(peer_id_ != "-1");
         LOG(WARNING) << "Received a message from unknown peer while already in a "
                         "conversation with a different peer.";
+        qDebug() << "Received a message from unknown peer while already in a "
+                    "conversation with a different peer.";
         return;
     }
 
@@ -289,8 +303,10 @@ void Conductor::OnMessageFromPeer(QString peer_id, const std::string& message) {
 
     Json::Reader reader;
     Json::Value jmessage;
-    if (!reader.parse(message, jmessage)) {
-        LOG(WARNING) << "Received unknown message. " << message;
+    //TODO parced QString
+    if (!reader.parse(message.toStdString(), jmessage)) {
+        //        LOG(WARNING) << "Received unknown message. " << message;
+        qDebug() << "Received unknown message. " << message;
         return;
     }
     std::string type;
@@ -303,6 +319,7 @@ void Conductor::OnMessageFromPeer(QString peer_id, const std::string& message) {
             // Recreate the peerconnection with DTLS disabled.
             if (!ReinitializePeerConnectionForLoopback()) {
                 LOG(LS_ERROR) << "Failed to initialize our PeerConnection instance";
+                qDebug() << "Failed to initialize our PeerConnection instance";
                 DeletePeerConnection();
                 client_->SignOut();
             }
@@ -313,6 +330,7 @@ void Conductor::OnMessageFromPeer(QString peer_id, const std::string& message) {
         if (!rtc::GetStringFromJsonObject(jmessage, kSessionDescriptionSdpName,
                                           &sdp)) {
             LOG(WARNING) << "Can't parse received session description message.";
+            qDebug() << "Can't parse received session description message.";
             return;
         }
         webrtc::SdpParseError error;
@@ -321,13 +339,17 @@ void Conductor::OnMessageFromPeer(QString peer_id, const std::string& message) {
         if (!session_description) {
             LOG(WARNING) << "Can't parse received session description message. "
                          << "SdpParseError was: " << error.description;
+            qDebug() << "Can't parse received session description message. "
+                    << "SdpParseError was: " << QString::fromStdString(error.description);
             return;
         }
-        LOG(INFO) << " Received session description :" << message;
+        //        LOG(INFO) << " Received session description :" << message;
+        qDebug() << " Received session description :" << message;
         peer_connection_->SetRemoteDescription(
                     DummySetSessionDescriptionObserver::Create(), session_description);
         if (session_description->type() ==
                 webrtc::SessionDescriptionInterface::kOffer) {
+            qDebug() << "peer_connection_->CreateAnswer(this, NULL);";
             peer_connection_->CreateAnswer(this, NULL);
         }
         return;
@@ -341,6 +363,7 @@ void Conductor::OnMessageFromPeer(QString peer_id, const std::string& message) {
                                            &sdp_mlineindex) ||
                 !rtc::GetStringFromJsonObject(jmessage, kCandidateSdpName, &sdp)) {
             LOG(WARNING) << "Can't parse received message.";
+            qDebug() << "Can't parse received message.";
             return;
         }
         webrtc::SdpParseError error;
@@ -349,13 +372,17 @@ void Conductor::OnMessageFromPeer(QString peer_id, const std::string& message) {
         if (!candidate.get()) {
             LOG(WARNING) << "Can't parse received candidate message. "
                          << "SdpParseError was: " << error.description;
+            qDebug() << "Can't parse received candidate message. "
+                     << "SdpParseError was: " << QString::fromStdString(error.description);
             return;
         }
         if (!peer_connection_->AddIceCandidate(candidate.get())) {
             LOG(WARNING) << "Failed to apply the received candidate";
+            qDebug() << "Failed to apply the received candidate";
             return;
         }
-        LOG(INFO) << " Received candidate :" << message;
+        //        LOG(INFO) << " Received candidate :" << message;
+        qDebug() << " Received candidate :" << message;
         return;
     }
 }
@@ -385,16 +412,42 @@ void Conductor::OnDisconnectedSlot() {
     this->OnDisconnected();
 }
 
-void Conductor::OnPeerConnectedSlot(QString id, const std::string& name) {
-    this->OnPeerConnected(id, name);
-}
+//void Conductor::OnPeerConnectedSlot(QString id, QString name) {
+//    this->OnPeerConnected(id, name);
+//}
 
 void Conductor::OnPeerDisconnectedSlot(QString id) {
     this->OnPeerDisconnected(id);
 }
 
-void Conductor::OnMessageFromPeerSlot(QString peer_id, const std::string& message) {
-    this->OnMessageFromPeer(peer_id, message);
+// enqueue messages for processing
+void Conductor::OnMessageFromPeerSlot(QString peer_id, const QString& message) {
+    QMap<QString, QString> curMsg;
+    curMsg[peer_id] = message;
+    this->m_messageQueue.enqueue(curMsg);
+    qDebug() << "QUEUE LEN: ";
+    qDebug() << this->m_messageQueue.length();
+    if (!this->m_processingMsg) {
+        Q_EMIT DequeueMessagesFromPeerSignal();
+    }
+}
+
+void Conductor::DequeueMessagesFromPeerSlot() {
+    this->m_processingMsg = true;
+    while (!this->m_messageQueue.isEmpty()) {
+        qDebug() << "AAAAAAAAAAA!!!!!!!!!!!!!!r";
+        QMap<QString, QString> curMsg;
+        curMsg = this->m_messageQueue.dequeue();
+        QMapIterator<QString, QString> i(curMsg);
+        while (i.hasNext()) {
+            i.next();
+            qDebug() << "this->OnMessageFromPeer";
+            qDebug() << i.value();
+            this->OnMessageFromPeer(i.key(), i.value());
+        }
+    }
+    this->m_processingMsg = false;
+//    Q_EMIT DequeueMessagesFromPeerSignal();
 }
 
 void Conductor::OnMessageSentSlot(int err) {
@@ -403,6 +456,10 @@ void Conductor::OnMessageSentSlot(int err) {
 
 void Conductor::OnServerConnectionFailureSlot() {
     this->OnServerConnectionFailure();
+}
+
+void Conductor::ConnectToPeerSlot(QString peer_id) {
+    this->ConnectToPeer(peer_id);
 }
 
 //~=====================
@@ -431,6 +488,7 @@ void Conductor::DisconnectFromServer() {
 }
 
 void Conductor::ConnectToPeer(QString peer_id) {
+    qDebug() << "Conductor::ConnectToPeer";
     ASSERT(peer_id_ == "-1");
     ASSERT(peer_id != "-1");
 
@@ -453,26 +511,38 @@ cricket::VideoCapturer* Conductor::OpenVideoCaptureDevice() {
                 cricket::DeviceManagerFactory::Create());
     if (!dev_manager->Init()) {
         LOG(LS_ERROR) << "Can't create device manager";
+        qDebug() << "Can't create device manager";
         return NULL;
     }
     std::vector<cricket::Device> devs;
     if (!dev_manager->GetVideoCaptureDevices(&devs)) {
         LOG(LS_ERROR) << "Can't enumerate video devices";
+        qDebug() << "Can't enumerate video devices";
         return NULL;
     }
     std::vector<cricket::Device>::iterator dev_it = devs.begin();
     cricket::VideoCapturer* capturer = NULL;
+    //TODO HACK for 2 devices on 1 machine
+    int iter = 0;
     for (; dev_it != devs.end(); ++dev_it) {
-        capturer = dev_manager->CreateVideoCapturer(*dev_it);
-        if (capturer != NULL)
-            break;
+        if (!this->m_isAcceptingConnection || iter == 1) {
+            capturer = dev_manager->CreateVideoCapturer(*dev_it);
+            if (capturer != NULL)
+                break;
+        }
+        iter++;
     }
+    qDebug() << "RETURNING CAPTURER!!!!";
+    qDebug() << capturer;
     return capturer;
 }
 
 void Conductor::AddStreams() {
-    if (active_streams_.find(kStreamLabel) != active_streams_.end())
+    qDebug() << "Conductor::AddStreams";
+    if (active_streams_.find(kStreamLabel) != active_streams_.end()) {
+        qDebug() << "Already added!!!!!!!!";
         return;  // Already added.
+    }
 
     rtc::scoped_refptr<webrtc::AudioTrackInterface> audio_track(
                 peer_connection_factory_->CreateAudioTrack(
@@ -490,8 +560,10 @@ void Conductor::AddStreams() {
 
     stream->AddTrack(audio_track);
     stream->AddTrack(video_track);
+    qDebug() << "ADDDINGGGG STREAM!!!";
     if (!peer_connection_->AddStream(stream)) {
         LOG(LS_ERROR) << "Adding stream to PeerConnection failed";
+        qDebug() << "Adding stream to PeerConnection failed";
     }
     typedef std::pair<std::string,
             rtc::scoped_refptr<webrtc::MediaStreamInterface> >
@@ -503,7 +575,7 @@ void Conductor::AddStreams() {
 void Conductor::DisconnectFromCurrentPeer() {
     LOG(INFO) << __FUNCTION__;
     if (peer_connection_.get()) {
-//        client_->SendHangUp(peer_id_);
+        //        client_->SendHangUp(peer_id_);
         Q_EMIT SendHangUpSignal(peer_id_);
         DeletePeerConnection();
     }
@@ -549,11 +621,13 @@ void Conductor::UIThreadCallback(int msg_id, void* data) {
             pending_messages_.pop_front();
 
             // TODO hangle failed sending
+            qDebug() << "Q_EMIT SendToPeerSignal(peer_id_, QString::fromStdString(*msg));";
+            qDebug() << peer_id_;
             Q_EMIT SendToPeerSignal(peer_id_, QString::fromStdString(*msg));
-//            if (!client_->SendToPeer(peer_id_, *msg) && peer_id_ != "-1") {
-//                LOG(LS_ERROR) << "SendToPeer failed";
-//                DisconnectFromServer();
-//            }
+            //            if (!client_->SendToPeer(peer_id_, *msg) && peer_id_ != "-1") {
+            //                LOG(LS_ERROR) << "SendToPeer failed";
+            //                DisconnectFromServer();
+            //            }
             delete msg;
         }
 
@@ -624,3 +698,4 @@ void Conductor::SendMessage(const std::string& json_object) {
     std::string* msg = new std::string(json_object);
     main_wnd_->QueueUIThreadCallback(SEND_MESSAGE_TO_PEER, msg);
 }
+

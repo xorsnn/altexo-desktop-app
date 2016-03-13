@@ -10,6 +10,9 @@
 #include "webrtc/base/ssladapter.h"
 #include "webrtc/base/thread.h"
 
+#include <QtQuick/QQuickView>
+#include "quick_renderer/threadrenderer.h"
+
 #include "alconnclient.h"
 
 class CustomSocketServer : public rtc::PhysicalSocketServer {
@@ -55,7 +58,9 @@ protected:
 
 int main(int argc, char *argv[])
 {
+//    QGuiApplication a(argc, argv);
     QApplication a(argc, argv);
+
 
     rtc::FlagList::SetFlagsFromCommandLine(&argc, argv, true);
     if (FLAG_help) {
@@ -70,13 +75,38 @@ int main(int argc, char *argv[])
         return -1;
     }
 
-//    GtkMainWnd wnd(FLAG_server, FLAG_port, FLAG_autoconnect, FLAG_autocall);
-//    wnd.Create();
     MainWindow w;
     w.show();
 
     AlConnClient cl;
 
+    w.setWsClient(&cl);
+    // **
+    // * WS_CLIENT-MAIN_WINDOW
+    // *
+    QObject::connect(&cl, SIGNAL(OnPeerConnectedSignal(QString, QString)),
+                     &w, SLOT(OnPeerConnectedSlot(QString, QString)));
+
+//    qmlRegisterType<ThreadRenderer>("SceneGraphRendering", 1, 0, "Renderer");
+    int execReturn = 0;
+
+//    {
+//        QQuickView view;
+
+//        // Rendering in a thread introduces a slightly more complicated cleanup
+//        // so we ensure that no cleanup of graphics resources happen until the
+//        // application is shutting down.
+//        view.setPersistentOpenGLContext(true);
+//        view.setPersistentSceneGraph(true);
+
+//        view.setResizeMode(QQuickView::SizeRootObjectToView);
+//        view.setSource(QUrl("qrc:/main.qml"));
+//        view.show();
+//    }
+
+    // **
+    // * CUSTOM SOCKET
+    // *
     rtc::AutoThread auto_thread;
     rtc::Thread* thread = rtc::Thread::Current();
     CustomSocketServer socket_server(thread, &a);
@@ -90,6 +120,10 @@ int main(int argc, char *argv[])
     socket_server.set_client(&client);
     socket_server.set_conductor(conductor);
 
+
+    // **
+    // * WS_CLIENT-CONDUCTOR
+    // *
     QObject::connect(&cl, SIGNAL(OnSignedInSignal()), conductor, SLOT(OnSignedInSlot()));
 
     QObject::connect(conductor, SIGNAL(SendToPeerSignal(QString, const QString&)),
@@ -97,15 +131,19 @@ int main(int argc, char *argv[])
 
     QObject::connect(conductor, SIGNAL(SendHangUpSignal(QString)),
                      &cl, SLOT(SendHangUpSlot(QString)));
-//    this->server_ = "127.0.0.1";
-//    this->port_ = "8888";
-//    int port = this->port_.length() ? atoi(this->port_.c_str()) : 0;
-//    callback_->StartLogin(this->server_, port);
+    // TODO move to client-window interaction
+//    QObject::connect(&cl, SIGNAL(OnPeerConnectedSignal(QString, QString)),
+//                     conductor, SLOT(OnPeerConnectedSlot(QString, QString)));
+    QObject::connect(&cl, SIGNAL(OnMessageFromPeerSignal(QString, QString)),
+                     conductor, SLOT(OnMessageFromPeerSlot(QString, QString)));
+
+    // **
+    // * WS_CLIENT-MAIN_WIDOW
+    // *
+    QObject::connect(&w, SIGNAL(ConnectToPeerSignal(QString)), conductor, SLOT(ConnectToPeerSlot(QString)));
+
 
     thread->Run();
-
-    // gtk_main();
-//    wnd.Destroy();
 
     thread->set_socketserver(NULL);
     // TODO(henrike): Run the Gtk main loop to tear down the connection.
@@ -116,5 +154,15 @@ int main(int argc, char *argv[])
      */
     rtc::CleanupSSL();
 
-    return a.exec();
+//    // As the render threads make use of our QGuiApplication object
+//    // to clean up gracefully, wait for them to finish before
+//    // QGuiApp is taken off the heap.
+//    for (int i = 0; i < ThreadRenderer::threads.count(); i++) {
+////    foreach (QThread *t, ThreadRenderer::threads) {
+//        QThread *t = ThreadRenderer::threads[i];
+//        t->wait();
+//        delete t;
+//    }
+    execReturn  = a.exec();
+    return execReturn;
 }

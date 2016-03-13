@@ -13,6 +13,7 @@
 #include "talk/media/base/videoframe.h"
 #include "talk/media/base/videorenderer.h"
 //#include "webrtc/base/win32.h"
+#include "alconnclient.h"
 
 #include "VideoRenderer.h"
 
@@ -102,8 +103,12 @@ public:
 public Q_SLOTS:
     void updateRenderImage(const int target,QImage *newImage);
 
+     void OnPeerConnectedSlot(QString id, QString name);
+     void setWsClient(AlConnClient* cl);
+
 private Q_SLOTS:
     void on_startButton_clicked();
+
 
 
 
@@ -136,6 +141,11 @@ private Q_SLOTS:
 //        rtc::scoped_refptr<webrtc::VideoTrackInterface> rendered_track_;
 //    };
 
+    void on_peerListView_doubleClicked(const QModelIndex &index);
+
+Q_SIGNALS:
+    void ConnectToPeerSignal(QString peer_id);
+
 private:
     Ui::MainWindow *ui;
     MainWndCallback *callback_;
@@ -149,6 +159,7 @@ private:
     int draw_buffer_size_;
 
     QStringListModel* m_model;
+    AlConnClient* m_cl;
 };
 
 #endif // MAINWINDOW_H

@@ -1,0 +1,5 @@
+<RCC>
+    <qresource prefix="/">
+        <file alias="main.qml">quick_renderer/main.qml</file>
+    </qresource>
+</RCC>

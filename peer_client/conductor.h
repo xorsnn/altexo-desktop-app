@@ -23,6 +23,8 @@
 #include "peer_connection_client.h"
 #include "webrtc/base/scoped_ptr.h"
 
+#include <QQueue>
+#include <QMap>
 
 namespace webrtc {
 class VideoCaptureModule;
@@ -99,7 +101,7 @@ protected:
     virtual void OnDisconnected();
     virtual void OnPeerConnected(QString id, const std::string& name);
     virtual void OnPeerDisconnected(QString id);
-    virtual void OnMessageFromPeer(QString peer_id, const std::string& message);
+    virtual void OnMessageFromPeer(QString peer_id, const QString& message);
     virtual void OnMessageSent(int err);
     virtual void OnServerConnectionFailure();
 
@@ -107,15 +109,19 @@ protected:
 public Q_SLOTS:
     void OnSignedInSlot();
     void OnDisconnectedSlot();
-    void OnPeerConnectedSlot(QString id, const std::string& name);
     void OnPeerDisconnectedSlot(QString id);
-    void OnMessageFromPeerSlot(QString peer_id, const std::string& message);
+    void OnMessageFromPeerSlot(QString peer_id, const QString& message);
     void OnMessageSentSlot(int err);
     void OnServerConnectionFailureSlot();
+
+    void ConnectToPeerSlot(QString peer_id);
+    void DequeueMessagesFromPeerSlot();
+
 
 Q_SIGNALS:
     void SendToPeerSignal(QString peer_id, const QString &message);
     void SendHangUpSignal(QString peer_id_);
+    void DequeueMessagesFromPeerSignal();
 
 protected:
     // Send a message to the remote peer.
@@ -134,6 +140,9 @@ protected:
     std::string server_;
 
     bool debug_;
+    QQueue<QMap<QString, QString>> m_messageQueue;
+    bool m_processingMsg;
+    bool m_isAcceptingConnection;
 };
 
 #endif  // WEBRTC_EXAMPLES_PEERCONNECTION_CLIENT_CONDUCTOR_H_
