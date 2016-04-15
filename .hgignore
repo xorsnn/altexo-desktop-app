@@ -4,4 +4,5 @@ syntax: glob
 *.o
 moc_*
 *.lo
-
+*/node_modules/*
+build-*
