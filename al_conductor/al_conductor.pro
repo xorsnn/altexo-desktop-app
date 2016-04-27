@@ -4,19 +4,21 @@
 #
 #-------------------------------------------------
 
-QT       -= core gui
+TARGET = al_conductor
 
-TARGET = al_konductor
 TEMPLATE = lib
 
 DEFINES += AL_KONDUCTOR_LIBRARY
 
-SOURCES += alconductor.cpp
+SOURCES += \
+    almanager.cpp \
+    conductor/conductor.cc
 
-HEADERS += alconductor.h\
-        al_konductor_global.h
+HEADERS += \
+    almanager.h \
+    conductor/conductor.h
 
-unix {
-    target.path = /usr/lib
-    INSTALLS += target
-}
+#unix {
+#    target.path = /usr/lib
+#    INSTALLS += target
+#}

@@ -9,6 +9,6 @@ SUBDIRS       = \
     msg_handler \
     one2one_receiver \
     peer_client \
-    al_konductor
+    al_conductor
 
 #AlteXo.depends = live_streamer

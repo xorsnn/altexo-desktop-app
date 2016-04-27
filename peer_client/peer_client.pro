@@ -50,6 +50,8 @@ QMAKE_CXXFLAGS += -fPIC
 #QMAKE_CXXFLAGS += -fcolor-diagnostics
 
 
+INCLUDEPATH += ../
+
 TARGET = peer_client
 TEMPLATE = app
 
