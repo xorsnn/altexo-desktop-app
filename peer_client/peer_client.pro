@@ -50,7 +50,7 @@ QMAKE_CXXFLAGS += -fPIC
 #QMAKE_CXXFLAGS += -fcolor-diagnostics
 
 
-INCLUDEPATH += ../
+INCLUDEPATH += ../al_manager
 
 TARGET = peer_client
 TEMPLATE = app
@@ -64,7 +64,8 @@ SOURCES += main.cpp\
     VideoRenderer.cpp \
     alconnclient.cpp \
     quick_renderer/threadrenderer.cpp \
-    quick_renderer/alvideorenderer.cpp
+    quick_renderer/alvideorenderer.cpp \
+    peerclientcallback.cpp
 
 HEADERS  += mainwindow.h \
     conductor.h \
@@ -74,7 +75,8 @@ HEADERS  += mainwindow.h \
     VideoRenderer.h \
     alconnclient.h \
     quick_renderer/alvideorenderer.h \
-    quick_renderer/threadrenderer.h
+    quick_renderer/threadrenderer.h \
+    peerclientcallback.h
 
 FORMS    += mainwindow.ui
 

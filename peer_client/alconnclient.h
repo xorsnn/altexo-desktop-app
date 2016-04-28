@@ -15,7 +15,7 @@ Q_SIGNALS:
     void OnDisconnectedSignal();
     void OnPeerConnectedSignal(QString id, QString name);
     void OnPeerDisconnectedSignal(int id);
-    void OnMessageFromPeerSignal(QString peer_id, QString message);
+    void OnMessageFromPeerSignal(std::string peer_id, std::string message);
     void OnMessageSentSignal(int err);
     void OnServerConnectionFailureSignal();
 

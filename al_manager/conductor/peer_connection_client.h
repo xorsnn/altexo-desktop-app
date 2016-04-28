@@ -28,9 +28,9 @@ struct PeerConnectionClientObserver {
   virtual void OnSignedIn() = 0;  // Called when we're logged on.
   virtual void OnDisconnected() = 0;
   //TODO remove - the ui staff
-  virtual void OnPeerConnected(QString id, const std::string& name) = 0;
-  virtual void OnPeerDisconnected(QString peer_id) = 0;
-  virtual void OnMessageFromPeer(QString peer_id, const QString& message) = 0;
+  virtual void OnPeerConnected(std::string id, const std::string& name) = 0;
+  virtual void OnPeerDisconnected(std::string peer_id) = 0;
+  virtual void OnMessageFromPeer(std::string peer_id, const std::string& message) = 0;
   virtual void OnMessageSent(int err) = 0;
   virtual void OnServerConnectionFailure() = 0;
 

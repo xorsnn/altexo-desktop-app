@@ -103,8 +103,8 @@ void AlConnClient::onMessageSlot(const QString &message) {
 //            Q_EMIT OnMessageFromPeerSignal(jsonObj["data"].toObject()["peer_id"].toString(),
 //                    jsonObj["data"].toObject()["message"].toString());
 //        } else {
-            Q_EMIT OnMessageFromPeerSignal(jsonObj["data"].toObject()["sender_id"].toString(),
-                    jsonObj["data"].toObject()["message"].toString());
+            Q_EMIT OnMessageFromPeerSignal(jsonObj["data"].toObject()["sender_id"].toString().toStdString(),
+                    jsonObj["data"].toObject()["message"].toString().toStdString());
 //        }
 
 //        }
