@@ -5,6 +5,7 @@
 #include <QApplication>
 #include "almanager.h"
 #include "mainwindow.h"
+#include <QQueue>
 
 class PeerClientCallback : public QObject,
         public AlCallback,
@@ -43,6 +44,7 @@ public:
     void setManager(AlManager*manager);
 
 
+//    void OnMessageFromPeer(std::string peer_id, const std::string& message);
 public Q_SLOTS:
     void OnSignedInSlot();
     void OnDisconnectedSlot();
@@ -65,6 +67,8 @@ private:
     AlManager* m_manager;
     std::string m_peerId;
     std::deque<std::string*> m_pendingMessages;
+    QQueue<QMap<QString, QString>> m_messageQueue;
+    bool m_processingMsg;
 };
 
 #endif // PEERCLIENTCALLBACK_H

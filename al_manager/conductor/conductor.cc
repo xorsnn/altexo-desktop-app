@@ -46,7 +46,7 @@ protected:
     ~DummySetSessionDescriptionObserver() {}
 };
 
-Conductor::Conductor(PeerConnectionClient* client, AlCallback* alCallback)
+Conductor::Conductor(PeerConnectionClient* client, AlCallback* alCallback, AlDataManager* alDataManager)
     : loopback_(false),
 //      client_(client),
       m_alCallback(alCallback),
@@ -54,6 +54,7 @@ Conductor::Conductor(PeerConnectionClient* client, AlCallback* alCallback)
       m_processingMsg(false),
       m_isAcceptingConnection(false) {
 
+    m_dataManager = alDataManager;
 //    client_->RegisterObserver(this);
 //    m_alCallback->RegisterObserver(this);
 //    TODO clean up  after it will be handled with callback
@@ -175,7 +176,11 @@ void Conductor::OnAddStream(webrtc::MediaStreamInterface* stream) {
 
         // TODO additional method
         // Video track
-        this->m_alCallback->startRemoteRendererCb(track);
+
+//        this->m_alCallback->startRemoteRendererCb(track);
+        std::cout << "============qwe=============" << std::endl;
+        this->m_dataManager->startRemoteRenderer(track);
+
         //        this->SetRemoteMedia(track);
     }
     stream -> Release();
@@ -262,33 +267,35 @@ void Conductor::OnIceCandidate(const webrtc::IceCandidateInterface* candidate) {
 ////    }
 //}
 
-//void Conductor::OnMessageFromPeer(std::string peer_id, const std::string& message) {
-//    if (this->debug_) {
-//        std::cout << "Conductor::OnMessageFromPeer" << std::endl;
-//        std::cout << peer_id_ << std::endl;
-//    }
+void Conductor::OnMessageFromPeer(std::string peer_id, const std::string& message) {
+    if (this->debug_) {
+        std::cout << "Conductor::OnMessageFromPeer" << std::endl;
+        std::cout << peer_id << std::endl;
+    }
 //    ASSERT(peer_id_ == peer_id || peer_id_ == "-1");
-//    ASSERT(!message.empty());
+    ASSERT(!message.empty());
 
 
-//    if (!m_peerConnection.get()) {
+    if (!m_peerConnection.get()) {
 //        ASSERT(peer_id_ == "-1");
-////        TODO remove when cleaning up
-//        std::cout << "< 11" << std::endl;
-//        std::cout << peer_id << std::endl;
+//        TODO remove when cleaning up
+        std::cout << "< 11" << std::endl;
+        std::cout << peer_id << std::endl;
 //        peer_id_ = peer_id;
-//        //TODO HACK!
-//        this->m_isAcceptingConnection = true;
+        //TODO HACK!
+        this->m_isAcceptingConnection = true;
 
-//        if (!InitializePeerConnection()) {
-//            std::cout << "< 12" << std::endl;
-//            LOG(LS_ERROR) << "Failed to initialize our PeerConnection instance";
-//            std::cout << "Failed to initialize our PeerConnection instance" << std::endl;
+        if (!InitializePeerConnection()) {
+            std::cout << "< 12" << std::endl;
+            LOG(LS_ERROR) << "Failed to initialize our PeerConnection instance";
+            std::cout << "Failed to initialize our PeerConnection instance" << std::endl;
+//            TODO see
 //            client_->SignOut();
-//            return;
-//        }
-//        std::cout << "< 13" << std::endl;
-//    } else if (peer_id != peer_id_) {
+            return;
+        }
+        std::cout << "< 13" << std::endl;
+    }
+//    else if (peer_id != peer_id_) {
 //        ASSERT(peer_id_ != "-1");
 //        LOG(WARNING) << "Received a message from unknown peer while already in a "
 //                        "conversation with a different peer.";
@@ -297,23 +304,23 @@ void Conductor::OnIceCandidate(const webrtc::IceCandidateInterface* candidate) {
 //        return;
 //    }
 
-//    if (this->debug_) {
-//        std::cout << "< 10" << std::endl;
-//    }
+    if (this->debug_) {
+        std::cout << "< 10" << std::endl;
+    }
 
-//    Json::Reader reader;
-//    Json::Value jmessage;
-//    //TODO parced QString
-//    if (!reader.parse(message, jmessage)) {
-//        //        LOG(WARNING) << "Received unknown message. " << message;
-//        std::cout << "Received unknown message. " << message << std::endl;
-//        return;
-//    }
-//    std::string type;
-//    std::string json_object;
+    Json::Reader reader;
+    Json::Value jmessage;
+    //TODO parced QString
+    if (!reader.parse(message, jmessage)) {
+        //        LOG(WARNING) << "Received unknown message. " << message;
+        std::cout << "Received unknown message. " << message << std::endl;
+        return;
+    }
+    std::string type;
+    std::string json_object;
 
-//    rtc::GetStringFromJsonObject(jmessage, kSessionDescriptionTypeName, &type);
-//    if (!type.empty()) {
+    rtc::GetStringFromJsonObject(jmessage, kSessionDescriptionTypeName, &type);
+    if (!type.empty()) {
 //        if (type == "offer-loopback") {
 //            // This is a loopback call.
 //            // Recreate the peerconnection with DTLS disabled.
@@ -321,71 +328,72 @@ void Conductor::OnIceCandidate(const webrtc::IceCandidateInterface* candidate) {
 //                LOG(LS_ERROR) << "Failed to initialize our PeerConnection instance";
 //                std::cout << "Failed to initialize our PeerConnection instance" << std::endl;
 //                DeletePeerConnection();
-//                client_->SignOut();
+////                TODO take a look
+////                client_->SignOut();
 //            }
 //            return;
 //        }
 
-//        std::string sdp;
-//        if (!rtc::GetStringFromJsonObject(jmessage, kSessionDescriptionSdpName,
-//                                          &sdp)) {
-//            LOG(WARNING) << "Can't parse received session description message.";
-//            std::cout << "Can't parse received session description message." << std::endl;
-//            return;
-//        }
-//        webrtc::SdpParseError error;
-//        webrtc::SessionDescriptionInterface* session_description(
-//                    webrtc::CreateSessionDescription(type, sdp, &error));
-//        if (!session_description) {
-//            LOG(WARNING) << "Can't parse received session description message. "
-//                         << "SdpParseError was: " << error.description;
-//            std::cout << "Can't parse received session description message. "
-//                    << "SdpParseError was: " << error.description << std::endl;
-//            return;
-//        }
-//        //        LOG(INFO) << " Received session description :" << message;
-//        std::cout << " Received session description :" << message << std::endl;
-//        m_peerConnection->SetRemoteDescription(
-//                    DummySetSessionDescriptionObserver::Create(), session_description);
-//        if (session_description->type() ==
-//                webrtc::SessionDescriptionInterface::kOffer) {
-//            std::cout << "m_peerConnection->CreateAnswer(this, NULL);" << std::endl;
-//            m_peerConnection->CreateAnswer(this, NULL);
-//        }
-//        return;
-//    } else {
-//        std::string sdp_mid;
-//        int sdp_mlineindex = 0;
-//        std::string sdp;
-//        if (!rtc::GetStringFromJsonObject(jmessage, kCandidateSdpMidName,
-//                                          &sdp_mid) ||
-//                !rtc::GetIntFromJsonObject(jmessage, kCandidateSdpMlineIndexName,
-//                                           &sdp_mlineindex) ||
-//                !rtc::GetStringFromJsonObject(jmessage, kCandidateSdpName, &sdp)) {
-//            LOG(WARNING) << "Can't parse received message.";
-//            std::cout << "Can't parse received message." << std::endl;
-//            return;
-//        }
-//        webrtc::SdpParseError error;
-//        rtc::scoped_ptr<webrtc::IceCandidateInterface> candidate(
-//                    webrtc::CreateIceCandidate(sdp_mid, sdp_mlineindex, sdp, &error));
-//        if (!candidate.get()) {
-//            LOG(WARNING) << "Can't parse received candidate message. "
-//                         << "SdpParseError was: " << error.description;
-//            std::cout << "Can't parse received candidate message. "
-//                     << "SdpParseError was: " << error.description << std::endl;
-//            return;
-//        }
-//        if (!m_peerConnection->AddIceCandidate(candidate.get())) {
-//            LOG(WARNING) << "Failed to apply the received candidate";
-//            std::cout << "Failed to apply the received candidate" << std::endl;
-//            return;
-//        }
-//        //        LOG(INFO) << " Received candidate :" << message;
-//        std::cout << " Received candidate :" << message << std::endl;
-//        return;
-//    }
-//}
+        std::string sdp;
+        if (!rtc::GetStringFromJsonObject(jmessage, kSessionDescriptionSdpName,
+                                          &sdp)) {
+            LOG(WARNING) << "Can't parse received session description message.";
+            std::cout << "Can't parse received session description message." << std::endl;
+            return;
+        }
+        webrtc::SdpParseError error;
+        webrtc::SessionDescriptionInterface* session_description(
+                    webrtc::CreateSessionDescription(type, sdp, &error));
+        if (!session_description) {
+            LOG(WARNING) << "Can't parse received session description message. "
+                         << "SdpParseError was: " << error.description;
+            std::cout << "Can't parse received session description message. "
+                    << "SdpParseError was: " << error.description << std::endl;
+            return;
+        }
+        //        LOG(INFO) << " Received session description :" << message;
+        std::cout << " Received session description :" << message << std::endl;
+        m_peerConnection->SetRemoteDescription(
+                    DummySetSessionDescriptionObserver::Create(), session_description);
+        if (session_description->type() ==
+                webrtc::SessionDescriptionInterface::kOffer) {
+            std::cout << "m_peerConnection->CreateAnswer(this, NULL);" << std::endl;
+            m_peerConnection->CreateAnswer(this, NULL);
+        }
+        return;
+    } else {
+        std::string sdp_mid;
+        int sdp_mlineindex = 0;
+        std::string sdp;
+        if (!rtc::GetStringFromJsonObject(jmessage, kCandidateSdpMidName,
+                                          &sdp_mid) ||
+                !rtc::GetIntFromJsonObject(jmessage, kCandidateSdpMlineIndexName,
+                                           &sdp_mlineindex) ||
+                !rtc::GetStringFromJsonObject(jmessage, kCandidateSdpName, &sdp)) {
+            LOG(WARNING) << "Can't parse received message.";
+            std::cout << "Can't parse received message." << std::endl;
+            return;
+        }
+        webrtc::SdpParseError error;
+        rtc::scoped_ptr<webrtc::IceCandidateInterface> candidate(
+                    webrtc::CreateIceCandidate(sdp_mid, sdp_mlineindex, sdp, &error));
+        if (!candidate.get()) {
+            LOG(WARNING) << "Can't parse received candidate message. "
+                         << "SdpParseError was: " << error.description;
+            std::cout << "Can't parse received candidate message. "
+                     << "SdpParseError was: " << error.description << std::endl;
+            return;
+        }
+        if (!m_peerConnection->AddIceCandidate(candidate.get())) {
+            LOG(WARNING) << "Failed to apply the received candidate";
+            std::cout << "Failed to apply the received candidate" << std::endl;
+            return;
+        }
+        //        LOG(INFO) << " Received candidate :" << message;
+        std::cout << " Received candidate :" << message << std::endl;
+        return;
+    }
+}
 
 //void Conductor::OnMessageSent(int err) {
 //    // Process the next pending message if any.

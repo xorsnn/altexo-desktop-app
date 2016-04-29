@@ -28,7 +28,9 @@ SOURCES += \
     almanager.cpp \
     conductor/conductor.cc \
     conductor/defaults.cc \
-    conductor/peer_connection_client.cc
+    conductor/peer_connection_client.cc \
+    alvideorenderer.cpp \
+    conductor/aldatamanager.cpp
 
 HEADERS += \
     almanager.h \
@@ -36,7 +38,9 @@ HEADERS += \
     customsocketserver.h \
     conductor/defaults.h \
     conductor/peer_connection_client.h \
-    alcallback.h
+    alcallback.h \
+    alvideorenderer.h \
+    conductor/aldatamanager.h
 
 #unix {
 #    target.path = /usr/lib

@@ -147,9 +147,10 @@ int main(int argc, char *argv[])
      destroy = (void (*)(AlManager*))dlsym(handle, "destroy_object");
 
      AlManager* myClass = (AlManager*)create();
-
+     cb.setManager(myClass);
      myClass->init(&cb);
      myClass->run();
+
      std::cout << "STOPPED" << std::endl;
      destroy( myClass );
     //~ test external lib

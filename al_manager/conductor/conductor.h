@@ -34,6 +34,8 @@
 //#include <QQueue>
 //#include <QMap>
 #include "alcallback.h"
+#include "alvideorenderer.h"
+#include "conductor/aldatamanager.h"
 
 
 
@@ -76,7 +78,7 @@ public:
         STREAM_REMOVED,
     };
 
-    Conductor(PeerConnectionClient* client, AlCallback* alCallback);
+    Conductor(PeerConnectionClient* client, AlCallback* alCallback, AlDataManager* alDataManager);
 
     bool connection_active() const;
 
@@ -87,6 +89,11 @@ public:
     bool ReinitializePeerConnectionForLoopback();
     bool CreatePeerConnection(bool dtls);
     void DeletePeerConnection();
+
+    bool hasConnections() {
+         return (m_peerConnection.get());
+    }
+
 protected:
     ~Conductor();
 //    bool InitializePeerConnection();
@@ -127,11 +134,12 @@ protected:
 //    //
 //    // PeerConnectionClientObserver implementation.
 //    //
+public:
 //    virtual void OnSignedIn();
 //    virtual void OnDisconnected();
 //    virtual void OnPeerConnected(std::string id, const std::string& name);
 //    virtual void OnPeerDisconnected(std::string id);
-//    virtual void OnMessageFromPeer(std::string peer_id, const std::string& message);
+    void OnMessageFromPeer(std::string peer_id, const std::string& message);
 //    virtual void OnMessageSent(int err);
 //    virtual void OnServerConnectionFailure();
 
@@ -172,7 +180,7 @@ protected:
     std::queue<std::map<std::string, std::string>> m_messageQueue;
     bool m_processingMsg;
     bool m_isAcceptingConnection;
-
+    AlDataManager* m_dataManager;
 public:
     rtc::scoped_refptr<webrtc::PeerConnectionInterface> m_peerConnection;
     std::map<std::string, rtc::scoped_refptr<webrtc::MediaStreamInterface>> m_activeStreams;
