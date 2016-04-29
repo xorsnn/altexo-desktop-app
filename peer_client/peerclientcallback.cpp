@@ -85,6 +85,9 @@ void PeerClientCallback::OnPeerDisconnectedSlot(std::string id) {
 
 void PeerClientCallback::OnMessageFromPeerSlot(std::string peer_id, const std::string& message) {
     std::cout << "PeerClientCallback::OnMessageFromPeerSlot" << std::endl;
+    if (m_peerId == "-1") {
+        m_peerId = peer_id;
+    }
     QMap<QString, QString> curMsg;
     curMsg[QString::fromStdString(peer_id)] = QString::fromStdString(message);
     m_messageQueue.enqueue(curMsg);
