@@ -6,3 +6,5 @@ moc_*
 *.lo
 */node_modules/*
 build-*
+.git/
+.gitignore
