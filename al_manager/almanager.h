@@ -19,11 +19,9 @@ public:
     virtual void InitializePeerConnection();
     virtual void DeletePeerConnection();
 
-//    virtual rtc::scoped_refptr<Conductor> getConductor() {
-//        std::cout << "aaaa" << std::endl;
-//        return m_conductor;
-//    }
     virtual void OnMessageFromPeer(std::string peer_id, const std::string& message);
+
+
 
 private:
     rtc::AutoThread auto_thread;

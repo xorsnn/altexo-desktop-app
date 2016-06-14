@@ -5,7 +5,7 @@ AlDataManager::AlDataManager()
 
 }
 
-void AlDataManager::startRemoteRenderer(webrtc::VideoTrackInterface* remote_video) {
+void AlDataManager::startRemoteRenderer(webrtc::VideoTrackInterface* remote_video, AlCallback* alCallback) {
     std::cout << "AlDataManager::startRemoteRenderer" << std::endl;
-    m_remoteRenderer.reset(new AlVideoRenderer(1, remote_video));
+    m_remoteRenderer.reset(new AlVideoRenderer(1, remote_video, alCallback));
 }

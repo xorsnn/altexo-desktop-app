@@ -32,7 +32,7 @@ macx {
     include(unix-deps.pri)
 }
 
-INCLUDEPATH += ../AlteXo/interfaces/
+INCLUDEPATH += ../../al_sdk_tester/interfaces
 
 TARGET = kinect_source
 TEMPLATE = lib

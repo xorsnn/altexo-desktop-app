@@ -6,11 +6,12 @@
 #include "talk/media/base/videocommon.h"
 #include "talk/media/base/videoframe.h"
 #include "talk/media/base/videorenderer.h"
+#include "alcallback.h"
 
 class AlVideoRenderer: public webrtc::VideoRendererInterface
 {
 public:
-    AlVideoRenderer(const int target, webrtc::VideoTrackInterface* track_to_render);
+    AlVideoRenderer(const int target, webrtc::VideoTrackInterface* track_to_render, AlCallback* alCallback);
     virtual ~AlVideoRenderer();
 
     // VideoRendererInterface implementation
@@ -33,6 +34,7 @@ protected:
     int m_height;
     rtc::scoped_refptr<webrtc::VideoTrackInterface> m_rendered_track;
     const int m_nameReceiver;
+    AlCallback* m_alCallback;
 };
 
 

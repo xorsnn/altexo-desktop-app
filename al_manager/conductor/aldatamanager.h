@@ -15,7 +15,7 @@ class AlDataManager
 {
 public:
     AlDataManager();
-    void startRemoteRenderer(webrtc::VideoTrackInterface*);
+    void startRemoteRenderer(webrtc::VideoTrackInterface*,AlCallback*);
 private:
     //TODO implement local renderer later
 //    rtc::scoped_ptr<VideoRenderer> m_localRenderer;

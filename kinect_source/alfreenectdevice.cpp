@@ -22,7 +22,6 @@ void ALFreenectDevice::setMaxDepth(int newDepth) {
     this->maxDepth = newDepth;
 }
 
-
 void ALFreenectDevice::VideoCallback(void* _rgb, uint32_t timestamp) {
     Mutex::ScopedLock lock(m_rgb_mutex);
     uint8_t* rgb = static_cast<uint8_t*>(_rgb);
@@ -63,7 +62,6 @@ ALColor ALFreenectDevice::huePixelForDepth(uint16_t pix) {
     color.setHsb(alignedPix, 255, 255, 255);
     return color;
 }
-
 
 void ALFreenectDevice::DepthCallback(void* _depth, uint32_t timestamp) {
     Mutex::ScopedLock lock(m_depth_mutex);

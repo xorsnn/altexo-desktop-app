@@ -11,6 +11,7 @@
 #include "webrtc/base/json.h"
 #include "webrtc/base/logging.h"
 typedef std::map<int, std::string> Peers;
+
 class AlCallback {
 public:
     virtual void sendToPeerCb(std::string peer_id, const std::string &message) = 0;
@@ -26,6 +27,10 @@ public:
     virtual void onDisconnectedCb() = 0;
     virtual void processUiEventsCb() = 0;
     virtual void SwitchToStreamingUI() = 0; // ????
+
+    virtual void updateFrameCb(const uint8_t* image, int width, int height);
+
+
 };
 
 #endif // ALCALLBACK_H

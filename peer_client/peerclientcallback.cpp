@@ -422,3 +422,11 @@ void PeerClientCallback::Close() {
 void PeerClientCallback::setManager(AlManager* manager) {
     m_manager = manager;
 }
+
+void PeerClientCallback::updateFrameCb(const uint8_t* image, int width, int height) {
+    std::cout << "PeerClientCallback::updateFrameCb" << std::endl;
+//    m_img.loadFromData(image, width*height*4, QImage::Format_ARGB32);
+    QImage img(image, width, height, QImage::Format_ARGB32);
+    m_img = img;
+//    img.save("out_123.png", "PNG");
+}

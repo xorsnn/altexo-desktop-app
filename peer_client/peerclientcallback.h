@@ -28,6 +28,8 @@ public:
     virtual void processUiEventsCb();
     virtual void SwitchToStreamingUI(); // ????
 
+    virtual void updateFrameCb(const uint8_t* image, int width, int height);
+
     // **
     // * MainWndCallback implementation
     // *
@@ -69,6 +71,7 @@ private:
     std::deque<std::string*> m_pendingMessages;
     QQueue<QMap<QString, QString>> m_messageQueue;
     bool m_processingMsg;
+    QImage m_img;
 };
 
 #endif // PEERCLIENTCALLBACK_H

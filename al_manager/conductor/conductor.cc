@@ -179,7 +179,7 @@ void Conductor::OnAddStream(webrtc::MediaStreamInterface* stream) {
 
 //        this->m_alCallback->startRemoteRendererCb(track);
         std::cout << "============qwe=============" << std::endl;
-        this->m_dataManager->startRemoteRenderer(track);
+        this->m_dataManager->startRemoteRenderer(track, m_alCallback);
 
         //        this->SetRemoteMedia(track);
     }
