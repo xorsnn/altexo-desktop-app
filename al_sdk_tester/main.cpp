@@ -63,7 +63,7 @@ int main(int argc, char *argv[])
     // *
 
     AlSensorInterface* sensorInterface = NULL;
-    QPluginLoader sensorPluginLoader("/home/xors/workspace/QT/kinect_source_build/source/build/libkinect_source.so");
+    QPluginLoader sensorPluginLoader("/home/xors/workspace/QT/altexo/kinect_source_build/source/build/libkinect_source.so");
     QObject *sensorPlugin = sensorPluginLoader.instance();
     if (sensorPlugin) {
         qDebug() << "sensor loaded";

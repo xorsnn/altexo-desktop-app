@@ -1,9 +1,5 @@
 #include "alvideocapturer.h"
-//#include "talk/media/devices/deviceinfo.h"
-//#include "talk/media/base/mediacommon.h"
-//XORS
 #include "webrtc/system_wrappers/include/logging.h"
-//#include "talk/media/base/videoframe.h"
 #include <QElapsedTimer>
 #include <stdlib.h>
 #include <QDebug>

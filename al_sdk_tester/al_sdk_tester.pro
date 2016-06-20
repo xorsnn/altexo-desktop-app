@@ -44,7 +44,7 @@ CONFIG += no_keywords
 #}
 # ===============================
 
-INCLUDEPATH += /home/xors/workspace/QT/ALTEXO_SDK
+INCLUDEPATH += ../ALTEXO_SDK
 
 #LIBS += -L/home/xors/workspace/QT/build-al_manager-dev-Release -lal_manager
 LIBS += -lm -ldl
