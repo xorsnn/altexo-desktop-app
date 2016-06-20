@@ -9,9 +9,7 @@ ALFreenectDevice::ALFreenectDevice(freenect_context *_ctx, int _index) :
     m_new_depth_frame(false)
 {
     setDepthFormat(FREENECT_DEPTH_REGISTERED);
-    QSettings settings;
-    this->minDepth = settings.value("altexo/minDepth", 555).toInt();
-    this->maxDepth = settings.value("altexo/maxDepth", 1005).toInt();
+    this->updateSettings();
 }
 
 int ALFreenectDevice::getMaxDepth() {
