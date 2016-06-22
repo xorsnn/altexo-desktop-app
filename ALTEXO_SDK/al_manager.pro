@@ -40,6 +40,9 @@ QMAKE_CXXFLAGS += -D_GLIBCXX_USE_CXX11_ABI=0
 
 DEFINES += AL_KONDUCTOR_LIBRARY
 
+
+LIBS += -lboost_thread -lboost_system
+
 SOURCES += \
     almanager.cpp \
     conductor/conductor.cc \
@@ -48,7 +51,8 @@ SOURCES += \
     alvideorenderer.cpp \
     conductor/aldatamanager.cpp \
     almanagerinterface.cpp \
-    alvideocapturer.cpp
+    alvideocapturer.cpp \
+    alvideocapturerthread.cpp
 
 HEADERS += \
     almanager.h \
@@ -60,7 +64,8 @@ HEADERS += \
     alvideorenderer.h \
     conductor/aldatamanager.h \
     almanagerinterface.h \
-    alvideocapturer.h
+    alvideocapturer.h \
+    alvideocapturerthread.h
 
 #unix {
 #    target.path = /usr/lib

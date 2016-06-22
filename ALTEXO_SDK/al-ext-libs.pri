@@ -33,9 +33,6 @@ LIBS += -Wl,--as-needed
 
 LIBS += -Wl,--start-group
 
-
-#LIBS += $$WEBRTCBUILD/obj/talk/libjingle_peerconnection.a
-
 LIBS += $$WEBRTCBUILD/obj/webrtc/api/libjingle_peerconnection.a
 
 LIBS += $$WEBRTCBUILD/obj/webrtc/system_wrappers/libfield_trial_default.a
@@ -44,8 +41,6 @@ LIBS += $$WEBRTCBUILD/obj/webrtc/base/librtc_base.a
 LIBS += $$WEBRTCBUILD/obj/webrtc/libwebrtc_common.a
 LIBS += $$WEBRTCBUILD/obj/webrtc/base/librtc_base_approved.a
 LIBS += $$WEBRTCBUILD/obj/chromium/src/third_party/boringssl/libboringssl.a
-#LIBS += $$WEBRTCBUILD/obj/talk/libjingle_media.a
-#LIBS += $$WEBRTCBUILD/obj/webrtc/modules/libvideo_render_module.a
 LIBS += $$WEBRTCBUILD/obj/webrtc/modules/libwebrtc_utility.a
 LIBS += $$WEBRTCBUILD/obj/webrtc/modules/libaudio_coding_module.a
 LIBS += $$WEBRTCBUILD/obj/webrtc/modules/libcng.a
@@ -92,13 +87,6 @@ LIBS += $$WEBRTCBUILD/obj/webrtc/modules/libwebrtc_h264.a
 LIBS += $$WEBRTCBUILD/obj/webrtc/modules/libwebrtc_i420.a
 LIBS += $$WEBRTCBUILD/obj/webrtc/modules/video_coding/utility/libvideo_coding_utility.a
 LIBS += $$WEBRTCBUILD/obj/webrtc/modules/video_coding/codecs/vp8/libwebrtc_vp8.a
-#LIBS += $$WEBRTCBUILD/obj/chromium/src/third_party/libvpx_new/libvpx_new.a
-#LIBS += $$WEBRTCBUILD/obj/chromium/src/third_party/libvpx_new/libvpx_intrinsics_mmx.a
-#LIBS += $$WEBRTCBUILD/obj/chromium/src/third_party/libvpx_new/libvpx_intrinsics_sse2.a
-#LIBS += $$WEBRTCBUILD/obj/chromium/src/third_party/libvpx_new/libvpx_intrinsics_ssse3.a
-#LIBS += $$WEBRTCBUILD/obj/chromium/src/third_party/libvpx_new/libvpx_intrinsics_sse4_1.a
-#LIBS += $$WEBRTCBUILD/obj/chromium/src/third_party/libvpx_new/libvpx_intrinsics_avx.a
-#LIBS += $$WEBRTCBUILD/obj/chromium/src/third_party/libvpx_new/libvpx_intrinsics_avx2.a
 
 LIBS += $$WEBRTCBUILD/obj/chromium/src/third_party/libvpx/libvpx.a
 LIBS += $$WEBRTCBUILD/obj/chromium/src/third_party/libvpx/libvpx_intrinsics_sse2.a
@@ -108,15 +96,12 @@ LIBS += $$WEBRTCBUILD/obj/chromium/src/third_party/libvpx/libvpx_intrinsics_mmx.
 LIBS += $$WEBRTCBUILD/obj/chromium/src/third_party/libvpx/libvpx_intrinsics_sse4_1.a
 
 LIBS += $$WEBRTCBUILD/obj/webrtc/modules/video_coding/codecs/vp9/libwebrtc_vp9.a
-#LIBS += $$WEBRTCBUILD/obj/webrtc/sound/librtc_sound.a
 LIBS += $$WEBRTCBUILD/obj/webrtc/system_wrappers/libmetrics_default.a
 LIBS += $$WEBRTCBUILD/obj/webrtc/libjingle/xmllite/librtc_xmllite.a
 LIBS += $$WEBRTCBUILD/obj/webrtc/libjingle/xmpp/librtc_xmpp.a
 LIBS += $$WEBRTCBUILD/obj/webrtc/p2p/librtc_p2p.a
 LIBS += $$WEBRTCBUILD/obj/chromium/src/third_party/usrsctp/libusrsctplib.a
 LIBS += $$WEBRTCBUILD/obj/webrtc/modules/libvideo_capture_module_internal_impl.a
-#LIBS += $$WEBRTCBUILD/obj/webrtc/modules/libvideo_render_module_internal_impl.a
-#LIBS += $$WEBRTCBUILD/obj/talk/libjingle_p2p.a
 LIBS += $$WEBRTCBUILD/obj/chromium/src/third_party/libsrtp/libsrtp.a
 
 LIBS += $$WEBRTCBUILD/obj/chromium/src/third_party/boringssl/libboringssl_asm.a
@@ -173,7 +158,6 @@ LIBS += $$WEBRTCBUILD/obj/chromium/src/third_party/yasm/libgenperf_libs.a
 LIBS += $$WEBRTCBUILD/obj/chromium/src/third_party/protobuf/libprotobuf_full_do_not_use.a
 LIBS += $$WEBRTCBUILD/obj/chromium/src/third_party/protobuf/libprotoc_lib.a
 LIBS += $$WEBRTCBUILD/obj/chromium/src/third_party/libvpx/libvpx_intrinsics_avx.a
-
 
 LIBS += -Wl,--end-group
 

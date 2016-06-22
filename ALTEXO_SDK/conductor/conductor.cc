@@ -406,7 +406,7 @@ void Conductor::OnMessageFromPeer(std::string peer_id, const std::string& messag
             return;
         }
         webrtc::SdpParseError error;
-        rtc::scoped_ptr<webrtc::IceCandidateInterface> candidate(
+        google_breakpad::scoped_ptr<webrtc::IceCandidateInterface> candidate(
                     webrtc::CreateIceCandidate(sdp_mid, sdp_mlineindex, sdp, &error));
         if (!candidate.get()) {
             LOG(WARNING) << "Can't parse received candidate message. "

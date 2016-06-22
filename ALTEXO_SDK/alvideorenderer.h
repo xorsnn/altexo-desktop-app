@@ -9,6 +9,7 @@
 
 #include "webrtc/api/mediastreaminterface.h"
 #include "webrtc/api/peerconnectioninterface.h"
+#include "chromium/src/breakpad/src/common/scoped_ptr.h"
 
 #include "alcallback.h"
 
@@ -34,7 +35,7 @@ public:
 
 protected:
     void SetSize(int width, int height);
-    rtc::scoped_ptr<uint8_t[]> m_image;
+    google_breakpad::scoped_ptr<uint8_t> m_image;
     int m_width;
     int m_height;
     rtc::scoped_refptr<webrtc::VideoTrackInterface> m_rendered_track;

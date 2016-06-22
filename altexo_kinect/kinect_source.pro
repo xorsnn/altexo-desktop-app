@@ -10,7 +10,7 @@ QT += core gui
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-ROOT_DIRECTORY = ../kinect_source_build/source
+ROOT_DIRECTORY = ../../kinect_source_build/source
 LIB_DIRECTORY = $${ROOT_DIRECTORY}/lib
 BUILD_DIRECTORY = $${ROOT_DIRECTORY}/build
 TESTS_DIRECTORY = $${BUILD_DIRECTORY}/tests

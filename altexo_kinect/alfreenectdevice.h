@@ -79,8 +79,9 @@ private:
 
     Mutex m_rgb_mutex;
     Mutex m_depth_mutex;
-    bool m_new_rgb_frame;
-    bool m_new_depth_frame;
+public:
+    bool m_newRgbFrame;
+    bool m_newDepthFrame;
 
 //    int minDepth = 200;
     int minDepth = 555;

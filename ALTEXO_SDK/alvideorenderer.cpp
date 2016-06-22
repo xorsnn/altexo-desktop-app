@@ -40,8 +40,7 @@ void AlVideoRenderer::OnFrame(const cricket::VideoFrame& video_frame) {
 
     const cricket::VideoFrame* frame = video_frame.GetCopyWithRotationApplied();
 
-    SetSize(static_cast<int>(frame->GetWidth()),
-            static_cast<int>(frame->GetHeight()));
+    SetSize(frame->width(),frame->height());
 
     int size = m_width * m_height * 4;
     //  // TODO(henrike): Convert directly to RGBA

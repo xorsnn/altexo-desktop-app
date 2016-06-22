@@ -18,7 +18,7 @@ private:
 //    TODO implement local renderer later
 //    rtc::scoped_ptr<VideoRenderer> m_localRenderer;
 
-    rtc::scoped_ptr<AlVideoRenderer> m_remoteRenderer;
+    google_breakpad::scoped_ptr<AlVideoRenderer> m_remoteRenderer;
     std::deque<std::string*> m_pendingMessages;
     bool m_debug;
 
