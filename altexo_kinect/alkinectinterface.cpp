@@ -40,19 +40,21 @@ void ALKinectInterface::updateDeviceState() {
 }
 
 void ALKinectInterface::needWDataSlot() {
-    static std::vector<uint8_t> rgb_(640*480*3);
-    this->device->getRGB(rgb_);
-    static std::vector<uint8_t> depth_(640*480*3);
-    this->device->getDepth(depth_);
+    if (this->device->m_newDepthFrame && this->device->m_newDepthFrame) {
+        static std::vector<uint8_t> rgb_(640*480*3);
+        this->device->getRGB(rgb_);
+        static std::vector<uint8_t> depth_(640*480*3);
+        this->device->getDepth(depth_);
 
-    QImage image_rgb((&(rgb_[0])), 640, 480, QImage::Format_RGB888);
-    QImage image_depth((&(depth_[0])), 640, 480, QImage::Format_RGB888);
+        QImage image_rgb((&(rgb_[0])), 640, 480, QImage::Format_RGB888);
+        QImage image_depth((&(depth_[0])), 640, 480, QImage::Format_RGB888);
 
-    QPainter painter;
-    painter.begin(m_image);
-    painter.drawImage(0, 0, image_depth);
-    painter.drawImage(640, 0, image_rgb);
-    painter.end();
+        QPainter painter;
+        painter.begin(m_image);
+        painter.drawImage(0, 0, image_depth);
+        painter.drawImage(640, 0, image_rgb);
+        painter.end();
+    }
 
     Q_EMIT this->newWFrameSignal(m_image);
 }

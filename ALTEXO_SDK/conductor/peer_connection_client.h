@@ -18,7 +18,8 @@
 
 #include "webrtc/base/nethelpers.h"
 #include "webrtc/base/physicalsocketserver.h"
-#include "webrtc/base/scoped_ptr.h"
+//#include "webrtc/base/scoped_ptr.h"
+#include "chromium/src/breakpad/src/common/scoped_ptr.h"
 #include "webrtc/base/signalthread.h"
 #include "webrtc/base/sigslot.h"
 
@@ -111,8 +112,8 @@ class PeerConnectionClient : public sigslot::has_slots<>,
   PeerConnectionClientObserver* callback_;
   rtc::SocketAddress server_address_;
   rtc::AsyncResolver* resolver_;
-  rtc::scoped_ptr<rtc::AsyncSocket> control_socket_;
-  rtc::scoped_ptr<rtc::AsyncSocket> hanging_get_;
+  google_breakpad::scoped_ptr<rtc::AsyncSocket> control_socket_;
+  google_breakpad::scoped_ptr<rtc::AsyncSocket> hanging_get_;
   std::string onconnect_data_;
   std::string control_data_;
   std::string notification_data_;

@@ -309,15 +309,15 @@ void PeerClientCallback::requestNewFrameSlot() {
     Q_EMIT requestNewFrameSignal();
 }
 
-void PeerClientCallback::newFrameSlot(QImage* img) {
+void PeerClientCallback::newFrameSlot(QImage* newImg) {
     // TODO: make quality configurable
-    QImage newImgTmp = img->scaled(640, 240);
-    QImage * newImg = &newImgTmp;
+//    QImage newImgTmp = img->scaled(640, 240);
+//    QImage * newImg = &newImgTmp;
     int numBytes = newImg->width()*newImg->height()*4;
     uint8_t *pData = new uint8_t[numBytes];
 
     memcpy(pData, newImg->convertToFormat(QImage::Format_RGBA8888).bits(), numBytes);
     m_managerInterface->setImageData(pData, numBytes, newImg->width(), newImg->height());
-
-    QTimer::singleShot(1000/40, this, SLOT(requestNewFrameSlot()));
+    qDebug() << "ping1";
+    QTimer::singleShot(1000/25, this, SLOT(requestNewFrameSlot()));
 }

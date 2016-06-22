@@ -4,8 +4,7 @@
 #include <QMutex>
 #include "webrtc/api/mediastreaminterface.h"
 #include "webrtc/api/peerconnectioninterface.h"
-//#include "talk/media/base/videocapturer.h"
-//#include "alconductor/alvideocapturerthread.h"
+#include "alvideocapturerthread.h"
 
 class AlVideoCapturer :  public cricket::VideoCapturer
 {
@@ -31,7 +30,8 @@ private:
     size_t m_imageDataLen;
     int m_width;
     int m_height;
-//    AlVideoCapturerThread m_captureThread;
+
+    AlVideoCapturerThread *m_captureThread;
 
 };
 
