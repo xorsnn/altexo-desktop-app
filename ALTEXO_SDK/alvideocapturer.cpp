@@ -1,9 +1,9 @@
 #include "alvideocapturer.h"
 #include "webrtc/system_wrappers/include/logging.h"
-#include <QElapsedTimer>
+//#include <QElapsedTimer>
 #include <stdlib.h>
-#include <QDebug>
-#include <QDateTime>
+//#include <QDebug>
+//#include <QDateTime>
 using namespace cricket;
 
 AlVideoCapturer::AlVideoCapturer() :
@@ -50,7 +50,7 @@ bool AlVideoCapturer::IsScreencast() const
     return true;
 }
 
-bool AlVideoCapturer::GetPreferredFourccs(std::vector<quint32>* fourccs)
+bool AlVideoCapturer::GetPreferredFourccs(std::vector<uint32_t>* fourccs)
 {
     fourccs->push_back(FOURCC_ABGR);
     return true;

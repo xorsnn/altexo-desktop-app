@@ -1,7 +1,6 @@
 #ifndef ALVIDEOCAPTURER_H
 #define ALVIDEOCAPTURER_H
-#include <QObject>
-#include <QMutex>
+//#include <QMutex>
 #include "webrtc/api/mediastreaminterface.h"
 #include "webrtc/api/peerconnectioninterface.h"
 #include "alvideocapturerthread.h"
@@ -17,7 +16,7 @@ public:
     void Stop();
     bool IsRunning();
     bool IsScreencast() const;
-    bool GetPreferredFourccs(std::vector<quint32>* fourccs);
+    bool GetPreferredFourccs(std::vector<uint32_t>* fourccs);
     // XORS
     void OnMessage(rtc::Message* msg) {}
 
