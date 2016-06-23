@@ -13,28 +13,28 @@ INCLUDEPATH += $$WEBRTCTRUNK/third_party/jsoncpp/source/include
 INCLUDEPATH += /usr/include/nss
 INCLUDEPATH += /usr/include/nspr
 
-PACKAGECONFIG[sdl] = "--enable-sdl,--disable-sdl,libsdl libxext,"
+# TODO: figure out if it is needed
+#PACKAGECONFIG[sdl] = "--enable-sdl,--disable-sdl,libsdl libxext,"
+
 #CONFIG(debug,debug|release) {
 #        WEBRTCBUILD = $$WEBRTCTRUNK/out/Debug
 #} else {
         WEBRTCBUILD = $$WEBRTCTRUNK/out/Release
 #}
 
-#WEBRTCBUILD = $$WEBRTCTRUNK/out/Debug
 
-
-LIBS += -Wl,-z,now
-LIBS += -Wl,-z,relro
-LIBS += -Wl,--fatal-warnings
-LIBS += -Wl,-z,defs -pthread
-LIBS += -Wl,--disable-new-dtags -m64
-LIBS += -Wl,-O1
-LIBS += -Wl,--as-needed
+# TODO: seems to be unnesessary
+#LIBS += -Wl,-z,now
+#LIBS += -Wl,-z,relro
+#LIBS += -Wl,--fatal-warnings
+#LIBS += -Wl,-z,defs -pthread
+#LIBS += -Wl,--disable-new-dtags -m64
+#LIBS += -Wl,-O1
+#LIBS += -Wl,--as-needed
 
 LIBS += -Wl,--start-group
 
 LIBS += $$WEBRTCBUILD/obj/webrtc/api/libjingle_peerconnection.a
-
 LIBS += $$WEBRTCBUILD/obj/webrtc/system_wrappers/libfield_trial_default.a
 LIBS += $$WEBRTCBUILD/obj/chromium/src/third_party/jsoncpp/libjsoncpp.a
 LIBS += $$WEBRTCBUILD/obj/webrtc/base/librtc_base.a

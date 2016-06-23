@@ -318,6 +318,6 @@ void PeerClientCallback::newFrameSlot(QImage* newImg) {
 
     memcpy(pData, newImg->convertToFormat(QImage::Format_RGBA8888).bits(), numBytes);
     m_managerInterface->setImageData(pData, numBytes, newImg->width(), newImg->height());
-    qDebug() << "ping1";
+
     QTimer::singleShot(1000/25, this, SLOT(requestNewFrameSlot()));
 }

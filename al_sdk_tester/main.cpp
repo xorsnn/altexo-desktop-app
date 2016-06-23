@@ -61,7 +61,7 @@ int main(int argc, char *argv[])
     // **
     // * KINECT
     // *
-
+    qDebug() << "KINECT";
     AlSensorInterface* sensorInterface = NULL;
     QPluginLoader sensorPluginLoader("/home/xors/workspace/QT/kinect_source_build/source/build/libkinect_source.so");
     QObject *sensorPlugin = sensorPluginLoader.instance();
@@ -84,17 +84,21 @@ int main(int argc, char *argv[])
     //======================================
     //======================================
     //======================================
+    qDebug() << "MANAGER!";
     //test external lib
-    void* handle = dlopen("/home/xors/workspace/QT/build-al_manager-qt5-Release/libal_manager.so", RTLD_LAZY);
-
+//    void* handle = dlopen("/home/xors/workspace/QT/build-al_manager-qt5-Release/libal_manager.so", RTLD_LAZY);
+    void* handle = dlopen("/home/xors/workspace/QT/altexo/ALTEXO_SDK/build/libaltexo_sdk.so", RTLD_LAZY);
+    qDebug() << "MANAGER2!";
     AlManagerInterface* (*create)();
     void (*destroy)(AlManagerInterface*);
 
     create = (AlManagerInterface* (*)())dlsym(handle, "create_object");
     destroy = (void (*)(AlManagerInterface*))dlsym(handle, "destroy_object");
-
+    qDebug() << "MANAGER3!";
     AlManagerInterface* myClass = (AlManagerInterface*)create();
+    qDebug() << "MANAGER4!";
     cb.setManager(myClass);
+    qDebug() << "MANAGER5!";
     myClass->init(&cb);
     myClass->run();
 
