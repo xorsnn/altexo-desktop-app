@@ -24,7 +24,7 @@ CaptureState AlVideoCapturer::Start(const VideoFormat& capture_format)
 {
     LOG(LS_INFO) << "AlVideoCapturer::Start";
 
-//    m_captureThread.start();
+    // m_captureThread.start();
 
     return CS_RUNNING;
 }
@@ -96,6 +96,3 @@ void AlVideoCapturer::setImageData(uint8_t *pImageBytes, size_t len, int width, 
 //        }
 //    }
 }
-
-
-

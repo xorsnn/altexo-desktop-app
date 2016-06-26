@@ -161,5 +161,5 @@ LIBS += $$WEBRTCBUILD/obj/chromium/src/third_party/libvpx/libvpx_intrinsics_avx.
 
 LIBS += -Wl,--end-group
 
-LIBS += -L$$WEBRTCTRUNK/build/linux/debian_wheezy_amd64-sysroot/usr/lib/x86_64-linux-gnu/ \
--lX11 -lXfixes -lXi -lXcomposite -lXext -lXrender -ldl -lrt -lexpat -lXrandr -lm -ldl
+#LIBS += -L$$WEBRTCTRUNK/build/linux/debian_wheezy_amd64-sysroot/usr/lib/x86_64-linux-gnu/ \
+LIBS += -lX11 -lXfixes -lXi -lXcomposite -lXext -lXrender -ldl -lrt -lexpat -lXrandr -lm -ldl

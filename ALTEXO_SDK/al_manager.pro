@@ -23,7 +23,7 @@ win32: {
 CONFIG += c++11
 CONFIG += no_keywords
 
-unix: CONFIG += link_pkgconfig
+#unix: CONFIG += link_pkgconfig
 
 unix: {
     include(al-ext-libs.pri)
@@ -34,11 +34,11 @@ win32: {
 }
 
 QMAKE_CXXFLAGS += -fno-rtti
-QMAKE_CXXFLAGS += -fPIC
+#QMAKE_CXXFLAGS += -fPIC
 
 QMAKE_CXXFLAGS += -D_GLIBCXX_USE_CXX11_ABI=0
 
-DEFINES += AL_KONDUCTOR_LIBRARY
+#DEFINES += AL_KONDUCTOR_LIBRARY
 
 
 LIBS += -lboost_thread -lboost_system

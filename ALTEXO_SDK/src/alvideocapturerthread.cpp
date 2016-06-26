@@ -67,8 +67,6 @@ void AlVideoCapturerThread::threadMain()
         std::cout << "tread exception" << std::endl;
 
     }
-
-
 } // threadMain
 
 

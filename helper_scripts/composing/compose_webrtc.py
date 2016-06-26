@@ -17,6 +17,9 @@ def main():
         resLine += libName
         resLine += ' PROPERTIES IMPORTED_LOCATION ' + line.strip() + ')\n'
 
+        # todo: debug
+        # resLine = line.strip() + '\n'
+
         fOut.write(resLine)
 
         libs.append(libName)
@@ -25,7 +28,8 @@ def main():
 
     # for libName in libs:
     fOut.write('TARGET_LINK_LIBRARIES(${PROJECT_NAME}\n')
-    fOut.write("\n  ".join(libs))
+    # fOut.write("\n  PRIVATE ".join(libs))
+    fOut.write("\n  PRIVATE ".join(libs))
     fOut.write(')\n')
     fOut.close()
 
