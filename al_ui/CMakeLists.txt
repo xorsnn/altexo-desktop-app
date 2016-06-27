@@ -1,6 +1,15 @@
 project(al_ui)
 cmake_minimum_required(VERSION 2.8)
-aux_source_directory(. SRC_LIST)
+
+file(GLOB SRC_LIST
+  src/*.cpp
+  src/*.h
+  src/*.cc
+  src/**/*.cpp
+  src/**/*.h
+  src/**/*.cc
+)
+INCLUDE_DIRECTORIES(./src/)
 
 # Use our modified FindSDL2* modules
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${${PROJECT_NAME}_SOURCE_DIR}/cmake")
@@ -21,10 +30,12 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
 endif()
 
 find_package(SDL2 REQUIRED)
+INCLUDE(${CMAKE_ROOT}/Modules/FindOpenGL.cmake)
 
 include_directories(${SDL2_INCLUDE_DIR})
 include_directories(include)
+include_directories(${OPENGL_INCLUDE_DIR})
 
 add_executable(${PROJECT_NAME} ${SRC_LIST})
-target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARY})
+target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARY} ${OPENGL_LIBRARIES})
 install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${BIN_DIR})
