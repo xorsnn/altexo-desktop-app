@@ -1,9 +1,9 @@
 #include "alvideocapturer.h"
 #include "webrtc/system_wrappers/include/logging.h"
-#include <QElapsedTimer>
+//#include <QElapsedTimer>
 #include <stdlib.h>
-#include <QDebug>
-#include <QDateTime>
+//#include <QDebug>
+//#include <QDateTime>
 using namespace cricket;
 
 AlVideoCapturer::AlVideoCapturer() :
@@ -24,7 +24,7 @@ CaptureState AlVideoCapturer::Start(const VideoFormat& capture_format)
 {
     LOG(LS_INFO) << "AlVideoCapturer::Start";
 
-//    m_captureThread.start();
+    // m_captureThread.start();
 
     return CS_RUNNING;
 }
@@ -50,7 +50,7 @@ bool AlVideoCapturer::IsScreencast() const
     return true;
 }
 
-bool AlVideoCapturer::GetPreferredFourccs(std::vector<quint32>* fourccs)
+bool AlVideoCapturer::GetPreferredFourccs(std::vector<uint32_t>* fourccs)
 {
     fourccs->push_back(FOURCC_ABGR);
     return true;
@@ -96,6 +96,3 @@ void AlVideoCapturer::setImageData(uint8_t *pImageBytes, size_t len, int width, 
 //        }
 //    }
 }
-
-
-

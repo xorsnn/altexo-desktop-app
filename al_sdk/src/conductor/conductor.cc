@@ -687,4 +687,3 @@ void Conductor::SendMessage(const std::string& json_object) {
     std::string* msg = new std::string(json_object);
     queueUIThreadCallback(SEND_MESSAGE_TO_PEER, msg);
 }
-

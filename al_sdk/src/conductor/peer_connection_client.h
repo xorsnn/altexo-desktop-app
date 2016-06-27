@@ -14,7 +14,7 @@
 
 #include <map>
 #include <string>
-#include <QString>
+//#include <QString>
 
 #include "webrtc/base/nethelpers.h"
 #include "webrtc/base/physicalsocketserver.h"

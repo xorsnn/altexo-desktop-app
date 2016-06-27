@@ -15,12 +15,11 @@
 #include "webrtc/base/logging.h"
 #include "webrtc/base/nethelpers.h"
 #include "webrtc/base/stringutils.h"
+#include <iostream>
 
 #ifdef WIN32
 #include "webrtc/base/win32socketserver.h"
 #endif
-
-#include <QDebug>
 
 using rtc::sprintfn;
 
@@ -61,7 +60,7 @@ PeerConnectionClient::~PeerConnectionClient() {
 
 void PeerConnectionClient::InitSocketSignals() {
     if (this->debug_) {
-        qDebug() << "PeerConnectionClient::InitSocketSignals";
+        std::cout << "PeerConnectionClient::InitSocketSignals" << std::endl;
     }
     ASSERT(control_socket_.get() != NULL);
     ASSERT(hanging_get_.get() != NULL);
@@ -94,7 +93,7 @@ const Peers& PeerConnectionClient::peers() const {
 void PeerConnectionClient::RegisterObserver(
         PeerConnectionClientObserver* callback) {
     if (this->debug_) {
-        qDebug() << "PeerConnectionClient::RegisterObserver";
+        std::cout << "PeerConnectionClient::RegisterObserver" << std::endl;
     }
     ASSERT(!callback_);
     callback_ = callback;
@@ -103,9 +102,9 @@ void PeerConnectionClient::RegisterObserver(
 void PeerConnectionClient::Connect(const std::string& server, int port,
                                    const std::string& client_name) {
     if (this->debug_) {
-        qDebug() << "PeerConnectionClient::Connect";
-        qDebug() << QString::fromStdString(server);
-        qDebug() << QString::fromStdString(client_name);
+        std::cout << "PeerConnectionClient::Connect";
+        std::cout << server << std::endl;
+        std::cout << client_name << std::endl;
     }
 
     ASSERT(!server.empty());
@@ -113,7 +112,7 @@ void PeerConnectionClient::Connect(const std::string& server, int port,
 
     if (state_ != NOT_CONNECTED) {
         if (this->debug_) {
-            qDebug() << "The client must not be connected before you can call Connect()";
+            std::cout << "The client must not be connected before you can call Connect()" << std::endl;
         }
         LOG(WARNING)
                 << "The client must not be connected before you can call Connect()";
@@ -140,14 +139,14 @@ void PeerConnectionClient::Connect(const std::string& server, int port,
     if (server_address_.IsUnresolvedIP()) {
         state_ = RESOLVING;
         resolver_ = new rtc::AsyncResolver();
-        qDebug() << "<<111";
-        qDebug() << this->resolver_;
+
+//        qDebug() << this->resolver_;
 //        qDebug() << this->resolver_->SignalDone;
         this->resolver_->SignalDone.connect(this, &PeerConnectionClient::OnResolveResult);
-        qDebug() << "<<222";
+//        qDebug() << "<<222";
         resolver_->Start(server_address_);
     } else {
-        qDebug() << "<<333";
+//        qDebug() << "<<333";
         DoConnect();
     }
 }
@@ -155,7 +154,7 @@ void PeerConnectionClient::Connect(const std::string& server, int port,
 void PeerConnectionClient::OnResolveResult(
         rtc::AsyncResolverInterface* resolver) {
     if (this->debug_) {
-        qDebug() << "PeerConnectionClient::OnResolveResult";
+        std::cout << "PeerConnectionClient::OnResolveResult" << std::endl;
     }
     if (resolver_->GetError() != 0) {
         callback_->OnServerConnectionFailure();
@@ -170,7 +169,7 @@ void PeerConnectionClient::OnResolveResult(
 
 void PeerConnectionClient::DoConnect() {
     if (this->debug_) {
-        qDebug() << "PeerConnectionClient::DoConnect";
+        std::cout << "PeerConnectionClient::DoConnect" << std::endl;
     }
     control_socket_.reset(CreateClientSocket(server_address_.ipaddr().family()));
     hanging_get_.reset(CreateClientSocket(server_address_.ipaddr().family()));
@@ -181,16 +180,14 @@ void PeerConnectionClient::DoConnect() {
     onconnect_data_ = buffer;
 
     if (this->debug_) {
-        qDebug() << QString::fromUtf8(buffer);
+        std::cout << buffer << std::endl;
     }
 
-    qDebug() << "< 4";
     bool ret = ConnectControlSocket();
     if (ret)
-        qDebug() << "< 5";
         state_ = SIGNING_IN;
     if (!ret) {
-        qDebug() << "< 6";
+//        qDebug() << "< 6";
         callback_->OnServerConnectionFailure();
     }
 }
@@ -267,8 +264,7 @@ void PeerConnectionClient::Close() {
 
 bool PeerConnectionClient::ConnectControlSocket() {
     if (this->debug_) {
-        qDebug() << "PeerConnectionClient::ConnectControlSocket";
-//        qDebug() << QString::fromStdString(this->server_address_);
+        std::cout << "PeerConnectionClient::ConnectControlSocket" << std::endl;
     }
     ASSERT(control_socket_->GetState() == rtc::Socket::CS_CLOSED);
     int err = control_socket_->Connect(server_address_);
@@ -281,8 +277,7 @@ bool PeerConnectionClient::ConnectControlSocket() {
 
 void PeerConnectionClient::OnConnect(rtc::AsyncSocket* socket) {
     if (this->debug_) {
-        qDebug() << "PeerConnectionClient::OnConnect";
-
+        std::cout << "PeerConnectionClient::OnConnect" << std::endl;
     }
     ASSERT(!onconnect_data_.empty());
     size_t sent = socket->Send(onconnect_data_.c_str(), onconnect_data_.length());
@@ -293,7 +288,7 @@ void PeerConnectionClient::OnConnect(rtc::AsyncSocket* socket) {
 
 void PeerConnectionClient::OnHangingGetConnect(rtc::AsyncSocket* socket) {
     if (this->debug_) {
-        qDebug() << "PeerConnectionClient::OnHangingGetConnect";
+        std::cout << "PeerConnectionClient::OnHangingGetConnect" << std::endl;
     }
 
     char buffer[1024];
@@ -386,7 +381,7 @@ bool PeerConnectionClient::ReadIntoBuffer(rtc::AsyncSocket* socket,
 
 void PeerConnectionClient::OnRead(rtc::AsyncSocket* socket) {
     if (this->debug_) {
-        qDebug() << "PeerConnectionClient::OnRead";
+        std::cout << "PeerConnectionClient::OnRead" << std::endl;
     }
     size_t content_length = 0;
     if (ReadIntoBuffer(socket, &control_data_, &content_length)) {
@@ -396,7 +391,7 @@ void PeerConnectionClient::OnRead(rtc::AsyncSocket* socket) {
         if (ok) {
             if (my_id_ == -1) {
                 if (this->debug_) {
-                    qDebug() << "PeerConnectionClient::OnRead my_id_ == -1";
+                    std::cout << "PeerConnectionClient::OnRead my_id_ == -1" << std::endl;
                 }
                 // First response.  Let's store our server assigned ID.
                 ASSERT(state_ == SIGNING_IN);
@@ -405,7 +400,7 @@ void PeerConnectionClient::OnRead(rtc::AsyncSocket* socket) {
 
                 // The body of the response will be a list of already connected peers.
                 if (content_length) {
-                    qDebug() << "<< 6";
+//                    qDebug() << "<< 6";
                     size_t pos = eoh + 4;
                     while (pos < control_data_.size()) {
                         size_t eol = control_data_.find('\n', pos);
@@ -419,7 +414,7 @@ void PeerConnectionClient::OnRead(rtc::AsyncSocket* socket) {
                             peers_[id] = name;
                             // TOOD
 //                            callback_->OnPeerConnected(id, name);
-                            qDebug() << "<< 7";
+
                         }
                         pos = eol + 1;
                     }
@@ -428,13 +423,13 @@ void PeerConnectionClient::OnRead(rtc::AsyncSocket* socket) {
                 callback_->OnSignedIn();
             } else if (state_ == SIGNING_OUT) {
                 if (this->debug_) {
-                    qDebug() << "PeerConnectionClient::OnRead state_ == SIGNING_OUT";
+                    std::cout << "PeerConnectionClient::OnRead state_ == SIGNING_OUT" << std::endl;
                 }
                 Close();
                 callback_->OnDisconnected();
             } else if (state_ == SIGNING_OUT_WAITING) {
                 if (this->debug_) {
-                    qDebug() << "PeerConnectionClient::OnRead state_ == SIGNING_OUT_WAITING";
+                    std::cout << "PeerConnectionClient::OnRead state_ == SIGNING_OUT_WAITING" << std::endl;
                 }
                 SignOut();
             }
@@ -452,7 +447,7 @@ void PeerConnectionClient::OnRead(rtc::AsyncSocket* socket) {
 
 void PeerConnectionClient::OnHangingGetRead(rtc::AsyncSocket* socket) {
     if (this->debug_) {
-        qDebug() << "PeerConnectionClient::OnHangingGetRead";
+        std::cout << "PeerConnectionClient::OnHangingGetRead" << std::endl;
     }
     LOG(INFO) << __FUNCTION__;
     size_t content_length = 0;
@@ -556,8 +551,8 @@ bool PeerConnectionClient::ParseServerResponse(const std::string& response,
 
 void PeerConnectionClient::OnClose(rtc::AsyncSocket* socket, int err) {
     if (this->debug_) {
-        qDebug() << "PeerConnectionClient::OnClose";
-        qDebug() << err;
+        std::cout << "PeerConnectionClient::OnClose" << std::endl;
+        std::cout << err << std::endl;
     }
     LOG(INFO) << __FUNCTION__;
 
@@ -568,9 +563,9 @@ void PeerConnectionClient::OnClose(rtc::AsyncSocket* socket, int err) {
 #else
     if (err != ECONNREFUSED) {
 #endif
-        qDebug() << "====close ref!===";
+//        qDebug() << "====close ref!===";
         if (socket == hanging_get_.get()) {
-            qDebug() << "====close get===";
+//            qDebug() << "====close get===";
             if (state_ == CONNECTED) {
                 hanging_get_->Close();
                 hanging_get_->Connect(server_address_);
@@ -580,14 +575,14 @@ void PeerConnectionClient::OnClose(rtc::AsyncSocket* socket, int err) {
         }
     } else {
         if (socket == control_socket_.get()) {
-            qDebug() << "====close control===";
+//            qDebug() << "====close control===";
             LOG(WARNING) << "Connection refused; retrying in 2 seconds";
             if (this->debug_) {
-                qDebug() << "Connection refused; retrying in 2 seconds";
+//                qDebug() << "Connection refused; retrying in 2 seconds";
             }
             rtc::Thread::Current()->PostDelayed(RTC_FROM_HERE, kReconnectDelay, this, 0);
         } else {
-            qDebug() << "====close get!===";
+//            qDebug() << "====close get!===";
             Close();
             callback_->OnDisconnected();
         }
