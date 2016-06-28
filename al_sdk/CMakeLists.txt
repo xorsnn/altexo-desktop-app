@@ -40,7 +40,7 @@ add_definitions(-DWEBRTC_POSIX)
 add_definitions(-DPOSIX)
 
 # Set output dir
-set(BIN_DIR ${${PROJECT_NAME}_SOURCE_DIR}/../../al_build/al_ui)
+# set(BIN_DIR ${${PROJECT_NAME}_SOURCE_DIR}/../../al_build/al_ui)
 
 add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
 # add_executable(${PROJECT_NAME} ${SRC_LIST})

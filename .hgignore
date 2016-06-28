@@ -10,3 +10,4 @@ build-*
 .gitignore
 al_sdk/build/
 al_ui/build/
+build/
