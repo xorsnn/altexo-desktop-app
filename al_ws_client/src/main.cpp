@@ -18,8 +18,6 @@ typedef websocketpp::config::asio_tls_client::message_type::ptr message_ptr;
 typedef websocketpp::lib::shared_ptr<boost::asio::ssl::context> context_ptr;
 typedef client::connection_ptr connection_ptr;
 
-
-
 class perftest {
 public:
   typedef perftest type;

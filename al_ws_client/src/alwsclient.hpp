@@ -22,6 +22,7 @@ private:
   void handleHttpResponse(cpr::Response r, int responseType);
 
   std::string m_token;
+  std::string m_wssLink;
 };
 
 #endif // ALWSCLIENT_H
