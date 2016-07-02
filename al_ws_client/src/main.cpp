@@ -1,138 +1,88 @@
-#include <websocketpp/config/asio_client.hpp>
-#include <websocketpp/client.hpp>
+/*
+ * libwebsockets-test-client - libwebsockets test implementation
+ *
+ * Copyright (C) 2011-2016 Andy Green <andy@warmcat.com>
+ *
+ * This file is made available under the Creative Commons CC0 1.0
+ * Universal Public Domain Dedication.
+ *
+ * The person who associated a work with this deed has dedicated
+ * the work to the public domain by waiving all of his or her rights
+ * to the work worldwide under copyright law, including all related
+ * and neighboring rights, to the extent allowed by law. You can copy,
+ * modify, distribute and perform the work, even for commercial purposes,
+ * all without asking permission.
+ *
+ * The test apps are intended to be adapted for use in your code, which
+ * may be proprietary.  So unlike the library itself, they are licensed
+ * Public Domain.
+ */
+
+#include <libwebsockets.h>
+#include "alconnclient.hpp"
 
 #include <iostream>
-#include <chrono>
+#include <getopt.h>
+
+static int deny_deflate, deny_mux, longlived, mirror_lifetime;
+
+static struct option options[] = {
+  { "help",	no_argument,		NULL, 'h' },
+  { "debug",      required_argument,      NULL, 'd' },
+  { "port",	required_argument,	NULL, 'p' },
+  { "ssl",	no_argument,		NULL, 's' },
+  { "version",	required_argument,	NULL, 'v' },
+  { "undeflated",	no_argument,		NULL, 'u' },
+  { "nomux",	no_argument,		NULL, 'n' },
+  { "longlived",	no_argument,		NULL, 'l' },
+  { NULL, 0, 0, 0 }
+};
 
 
-#include "alwsclient.hpp"
 
-typedef websocketpp::client<websocketpp::config::asio_client> client;
+int main(int argc, char **argv)
+{
+  int n = 0, ret = 0, port = 7681, use_ssl = 0, ietf_version = -1;
+  while (n >= 0) {
 
-using websocketpp::lib::placeholders::_1;
-using websocketpp::lib::placeholders::_2;
-using websocketpp::lib::bind;
+    // if (argc < 2) {
+	  //   // usage();
+		// }
+    // if (optind >= argc) {
+	  //   // usage();
+		// }
 
-// pull out the type of messages sent by our config
-typedef websocketpp::config::asio_tls_client::message_type::ptr message_ptr;
-typedef websocketpp::lib::shared_ptr<boost::asio::ssl::context> context_ptr;
-typedef client::connection_ptr connection_ptr;
+    n = getopt_long(argc, argv, "nuv:hsp:d:l", options, NULL);
 
-class perftest {
-public:
-  typedef perftest type;
-  typedef std::chrono::duration<int,std::micro> dur_type;
-
-  perftest () {
-    m_endpoint.set_access_channels(websocketpp::log::alevel::all);
-    m_endpoint.set_error_channels(websocketpp::log::elevel::all);
-
-    // Initialize ASIO
-    m_endpoint.init_asio();
-
-    // Register our handlers
-    m_endpoint.set_socket_init_handler(bind(&type::on_socket_init,this,::_1));
-    //m_endpoint.set_tls_init_handler(bind(&type::on_tls_init,this,::_1));
-    m_endpoint.set_message_handler(bind(&type::on_message,this,::_1,::_2));
-    m_endpoint.set_open_handler(bind(&type::on_open,this,::_1));
-    m_endpoint.set_close_handler(bind(&type::on_close,this,::_1));
-    m_endpoint.set_fail_handler(bind(&type::on_fail,this,::_1));
-  }
-
-  void start(std::string uri) {
-    websocketpp::lib::error_code ec;
-    client::connection_ptr con = m_endpoint.get_connection(uri, ec);
-
-    if (ec) {
-      m_endpoint.get_alog().write(websocketpp::log::alevel::app,ec.message());
-      return;
-    }
-
-    //con->set_proxy("http://humupdates.uchicago.edu:8443");
-
-    m_endpoint.connect(con);
-
-    // Start the ASIO io_service run loop
-    m_start = std::chrono::high_resolution_clock::now();
-    m_endpoint.run();
-  }
-
-  void on_socket_init(websocketpp::connection_hdl) {
-    m_socket_init = std::chrono::high_resolution_clock::now();
-  }
-
-  context_ptr on_tls_init(websocketpp::connection_hdl) {
-    m_tls_init = std::chrono::high_resolution_clock::now();
-    context_ptr ctx = websocketpp::lib::make_shared<boost::asio::ssl::context>(boost::asio::ssl::context::tlsv1);
-
-    try {
-      ctx->set_options(boost::asio::ssl::context::default_workarounds |
-        boost::asio::ssl::context::no_sslv2 |
-        boost::asio::ssl::context::no_sslv3 |
-        boost::asio::ssl::context::single_dh_use);
-      } catch (std::exception& e) {
-        std::cout << e.what() << std::endl;
-      }
-      return ctx;
-    }
-
-    void on_fail(websocketpp::connection_hdl hdl) {
-      client::connection_ptr con = m_endpoint.get_con_from_hdl(hdl);
-
-      std::cout << "Fail handler" << std::endl;
-      std::cout << con->get_state() << std::endl;
-      std::cout << con->get_local_close_code() << std::endl;
-      std::cout << con->get_local_close_reason() << std::endl;
-      std::cout << con->get_remote_close_code() << std::endl;
-      std::cout << con->get_remote_close_reason() << std::endl;
-      std::cout << con->get_ec() << " - " << con->get_ec().message() << std::endl;
-    }
-
-    void on_open(websocketpp::connection_hdl hdl) {
-      m_open = std::chrono::high_resolution_clock::now();
-      m_endpoint.send(hdl, "", websocketpp::frame::opcode::text);
-    }
-    void on_message(websocketpp::connection_hdl hdl, message_ptr) {
-      m_message = std::chrono::high_resolution_clock::now();
-      m_endpoint.close(hdl,websocketpp::close::status::going_away,"");
-    }
-    void on_close(websocketpp::connection_hdl) {
-      m_close = std::chrono::high_resolution_clock::now();
-
-      std::cout << "Socket Init: " << std::chrono::duration_cast<dur_type>(m_socket_init-m_start).count() << std::endl;
-      std::cout << "TLS Init: " << std::chrono::duration_cast<dur_type>(m_tls_init-m_start).count() << std::endl;
-      std::cout << "Open: " << std::chrono::duration_cast<dur_type>(m_open-m_start).count() << std::endl;
-      std::cout << "Message: " << std::chrono::duration_cast<dur_type>(m_message-m_start).count() << std::endl;
-      std::cout << "Close: " << std::chrono::duration_cast<dur_type>(m_close-m_start).count() << std::endl;
-    }
-  private:
-    client m_endpoint;
-
-    std::chrono::high_resolution_clock::time_point m_start;
-    std::chrono::high_resolution_clock::time_point m_socket_init;
-    std::chrono::high_resolution_clock::time_point m_tls_init;
-    std::chrono::high_resolution_clock::time_point m_open;
-    std::chrono::high_resolution_clock::time_point m_message;
-    std::chrono::high_resolution_clock::time_point m_close;
-  };
-
-  int main(int argc, char* argv[]) {
-    std::string uri = "wss://echo.websocket.org";
-
-    AlWsClient tmp;
-
-    if (argc == 2) {
-      uri = argv[1];
-    }
-
-    try {
-      perftest endpoint;
-      endpoint.start(uri);
-    } catch (const std::exception & e) {
-      std::cout << e.what() << std::endl;
-    } catch (websocketpp::lib::error_code e) {
-      std::cout << e.message() << std::endl;
-    } catch (...) {
-      std::cout << "other exception" << std::endl;
+    if (n < 0)
+    continue;
+    switch (n) {
+      case 'd':
+      lws_set_log_level(atoi(optarg), NULL);
+      break;
+      case 's':
+      use_ssl = 2; /* 2 = allow selfsigned */
+      break;
+      case 'p':
+      port = atoi(optarg);
+      break;
+      case 'l':
+      longlived = 1;
+      break;
+      case 'v':
+      ietf_version = atoi(optarg);
+      break;
+      case 'u':
+      deny_deflate = 1;
+      break;
+      case 'n':
+      deny_mux = 1;
+      break;
+      case 'h': {
+	      // usage();
+			}
     }
   }
+	AlConnClient cl;
+  return 1;
+}

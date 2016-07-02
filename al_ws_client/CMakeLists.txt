@@ -30,13 +30,14 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
 endif()
 
 
+set(LWS_OPENSSL_SUPPORT 1)
+
 include_directories(include)
-include_directories(../vendor/include)
+include_directories(/usr/include)
 
 # TODO: environment dependent
 set(LIB_CPR_PATH "/home/xors/workspace/ALTEXO/cpr")
 
-include_directories(../vendor/include)
 include_directories("${LIB_CPR_PATH}/include")
 
 find_package(Boost)
@@ -44,6 +45,6 @@ find_package(Boost)
 add_executable(${PROJECT_NAME} ${SRC_LIST})
 target_link_libraries(${PROJECT_NAME}
   ${LIB_CPR_PATH}/build/lib/libcpr.a
-  boost_system -lpthread -lssl -lcrypto -lcurl
+  boost_system -lpthread -lssl -lcrypto -lcurl -lwebsockets
 )
 # install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${BIN_DIR})
