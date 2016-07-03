@@ -28,14 +28,19 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
   endif()
 endif()
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 
 find_package(SDL2 REQUIRED)
+find_package(Boost)
 INCLUDE(${CMAKE_ROOT}/Modules/FindOpenGL.cmake)
 
 include_directories(${SDL2_INCLUDE_DIR})
 include_directories(include)
+include_directories(../include)
+include_directories(../vendor/Boost.DLL/include/)
 include_directories(${OPENGL_INCLUDE_DIR})
 
 add_executable(${PROJECT_NAME} ${SRC_LIST})
-target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARY} ${OPENGL_LIBRARIES})
+target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARY}
+  ${OPENGL_LIBRARIES} boost_system boost_filesystem -ldl)
 # install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${BIN_DIR})

@@ -4,6 +4,7 @@
 
 #include "imgui/imgui.h"
 #include "imgui_impl_sdl.h"
+#include "manager.hpp"
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <iostream>
@@ -12,6 +13,7 @@
 #define IM_ARRAYSIZE(_ARR) ((int)(sizeof(_ARR) / sizeof(*_ARR)))
 
 int main(int, char **) {
+
   // Setup SDL
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
     printf("Error: %s\n", SDL_GetError());
@@ -50,6 +52,8 @@ int main(int, char **) {
   bool show_test_window = true;
 
   ImVec4 clear_color = ImColor(114, 144, 154);
+
+  Manager m;
 
   // Main loop
 
