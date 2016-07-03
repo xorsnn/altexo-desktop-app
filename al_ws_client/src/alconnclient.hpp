@@ -1,13 +1,12 @@
 #ifndef ALCONNCLIENT_H
 #define ALCONNCLIENT_H
 
-#include <iostream>
 #include <cpr/cpr.h>
+#include <iostream>
 
 #include "alwsclient.hpp"
 
-class AlConnClient
-{
+class AlConnClient {
 public:
   AlConnClient();
   ~AlConnClient();
@@ -26,7 +25,7 @@ private:
   std::string m_token;
   std::string m_wssLink;
 
-	AlWsClient m_WsCl;
+  AlWsClient m_WsCl;
 };
 
 #endif // ALCONNCLIENT_H

@@ -3,28 +3,28 @@
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 
+#include <signal.h>
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
-#include <signal.h>
 
 #ifdef _WIN32
 #define random rand
 #include "gettimeofday.h"
 #else
-#include <syslog.h>
 #include <sys/time.h>
+#include <syslog.h>
 #include <unistd.h>
 #endif
 
-static struct lws *wsi_dumb, *wsi_mirror;
+static struct lws *wsi_dumb;
 static volatile int force_exit;
-static unsigned int opts;
 
-static AlWsClient* me;
+static AlWsClient *me;
 
-static int cbDumbIncrementStatic(struct lws *wsi, enum lws_callback_reasons reason,
-			void *user, void *in, size_t len) {
+static int cbDumbIncrementStatic(struct lws *wsi,
+                                 enum lws_callback_reasons reason, void *user,
+                                 void *in, size_t len) {
   return me->cbDumbIncrement(wsi, reason, user, in, len);
 };
 
@@ -51,31 +51,19 @@ enum demo_protocols {
 };
 
 static const struct lws_extension exts[] = {
-  {
-    "permessage-deflate",
-    lws_extension_callback_pm_deflate,
-    "permessage-deflate; client_max_window_bits"
-  },
-  {
-    "deflate-frame",
-    lws_extension_callback_pm_deflate,
-    "deflate_frame"
-  },
-  { NULL, NULL, NULL /* terminator */ }
-};
+    {"permessage-deflate", lws_extension_callback_pm_deflate,
+     "permessage-deflate; client_max_window_bits"},
+    {"deflate-frame", lws_extension_callback_pm_deflate, "deflate_frame"},
+    {NULL, NULL, NULL /* terminator */}};
 
-void sighandler(int sig)
-{
-  force_exit = 1;
-}
+void sighandler(int sig) { force_exit = 1; }
 
-static int ratelimit_connects(unsigned int *last, unsigned int secs)
-{
+static int ratelimit_connects(unsigned int *last, unsigned int secs) {
   struct timeval tv;
 
   gettimeofday(&tv, NULL);
   if (tv.tv_sec - (*last) < secs)
-  return 0;
+    return 0;
 
   *last = tv.tv_sec;
 
@@ -85,21 +73,18 @@ static int ratelimit_connects(unsigned int *last, unsigned int secs)
 AlWsClient::AlWsClient() {
   me = this;
   lws_protocols pr1 = {
-    "dumb-increment-protocol,fake-nonexistant-protocol",
-    // boost::bind(&AlWsClient::cbDumbIncrement, this, _1, _2, _3, _4, _5),
-    cbDumbIncrementStatic	,
-    0,
-    1024, // 20 was before
+      "dumb-increment-protocol,fake-nonexistant-protocol",
+      // boost::bind(&AlWsClient::cbDumbIncrement, this, _1, _2, _3, _4, _5),
+      cbDumbIncrementStatic, 0,
+      1024, // 20 was before
   };
   m_protocols[0] = pr1;
 
-  lws_protocols pr3 = { NULL, NULL, 0, 0 };
-  m_protocols[1] =  pr3;/* end */
+  lws_protocols pr3 = {NULL, NULL, 0, 0};
+  m_protocols[1] = pr3; /* end */
 }
 
-AlWsClient::~AlWsClient() {
-
-}
+AlWsClient::~AlWsClient() {}
 
 /*
 * dumb_increment protocol
@@ -107,61 +92,57 @@ AlWsClient::~AlWsClient() {
 * since this also happens to be protocols[0], some callbacks that are not
 * bound to a specific protocol also turn up here.
 */
-int AlWsClient::cbDumbIncrement(struct lws *wsi, enum lws_callback_reasons reason,
-			void *user, void *in, size_t len)
-{
+int AlWsClient::cbDumbIncrement(struct lws *wsi,
+                                enum lws_callback_reasons reason, void *user,
+                                void *in, size_t len) {
   std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
   std::cout << reason << std::endl;
   std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
-  int n;
   switch (reason) {
 
-    case LWS_CALLBACK_CLIENT_ESTABLISHED:
+  case LWS_CALLBACK_CLIENT_ESTABLISHED:
     lwsl_info("dumb: LWS_CALLBACK_CLIENT_ESTABLISHED\n");
     break;
 
-    case LWS_CALLBACK_CLOSED:
+  case LWS_CALLBACK_CLOSED:
     lwsl_notice("dumb: LWS_CALLBACK_CLOSED\n");
     wsi_dumb = NULL;
     break;
 
-    case LWS_CALLBACK_CLIENT_RECEIVE: {
-      // std::cout << "dfffff" << std::endl;
-      ((char *)in)[len] = '\0';
-      // std::cout << len << std::endl;
-      std::cout << (char *)in << std::endl;
-      lwsl_info("rx %d '%s'\n", (int)len, (char *)in);
-      // n = lws_write(wsi, (unsigned char *)in, len, LWS_WRITE_TEXT);
+  case LWS_CALLBACK_CLIENT_RECEIVE: {
+    // std::cout << "dfffff" << std::endl;
+    ((char *)in)[len] = '\0';
+    // std::cout << len << std::endl;
+    std::cout << (char *)in << std::endl;
+    lwsl_info("rx %d '%s'\n", (int)len, (char *)in);
+    // n = lws_write(wsi, (unsigned char *)in, len, LWS_WRITE_TEXT);
+  } break;
+
+  /* because we are protocols[0] ... */
+
+  case LWS_CALLBACK_CLIENT_CONNECTION_ERROR: {
+    if (wsi == wsi_dumb) {
+      lwsl_err("dumb: LWS_CALLBACK_CLIENT_CONNECTION_ERROR\n");
+      wsi_dumb = NULL;
     }
-    break;
+    // if (wsi == wsi_mirror) {
+    //   lwsl_err("mirror: LWS_CALLBACK_CLIENT_CONNECTION_ERROR\n");
+    //   wsi_mirror = NULL;
+    // }
+  } break;
 
-    /* because we are protocols[0] ... */
-
-    case LWS_CALLBACK_CLIENT_CONNECTION_ERROR: {
-      if (wsi == wsi_dumb) {
-        lwsl_err("dumb: LWS_CALLBACK_CLIENT_CONNECTION_ERROR\n");
-        wsi_dumb = NULL;
-      }
-      // if (wsi == wsi_mirror) {
-      //   lwsl_err("mirror: LWS_CALLBACK_CLIENT_CONNECTION_ERROR\n");
-      //   wsi_mirror = NULL;
-      // }
-    }
-    break;
-
-    case LWS_CALLBACK_CLIENT_CONFIRM_EXTENSION_SUPPORTED: {
-      if ((strcmp((char*)in, "deflate-stream") == 0) && m_denyDeflate) {
-        lwsl_notice("denied deflate-stream extension\n");
-        return 1;
-      }
-      if ((strcmp((char*)in, "x-webkit-deflate-frame") == 0))
-      return 1;
-      if ((strcmp((char*)in, "deflate-frame") == 0))
+  case LWS_CALLBACK_CLIENT_CONFIRM_EXTENSION_SUPPORTED: {
+    if ((strcmp((char *)in, "deflate-stream") == 0) && m_denyDeflate) {
+      lwsl_notice("denied deflate-stream extension\n");
       return 1;
     }
-    break;
+    if ((strcmp((char *)in, "x-webkit-deflate-frame") == 0))
+      return 1;
+    if ((strcmp((char *)in, "deflate-frame") == 0))
+      return 1;
+  } break;
 
-    default:
+  default:
     break;
   }
 
@@ -170,7 +151,7 @@ int AlWsClient::cbDumbIncrement(struct lws *wsi, enum lws_callback_reasons reaso
 
 int AlWsClient::run() {
 
-  unsigned int rl_dumb = 0, rl_mirror = 0;
+  unsigned int rl_dumb = 0;
   struct lws_context_creation_info info;
   struct lws_client_connect_info i;
   struct lws_context *context;
@@ -187,12 +168,11 @@ int AlWsClient::run() {
   memset(&i, 0, sizeof(i));
 
   i.port = m_port;
-  char* pathTmp = (char*)(m_path.c_str());
+  char *pathTmp = (char *)(m_path.c_str());
   if (lws_parse_uri(pathTmp, &prot, &i.address, &i.port, &p)) {
     std::cout << "PARCE!" << std::endl;
     // usage();
   }
-
 
   /* add back the leading / on path */
   path[0] = '/';
