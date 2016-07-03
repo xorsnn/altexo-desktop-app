@@ -39,6 +39,7 @@ include_directories(/usr/include)
 set(LIB_CPR_PATH "/home/xors/workspace/ALTEXO/cpr")
 
 include_directories("${LIB_CPR_PATH}/include")
+include_directories(../include/)
 
 find_package(Boost)
 

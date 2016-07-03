@@ -37,6 +37,7 @@ static struct option options[] = {{"help", no_argument, NULL, 'h'},
                                   {NULL, 0, 0, 0}};
 
 int main(int argc, char **argv) {
+  std::cout << "-zero" << std::endl;
   int n = 0, ret = 0, port = 7681, use_ssl = 0, ietf_version = -1;
   while (n >= 0) {
 
@@ -47,6 +48,7 @@ int main(int argc, char **argv) {
     //   // usage();
     // }
 
+    std::cout << "zero" << std::endl;
     n = getopt_long(argc, argv, "nuv:hsp:d:l", options, NULL);
 
     if (n < 0)
@@ -78,6 +80,7 @@ int main(int argc, char **argv) {
     }
     }
   }
+  std::cout << "one" << std::endl;
   AlConnClient cl;
   return 1;
 }

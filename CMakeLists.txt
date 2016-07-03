@@ -13,3 +13,4 @@ include_directories("${PROJECT_SOURCE_DIR}")
 
 add_subdirectory(al_sdk)
 add_subdirectory(al_ui)
+add_subdirectory(al_ws_client)
