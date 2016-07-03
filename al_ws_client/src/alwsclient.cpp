@@ -28,11 +28,6 @@ static int cbDumbIncrementStatic(struct lws *wsi, enum lws_callback_reasons reas
   return me->cbDumbIncrement(wsi, reason, user, in, len);
 };
 
-// static int cbLwsMirrorStatic(struct lws *wsi, enum lws_callback_reasons reason,
-// 		    void *user, void *in, size_t len) {
-//   return me->cbLwsMirror(wsi, reason, user, in, len);
-// };
-
 /*
 * This demo shows how to connect multiple websockets simultaneously to a
 * websocket server (there is no restriction on their having to be the same
@@ -92,20 +87,11 @@ AlWsClient::AlWsClient() {
   lws_protocols pr1 = {
     "dumb-increment-protocol,fake-nonexistant-protocol",
     // boost::bind(&AlWsClient::cbDumbIncrement, this, _1, _2, _3, _4, _5),
-    cbDumbIncrementStatic,
+    cbDumbIncrementStatic	,
     0,
     1024, // 20 was before
   };
   m_protocols[0] = pr1;
-
-  // lws_protocols pr2 = {
-  //   "fake-nonexistant-protocol,lws-mirror-protocol",
-  //   // boost::bind(&AlWsClient::cbLwsMirror, this, _1, _2, _3, _4, _5),
-  //   cbLwsMirrorStatic,
-  //   0,
-  //   128,
-  // };
-  // m_protocols[1] = pr2;
 
   lws_protocols pr3 = { NULL, NULL, 0, 0 };
   m_protocols[1] =  pr3;/* end */
@@ -181,84 +167,6 @@ int AlWsClient::cbDumbIncrement(struct lws *wsi, enum lws_callback_reasons reaso
 
   return 0;
 }
-
-// /* lws-mirror_protocol */
-// int AlWsClient::cbLwsMirror(struct lws *wsi, enum lws_callback_reasons reason,
-// 		    void *user, void *in, size_t len)
-// {
-//   // std::cout << "DDDDDDDDDDDDDDDDDDDDDDDDDDDDD" << std::endl;
-//   // std::cout << reason << std::endl;
-//   // std::cout << "DDDDDDDDDDDDDDDDDDDDDDDDDDDDD" << std::endl;
-//
-//   unsigned char buf[LWS_PRE + 4096];
-//   unsigned int rands[4];
-//   int l = 0;
-//   int n;
-//
-//   switch (reason) {
-//   case LWS_CALLBACK_CLIENT_ESTABLISHED: {
-//     lwsl_notice("mirror: LWS_CALLBACK_CLIENT_ESTABLISHED\n");
-//     lws_get_random(lws_get_context(wsi), rands, sizeof(rands[0]));
-//     m_mirrorLifetime = 16384 + (rands[0] & 65535);
-//     /* useful to test single connection stability */
-//     if (m_longlived) {
-//       m_mirrorLifetime += 500000;
-//     }
-//     lwsl_info("opened mirror connection with "
-//     "%d lifetime\n", m_mirrorLifetime);
-//     /*
-//     * mirror_lifetime is decremented each send, when it reaches
-//     * zero the connection is closed in the send callback.
-//     * When the close callback comes, wsi_mirror is set to NULL
-//     * so a new connection will be opened
-//     *
-//     * start the ball rolling,
-//     * LWS_CALLBACK_CLIENT_WRITEABLE will come next service
-//     */
-//     lws_callback_on_writable(wsi);
-//   }
-//   break;
-//
-//   case LWS_CALLBACK_CLOSED:
-//   lwsl_notice("mirror: LWS_CALLBACK_CLOSED mirror_lifetime=%d\n", m_mirrorLifetime);
-//   wsi_mirror = NULL;
-//   break;
-//
-//   case LWS_CALLBACK_CLIENT_WRITEABLE:
-//   for (n = 0; n < 1; n++) {
-//     lws_get_random(lws_get_context(wsi), rands, sizeof(rands));
-//     l += sprintf((char *)&buf[LWS_PRE + l],
-//     "c #%06X %u %u %u;",
-//     rands[0] & 0xffffff,	/* colour */
-//     rands[1] & 511,		/* x */
-//     rands[2] & 255,		/* y */
-//     (rands[3] & 31) + 1);	/* radius */
-//   }
-//
-//   n = lws_write(wsi, &buf[LWS_PRE], l,
-//     lws_write_protocol(lws_write_protocol(opts) | LWS_WRITE_TEXT));
-//     if (n < 0)
-//     return -1;
-//     if (n < l) {
-//       lwsl_err("Partial write LWS_CALLBACK_CLIENT_WRITEABLE\n");
-//       return -1;
-//     }
-//
-//     m_mirrorLifetime--;
-//     if (!m_mirrorLifetime) {
-//       lwsl_info("closing mirror session\n");
-//       return -1;
-//     }
-//     /* get notified as soon as we can write again */
-//     lws_callback_on_writable(wsi);
-//     break;
-//
-//     default:
-//     break;
-//   }
-//
-//   return 0;
-// }
 
 int AlWsClient::run() {
 
@@ -341,12 +249,6 @@ int AlWsClient::run() {
       i.protocol = m_protocols[PROTOCOL_DUMB_INCREMENT].name;
       wsi_dumb = lws_client_connect_via_info(&i);
     }
-
-    // if (!wsi_mirror && ratelimit_connects(&rl_mirror, 2u)) {
-    //   lwsl_notice("mirror: connecting\n");
-    //   i.protocol = m_protocols[PROTOCOL_LWS_MIRROR].name;
-    //   wsi_mirror = lws_client_connect_via_info(&i);
-    // }
 
     lws_service(context, 500);
   }
