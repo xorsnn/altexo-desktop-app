@@ -14,6 +14,7 @@ INCLUDE_DIRECTORIES(./src/)
 # Use our modified FindSDL2* modules
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${${PROJECT_NAME}_SOURCE_DIR}/cmake")
 
+
 # Set output dir
 # set(BIN_DIR ${${PROJECT_NAME}_SOURCE_DIR}/../../al_build/al_ui)
 
@@ -28,6 +29,7 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
   endif()
 endif()
+set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 
 
 set(LWS_OPENSSL_SUPPORT 1)
@@ -43,7 +45,9 @@ include_directories(../include/)
 
 find_package(Boost)
 
-add_executable(${PROJECT_NAME} ${SRC_LIST})
+# add_executable(${PROJECT_NAME} ${SRC_LIST})
+add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
+
 target_link_libraries(${PROJECT_NAME}
   ${LIB_CPR_PATH}/build/lib/libcpr.a
   boost_system -lpthread -lssl -lcrypto -lcurl -lwebsockets
