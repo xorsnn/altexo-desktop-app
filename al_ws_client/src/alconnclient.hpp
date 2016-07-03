@@ -5,6 +5,7 @@
 #include <iostream>
 
 #include "alwsclient.hpp"
+#include "boost/thread.hpp"
 
 class AlConnClient {
 public:
@@ -21,11 +22,13 @@ public:
 
 private:
   void handleHttpResponse(cpr::Response r, int responseType);
+  // void threadMain();
 
   std::string m_token;
   std::string m_wssLink;
 
   AlWsClient m_WsCl;
+  boost::thread m_internalThread;
 };
 
 #endif // ALCONNCLIENT_H

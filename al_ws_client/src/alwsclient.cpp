@@ -150,6 +150,11 @@ int AlWsClient::cbDumbIncrement(struct lws *wsi,
 }
 
 int AlWsClient::run() {
+  m_internalThread = boost::thread(&AlWsClient::threadMain, this);
+  return 1;
+}
+
+int AlWsClient::threadMain() {
 
   unsigned int rl_dumb = 0;
   struct lws_context_creation_info info;

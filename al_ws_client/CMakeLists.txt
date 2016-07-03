@@ -51,5 +51,6 @@ add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
 target_link_libraries(${PROJECT_NAME}
   ${LIB_CPR_PATH}/build/lib/libcpr.a
   boost_system -lpthread -lssl -lcrypto -lcurl -lwebsockets
+  boost_thread
 )
 # install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${BIN_DIR})
