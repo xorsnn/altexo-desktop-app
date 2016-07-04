@@ -58,7 +58,7 @@ public:
 
 private:
   std::vector<uint8_t> m_buffer_depth;
-  std::vector<uint8_t> m_buffer_depth_new;
+  // std::vector<uint8_t> m_buffer_depth_new;
   std::vector<uint8_t> m_buffer_video;
 
   uint16_t *m_depth;
@@ -70,9 +70,7 @@ public:
   bool m_newRgbFrame;
   bool m_newDepthFrame;
 
-  //    int minDepth = 200;
   int minDepth = 555;
-  //    int maxDepth = 900;
   int maxDepth = 1005;
 };
 
