@@ -1,20 +1,21 @@
 // ImGui - standalone example application for SDL2 + OpenGL
-// If you are new to ImGui, see examples/README.txt and documentation at the top of imgui.cpp.
+// If you are new to ImGui, see examples/README.txt and documentation at the top
+// of imgui.cpp.
 
 #include "imgui/imgui.h"
 #include "imgui_impl_sdl.h"
-#include <stdio.h>
-#include <iostream>
+#include "manager.hpp"
 #include <SDL.h>
 #include <SDL_opengl.h>
+#include <iostream>
+#include <stdio.h>
 
-#define IM_ARRAYSIZE(_ARR)  ((int)(sizeof(_ARR)/sizeof(*_ARR)))
+#define IM_ARRAYSIZE(_ARR) ((int)(sizeof(_ARR) / sizeof(*_ARR)))
 
-int main(int, char**)
-{
+int main(int, char **) {
+
   // Setup SDL
-  if (SDL_Init(SDL_INIT_VIDEO|SDL_INIT_TIMER) != 0)
-  {
+  if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
     printf("Error: %s\n", SDL_GetError());
     return -1;
   }
@@ -27,54 +28,59 @@ int main(int, char**)
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
   SDL_DisplayMode current;
   SDL_GetCurrentDisplayMode(0, &current);
-  SDL_Window *window = SDL_CreateWindow("Altexo holographic chat", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED, 1280, 720, SDL_WINDOW_OPENGL|SDL_WINDOW_RESIZABLE);
+  SDL_Window *window = SDL_CreateWindow(
+      "Altexo holographic chat", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
+      1280, 720, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
   SDL_GLContext glcontext = SDL_GL_CreateContext(window);
 
   // Setup ImGui binding
   ImGui_ImplSdl_Init(window);
 
   // Load Fonts
-  // (there is a default font, this is only if you want to change it. see extra_fonts/README.txt for more details)
-  //ImGuiIO& io = ImGui::GetIO();
-  //io.Fonts->AddFontDefault();
-  //io.Fonts->AddFontFromFileTTF("../../extra_fonts/Cousine-Regular.ttf", 15.0f);
-  //io.Fonts->AddFontFromFileTTF("../../extra_fonts/DroidSans.ttf", 16.0f);
-  //io.Fonts->AddFontFromFileTTF("../../extra_fonts/ProggyClean.ttf", 13.0f);
-  //io.Fonts->AddFontFromFileTTF("../../extra_fonts/ProggyTiny.ttf", 10.0f);
-  //io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f, NULL, io.Fonts->GetGlyphRangesJapanese());
+  // (there is a default font, this is only if you want to change it. see
+  // extra_fonts/README.txt for more details)
+  // ImGuiIO& io = ImGui::GetIO();
+  // io.Fonts->AddFontDefault();
+  // io.Fonts->AddFontFromFileTTF("../../extra_fonts/Cousine-Regular.ttf",
+  // 15.0f);
+  // io.Fonts->AddFontFromFileTTF("../../extra_fonts/DroidSans.ttf", 16.0f);
+  // io.Fonts->AddFontFromFileTTF("../../extra_fonts/ProggyClean.ttf", 13.0f);
+  // io.Fonts->AddFontFromFileTTF("../../extra_fonts/ProggyTiny.ttf", 10.0f);
+  // io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f,
+  // NULL, io.Fonts->GetGlyphRangesJapanese());
 
   bool show_test_window = true;
 
   ImVec4 clear_color = ImColor(114, 144, 154);
 
+  Manager m;
+
   // Main loop
 
   bool done = false;
-  while (!done)
-  {
+  while (!done) {
     SDL_Event event;
-    while (SDL_PollEvent(&event))
-    {
+    while (SDL_PollEvent(&event)) {
       ImGui_ImplSdl_ProcessEvent(&event);
       if (event.type == SDL_QUIT)
-      done = true;
+        done = true;
     }
 
     ImGui_ImplSdl_NewFrame(window);
 
     // 1. Show a simple window
-    // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in a window automatically called "Debug"
+    // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in
+    // a window automatically called "Debug"
     {
       // ImGui::SetNextWindowSize(ImVec2(200,100), ImGuiSetCond_FirstUseEver);
       // ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiSetCond_FirstUseEver);
-      ImGui::SetNextWindowSize(ImVec2(100,400), ImGuiSetCond_Once);
-      ImGui::SetNextWindowPos(ImVec2(10,10), ImGuiSetCond_Once);
+      ImGui::SetNextWindowSize(ImVec2(100, 400), ImGuiSetCond_Once);
+      ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiSetCond_Once);
 
       ImGui::Begin("Contacts", NULL);
       static int selected = 0;
       ImGui::BeginChild("left pane", ImVec2(-1, 0), true);
-      for (int i = 0; i < 20; i++)
-      {
+      for (int i = 0; i < 20; i++) {
         char label[128];
         sprintf(label, "MyObject %d", i);
         if (ImGui::Selectable(label, selected == i)) {
@@ -86,15 +92,16 @@ int main(int, char**)
       ImGui::End();
     }
 
-    // 3. Show the ImGui test window. Most of the sample code is in ImGui::ShowTestWindow()
-    if (show_test_window)
-    {
+    // 3. Show the ImGui test window. Most of the sample code is in
+    // ImGui::ShowTestWindow()
+    if (show_test_window) {
       ImGui::SetNextWindowPos(ImVec2(650, 20), ImGuiSetCond_FirstUseEver);
       ImGui::ShowTestWindow(&show_test_window);
     }
 
     // Rendering
-    glViewport(0, 0, (int)ImGui::GetIO().DisplaySize.x, (int)ImGui::GetIO().DisplaySize.y);
+    glViewport(0, 0, (int)ImGui::GetIO().DisplaySize.x,
+               (int)ImGui::GetIO().DisplaySize.y);
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
     ImGui::Render();

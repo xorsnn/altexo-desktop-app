@@ -1,13 +1,13 @@
 #ifndef ALCONNCLIENT_H
 #define ALCONNCLIENT_H
 
-#include <iostream>
 #include <cpr/cpr.h>
+#include <iostream>
 
 #include "alwsclient.hpp"
+#include "boost/thread.hpp"
 
-class AlConnClient
-{
+class AlConnClient {
 public:
   AlConnClient();
   ~AlConnClient();
@@ -22,11 +22,13 @@ public:
 
 private:
   void handleHttpResponse(cpr::Response r, int responseType);
+  // void threadMain();
 
   std::string m_token;
   std::string m_wssLink;
 
-	AlWsClient m_WsCl;
+  AlWsClient m_WsCl;
+  boost::thread m_internalThread;
 };
 
 #endif // ALCONNCLIENT_H

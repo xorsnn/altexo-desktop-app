@@ -1,6 +1,7 @@
 #ifndef ALWSCLIENT_H
 #define ALWSCLIENT_H
 
+#include "boost/thread.hpp"
 #include <iostream>
 #include <libwebsockets.h>
 
@@ -11,8 +12,7 @@
 // 	  "[-d <log bitfield>] [-l]\n");
 // }
 
-class AlWsClient
-{
+class AlWsClient {
 public:
   AlWsClient();
   ~AlWsClient();
@@ -20,18 +20,20 @@ public:
   int init(std::string path, int port) {
     m_path = path;
     m_port = port;
+    return 1;
   }
 
   int run();
 
   // Callbacks
   int cbDumbIncrement(struct lws *wsi, enum lws_callback_reasons reason,
-  			void *user, void *in, size_t len);
+                      void *user, void *in, size_t len);
   // int cbLwsMirror(struct lws *wsi, enum lws_callback_reasons reason,
-	// 	    void *user, void *in, size_t len);
+  // 	    void *user, void *in, size_t len);
 
 private:
-  int m_useSsl = 2; /* 2 = allow selfsigned */
+  int threadMain();
+  int m_useSsl = 2;  /* 2 = allow selfsigned */
   int m_port = 8888; // TODO: move to parameters
   int m_longlived = 1;
   int m_ietfVersion = -1;
@@ -42,9 +44,9 @@ private:
   // TODO: not sure what this is about
   int m_mirrorLifetime;
 
-
   // list of supported protocols and callbacks
   struct lws_protocols m_protocols[2];
+  boost::thread m_internalThread;
 };
 
 #endif // ALWsCLIENT_H
