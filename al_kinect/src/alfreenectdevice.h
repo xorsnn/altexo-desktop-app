@@ -37,13 +37,11 @@ public:
 
   // Do not call directly even in child
   void VideoCallback(void *_rgb, uint32_t timestamp);
-
   // Do not call directly even in child
   void DepthCallback(void *_depth, uint32_t timestamp);
 
-  bool getRGB(std::vector<uint8_t> &buffer);
-
-  bool getDepth(std::vector<uint8_t> &buffer);
+  std::vector<uint8_t> getRGB();
+  std::vector<uint16_t> getDepth();
 
   void createRainbowPallet();
 
@@ -57,14 +55,15 @@ public:
   void updateSettings();
 
 private:
-  std::vector<uint8_t> m_buffer_depth;
+  // std::vector<uint8_t> m_buffer_depth;
+  std::vector<uint16_t> m_bufferDepth;
   // std::vector<uint8_t> m_buffer_depth_new;
-  std::vector<uint8_t> m_buffer_video;
+  std::vector<uint8_t> m_bufferVideo;
 
-  uint16_t *m_depth;
+  // uint16_t *m_depth;
 
-  Mutex m_rgb_mutex;
-  Mutex m_depth_mutex;
+  Mutex m_rgbMutex;
+  Mutex m_depthMutex;
 
 public:
   bool m_newRgbFrame;

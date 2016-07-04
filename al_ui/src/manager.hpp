@@ -1,35 +1,29 @@
 #ifndef MANAGER_H
 #define MANAGER_H
 
-// #include "alconnclient.hpp"
-// #include "ws_client_api.hpp"
-// #include <boost/config.hpp>
-// #include <string>
-#include "sdk_api.hpp"
-#include "sensor_api.hpp"
-#include "ws_client_api.hpp"
-#include <boost/dll/import.hpp> // for import_alias
+#include "AL_API/sdk_api.hpp"
+#include "AL_API/sensor_api.hpp"
+#include "AL_API/ws_client_api.hpp"
+#include <boost/dll/import.hpp>
+#include <boost/thread.hpp>
 
-// class AlCallback;
-// class AlManager;
-
-class Manager {
+class Manager : public AlSensorCb {
 public:
   Manager();
   ~Manager();
 
-  // void init(AlCallback *alCallback);
+  // sensor cb
+  void newFrame(std::vector<uint8_t> rgbFrame);
+
+  void frameThread();
 
 private:
   void initSensor();
   void initWsConnection();
 
-  boost::shared_ptr<AlWsClientInterface> m_WsClient;
+  boost::shared_ptr<AlWsClientInterface> m_wsClient;
   boost::shared_ptr<AlSensorAPI> m_sensor;
-  // AlConnClient *m_connClient;
+  boost::thread m_frameThread;
 };
-
-// extern "C" BOOST_SYMBOL_EXPORT AlWsPlugin plugin;
-// AlWsPlugin plugin;
 
 #endif // MANAGER_H

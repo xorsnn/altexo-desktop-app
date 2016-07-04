@@ -1,7 +1,7 @@
 #ifndef ALSDKPLUGIN_H
 #define ALSDKPLUGIN_H
 
-#include "sdk_api.hpp"
+#include "AL_API/sdk_api.hpp"
 #include <boost/config.hpp>
 #include <string>
 

@@ -1,9 +1,9 @@
 #ifndef ALKINECTINTERFACE_H
 #define ALKINECTINTERFACE_H
 
+#include "AL_CB/al_sensor_cb.hpp"
 #include "alfreenectdevice.h"
-// #include <QImage>
-// #include <QPainter>
+#include <boost/signals2/signal.hpp>
 #if defined(__APPLE__)
 #include <GLUT/glut.h>
 #include <OpenGL/gl.h>
@@ -22,16 +22,13 @@ public:
   // void newWFrameSignal(QImage *image);
   // public Q_SLOTS:
 
-  void init();
+  void init(AlSensorCb *alSensorCb);
   void start();
   void stop();
 
   void needWDataSlot();
-
   void updateDeviceState();
-
   void changeMaxDepth(int delta);
-
   void updateSettingsSlot();
 
 public:
@@ -44,6 +41,9 @@ public:
 private:
   Freenect::Freenect freenect;
   freenect_video_format requested_format;
+  AlSensorCb *m_sensorCb;
+  boost::signals2::signal<void(std::vector<uint8_t> rgbFrame)>
+      m_needNewFrameSignal;
 
   // QImage *m_image;
 };

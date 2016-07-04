@@ -42,5 +42,5 @@ include_directories(${OPENGL_INCLUDE_DIR})
 
 add_executable(${PROJECT_NAME} ${SRC_LIST})
 target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARY}
-  ${OPENGL_LIBRARIES} boost_system boost_filesystem -ldl)
+${OPENGL_LIBRARIES} boost_system boost_filesystem boost_thread -ldl)
 # install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${BIN_DIR})

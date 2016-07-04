@@ -1,6 +1,7 @@
 #ifndef SENSORAPI_H
 #define SENSORAPI_H
 
+#include "AL_CB/al_sensor_cb.hpp"
 #include <string>
 
 class AlCallback;
@@ -8,7 +9,8 @@ class AlCallback;
 class AlSensorAPI {
 public:
   virtual ~AlSensorAPI() {}
-  virtual void init(AlCallback *alCallback) = 0;
+  virtual void init(AlSensorCb *alSensorCb) = 0;
+  virtual void requestNewFrame() = 0;
 };
 //]
 
