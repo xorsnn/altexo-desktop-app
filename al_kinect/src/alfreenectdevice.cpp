@@ -9,7 +9,7 @@ ALFreenectDevice::ALFreenectDevice(freenect_context *_ctx, int _index)
       m_buffer_video(freenect_find_video_mode(FREENECT_RESOLUTION_MEDIUM,
                                               FREENECT_VIDEO_RGB)
                          .bytes),
-      m_buffer_depth_new(480 * 640 * 3), m_newRgbFrame(false),
+      // m_buffer_depth_new(480 * 640 * 3), m_newRgbFrame(false),
       m_newDepthFrame(false) {
   setDepthFormat(FREENECT_DEPTH_REGISTERED);
   this->updateSettings();
@@ -72,6 +72,7 @@ ALColor ALFreenectDevice::huePixelForDepth(uint16_t pix) {
 }
 
 void ALFreenectDevice::DepthCallback(void *_depth, uint32_t timestamp) {
+  std::cout << "ALFreenectDevice::DepthCallback" << std::endl;
   Mutex::ScopedLock lock(m_depth_mutex);
   m_depth = static_cast<uint16_t *>(_depth);
   // TODO: we can make it on GPU
@@ -79,9 +80,9 @@ void ALFreenectDevice::DepthCallback(void *_depth, uint32_t timestamp) {
   // but it seems also not to be a bottleneck
   for (unsigned int i = 0; i < 640 * 480; i++) {
     ALColor color = this->huePixelForDepth(m_depth[i]);
-    m_buffer_depth_new[3 * i + 0] = (int)floorf(color.r);
-    m_buffer_depth_new[3 * i + 1] = (int)floorf(color.g);
-    m_buffer_depth_new[3 * i + 2] = (int)floorf(color.b);
+    m_buffer_depth[3 * i + 0] = (int)floorf(color.r);
+    m_buffer_depth[3 * i + 1] = (int)floorf(color.g);
+    m_buffer_depth[3 * i + 2] = (int)floorf(color.b);
   }
   m_newDepthFrame = true;
 }
@@ -99,7 +100,7 @@ bool ALFreenectDevice::getDepth(std::vector<uint8_t> &buffer) {
   Mutex::ScopedLock lock(m_depth_mutex);
   if (!m_newDepthFrame)
     return false;
-  buffer.swap(m_buffer_depth_new);
+  buffer.swap(m_buffer_depth);
   m_newDepthFrame = false;
   return true;
 }
