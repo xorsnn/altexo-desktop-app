@@ -2,9 +2,12 @@
 // If you are new to ImGui, see examples/README.txt and documentation at the top
 // of imgui.cpp.
 
+#include "hologramrenderer.hpp"
 #include "imgui/imgui.h"
 #include "imgui_impl_sdl.h"
 #include "manager.hpp"
+#include <GL/glew.h>
+#include <GL/glu.h>
 #include <SDL.h>
 #include <SDL_opengl.h>
 #include <iostream>
@@ -13,7 +16,6 @@
 #define IM_ARRAYSIZE(_ARR) ((int)(sizeof(_ARR) / sizeof(*_ARR)))
 
 int main(int, char **) {
-
   // Setup SDL
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
     printf("Error: %s\n", SDL_GetError());
@@ -24,8 +26,14 @@ int main(int, char **) {
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
+
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+  // SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
+  // SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
+  // SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
+  // SDL_GL_CONTEXT_PROFILE_CORE);
+
   SDL_DisplayMode current;
   SDL_GetCurrentDisplayMode(0, &current);
   SDL_Window *window = SDL_CreateWindow(
@@ -33,8 +41,36 @@ int main(int, char **) {
       1280, 720, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
   SDL_GLContext glcontext = SDL_GL_CreateContext(window);
 
+  // Opengl
+
+  // Initialize GLEW
+  glewExperimental = GL_TRUE;
+  GLenum glewError = glewInit();
+  if (glewError != GLEW_OK) {
+    printf("Error initializing GLEW! %s\n", glewGetErrorString(glewError));
+  }
+
+  // Use Vsync
+  if (SDL_GL_SetSwapInterval(1) < 0) {
+    printf("Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
+  }
+
+  // // Initialize OpenGL
+  // if (!initGL()) {
+  //   printf("Unable to initialize OpenGL!\n");
+  //   // success = false;
+  // }
+  // ~ opengl
+
   // Setup ImGui binding
   ImGui_ImplSdl_Init(window);
+
+  // local init
+  HologramRenderer hologramRenderer;
+  hologramRenderer.init();
+  Manager m;
+  m.initSensor(&hologramRenderer);
+  // ~ local init
 
   // Load Fonts
   // (there is a default font, this is only if you want to change it. see
@@ -52,8 +88,6 @@ int main(int, char **) {
   bool show_test_window = true;
 
   ImVec4 clear_color = ImColor(114, 144, 154);
-
-  Manager m;
 
   // Main loop
 
@@ -100,10 +134,14 @@ int main(int, char **) {
     }
 
     // Rendering
+
     glViewport(0, 0, (int)ImGui::GetIO().DisplaySize.x,
                (int)ImGui::GetIO().DisplaySize.y);
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
+
+    hologramRenderer.render();
+
     ImGui::Render();
     SDL_GL_SwapWindow(window);
   }

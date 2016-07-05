@@ -95,9 +95,9 @@ AlWsClient::~AlWsClient() {}
 int AlWsClient::cbDumbIncrement(struct lws *wsi,
                                 enum lws_callback_reasons reason, void *user,
                                 void *in, size_t len) {
-  std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
-  std::cout << reason << std::endl;
-  std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
+  // std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
+  // std::cout << reason << std::endl;
+  // std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
   switch (reason) {
 
   case LWS_CALLBACK_CLIENT_ESTABLISHED:

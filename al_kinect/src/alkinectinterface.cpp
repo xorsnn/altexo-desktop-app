@@ -1,4 +1,5 @@
 #include "alkinectinterface.h"
+#include <boost/bind.hpp>
 
 ALKinectInterface *thisObject;
 
@@ -13,9 +14,12 @@ ALKinectInterface::ALKinectInterface() {
   // this->m_image = new QImage(1280, 480, QImage::Format_RGB888);
 }
 
-void ALKinectInterface::init() {
+void ALKinectInterface::init(AlSensorCb *alSensorCb) {
   this->device = &freenect.createDevice<ALFreenectDevice>(0);
   this->start();
+  m_sensorCb = alSensorCb;
+  m_needNewFrameSignal.connect(
+      boost::bind(&AlSensorCb::newFrame, m_sensorCb, _1));
 }
 
 void ALKinectInterface::start() {
@@ -38,11 +42,13 @@ void ALKinectInterface::updateDeviceState() {
 }
 
 void ALKinectInterface::needWDataSlot() {
+  // std::cout << "ALKinectInterface::needWDataSlot" << std::endl;
   if (this->device->m_newDepthFrame && this->device->m_newDepthFrame) {
     static std::vector<uint8_t> rgb_(640 * 480 * 3);
     this->device->getRGB(rgb_);
-    static std::vector<uint8_t> depth_(640 * 480 * 3);
-    this->device->getDepth(depth_);
+    m_needNewFrameSignal(rgb_);
+    // static std::vector<uint8_t> depth_(640 * 480 * 3);
+    // this->device->getDepth(depth_);
 
     // QImage image_rgb((&(rgb_[0])), 640, 480, QImage::Format_RGB888);
     // QImage image_depth((&(depth_[0])), 640, 480, QImage::Format_RGB888);

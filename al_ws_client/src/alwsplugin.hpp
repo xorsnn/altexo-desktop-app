@@ -1,8 +1,8 @@
 #ifndef ALWSPLUGIN_H
 #define ALWSPLUGIN_H
 
+#include "AL_API/ws_client_api.hpp"
 #include "alconnclient.hpp"
-#include "ws_client_api.hpp"
 #include <boost/config.hpp>
 #include <string>
 
