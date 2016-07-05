@@ -66,9 +66,10 @@ int main(int, char **) {
   ImGui_ImplSdl_Init(window);
 
   // local init
-  // Manager m;
   HologramRenderer hologramRenderer;
   hologramRenderer.init();
+  Manager m;
+  m.initSensor(&hologramRenderer);
   // ~ local init
 
   // Load Fonts

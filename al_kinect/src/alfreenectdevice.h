@@ -33,14 +33,14 @@ private:
 class ALFreenectDevice : public Freenect::FreenectDevice {
 public:
   ALFreenectDevice(freenect_context *_ctx, int _index);
-  //~ALFreenectDevice(){}
+  ~ALFreenectDevice() {}
 
   // Do not call directly even in child
   void VideoCallback(void *_rgb, uint32_t timestamp);
   // Do not call directly even in child
   void DepthCallback(void *_depth, uint32_t timestamp);
 
-  std::vector<uint8_t> getRGB();
+  bool getRGB(std::vector<uint8_t> &buffer);
   std::vector<uint16_t> getDepth();
 
   void createRainbowPallet();

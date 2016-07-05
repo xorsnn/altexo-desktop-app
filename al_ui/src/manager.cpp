@@ -2,13 +2,13 @@
 #include <iostream>
 Manager::Manager() {
   std::cout << "Manager constructor" << std::endl;
-  initWsConnection();
-  initSensor();
+  // initWsConnection();
+  // initSensor();
 }
 
 Manager::~Manager() {}
 
-void Manager::initSensor() {
+void Manager::initSensor(AlSensorCb *sensorCb) {
   boost::filesystem::path lib_path(
       "/home/xors/workspace/QT/altexo/al_kinect/build/");
   std::cout << "Loading sensor plugin" << std::endl;
@@ -26,7 +26,7 @@ void Manager::initSensor() {
                                                 // `my_plugin_sum`
       );
 
-  m_sensor->init(this);
+  m_sensor->init(sensorCb);
 
   // tread requesting new sensor frame every 30 milliseconds
   boost::thread m_frameThread = boost::thread(&Manager::frameThread, this);

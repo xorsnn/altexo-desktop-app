@@ -44,9 +44,9 @@ void ALKinectInterface::updateDeviceState() {
 void ALKinectInterface::needWDataSlot() {
   // std::cout << "ALKinectInterface::needWDataSlot" << std::endl;
   if (this->device->m_newDepthFrame && this->device->m_newDepthFrame) {
-    m_needNewFrameSignal(this->device->getRGB());
-    // static std::vector<uint8_t> rgb_(640 * 480 * 3);
-    // this->device->getRGB(rgb_);
+    static std::vector<uint8_t> rgb_(640 * 480 * 3);
+    this->device->getRGB(rgb_);
+    m_needNewFrameSignal(rgb_);
     // static std::vector<uint8_t> depth_(640 * 480 * 3);
     // this->device->getDepth(depth_);
 

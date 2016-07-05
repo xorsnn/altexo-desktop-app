@@ -17,10 +17,10 @@ public:
 
   void frameThread();
 
-private:
-  void initSensor();
+  void initSensor(AlSensorCb *sensorCb);
   void initWsConnection();
 
+private:
   boost::shared_ptr<AlWsClientInterface> m_wsClient;
   boost::shared_ptr<AlSensorAPI> m_sensor;
   boost::thread m_frameThread;

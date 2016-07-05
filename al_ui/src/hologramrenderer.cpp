@@ -1,6 +1,8 @@
 #include "hologramrenderer.hpp"
 
 int HologramRenderer::init() {
+  m_newFrame = false;
+  tmpCounter = 1;
   // GL_CHECK_ERRORS
   // load the shader
   std::cout << "< 1" << std::endl;
@@ -16,6 +18,9 @@ int HologramRenderer::init() {
   shader.AddAttribute("vVertex");
   shader.AddAttribute("vColor");
   shader.AddUniform("MVP");
+  shader.AddUniform("textureMap");
+  // pass values of constant uniforms at initialization
+  glUniform1i(shader("textureMap"), 0);
   shader.UnUse();
 
   // GL_CHECK_ERRORS
@@ -74,6 +79,17 @@ int HologramRenderer::init() {
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
+  // setup OpenGL texture and bind to texture unit 0
+  glGenTextures(1, &textureID);
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, textureID);
+  // set texture parameters
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  glBindTexture(GL_TEXTURE_2D, 0);
+
   cout << "Initialization successfull" << endl;
   return 1;
 }
@@ -86,8 +102,23 @@ void HologramRenderer::render() {
   glBindBuffer(GL_ARRAY_BUFFER, vboVerticesID);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIndicesID);
 
+  glActiveTexture(GL_TEXTURE0);
+  glBindTexture(GL_TEXTURE_2D, textureID);
+
+  if (m_newFrame && tmpCounter < 100) {
+    // allocate texture
+    int w = 640;
+    int h = 480;
+
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE,
+                 m_rgbFrame.data());
+
+    m_newFrame = false;
+  }
+
   // bind the shader
   shader.Use();
+
   // pass the shader uniform
   glUniformMatrix4fv(shader("MVP"), 1, GL_FALSE, glm::value_ptr(P * MV));
 
@@ -99,4 +130,13 @@ void HologramRenderer::render() {
   glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
+  glBindTexture(GL_TEXTURE_2D, 0);
+}
+
+void HologramRenderer::newFrame(std::vector<uint8_t> rgbFrame) {
+  if (!m_newFrame) {
+    m_rgbFrame.swap(rgbFrame);
+    m_newFrame = true;
+  }
+  // tmpCounter++;
 }

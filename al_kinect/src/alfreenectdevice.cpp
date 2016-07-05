@@ -9,8 +9,8 @@ ALFreenectDevice::ALFreenectDevice(freenect_context *_ctx, int _index)
       m_bufferVideo(freenect_find_video_mode(FREENECT_RESOLUTION_MEDIUM,
                                              FREENECT_VIDEO_RGB)
                         .bytes),
-      // m_bufferDepth_new(480 * 640 * 3), m_newRgbFrame(false),
-      m_newDepthFrame(false) {
+      // m_bufferDepth_new(480 * 640 * 3),
+      m_newRgbFrame(false), m_newDepthFrame(false) {
   setDepthFormat(FREENECT_DEPTH_REGISTERED);
   this->updateSettings();
 }
@@ -22,8 +22,10 @@ void ALFreenectDevice::setMaxDepth(int newDepth) { this->maxDepth = newDepth; }
 void ALFreenectDevice::VideoCallback(void *_rgb, uint32_t timestamp) {
   Mutex::ScopedLock lock(m_rgbMutex);
   uint8_t *rgb = static_cast<uint8_t *>(_rgb);
-  std::copy(rgb, rgb + getVideoBufferSize(), m_bufferVideo.begin());
-  m_newRgbFrame = true;
+  if (!m_newRgbFrame) {
+    std::copy(rgb, rgb + getVideoBufferSize(), m_bufferVideo.begin());
+    m_newRgbFrame = true;
+  }
 }
 
 float ALFreenectDevice::ofMap(float value, float inputMin, float inputMax,
@@ -84,17 +86,21 @@ void ALFreenectDevice::DepthCallback(void *_depth, uint32_t timestamp) {
   //   m_bufferDepth[3 * i + 1] = (int)floorf(color.g);
   //   m_bufferDepth[3 * i + 2] = (int)floorf(color.b);
   // }
-  std::copy(depth, depth + getDepthBufferSize(), m_bufferDepth.begin());
+  // std::copy(depth, depth + getDepthBufferSize(), m_bufferDepth.begin());
+  // std::cout << m_bufferDepth.size() << std::endl;
+  // std::cout << getDepthBufferSize() << std::endl;
   m_newDepthFrame = true;
 }
 
-std::vector<uint8_t> ALFreenectDevice::getRGB() {
+bool ALFreenectDevice::getRGB(std::vector<uint8_t> &buffer) {
   Mutex::ScopedLock lock(m_rgbMutex);
-  // if (!m_newRgbFrame)
-  // return false;
-  // buffer.swap(m_bufferVideo);
+  if (!m_newRgbFrame) {
+    return false;
+  }
+  buffer.swap(m_bufferVideo);
   m_newRgbFrame = false;
-  return m_bufferVideo;
+  // return m_bufferVideo;
+  return true;
 }
 
 std::vector<uint16_t> ALFreenectDevice::getDepth() {
