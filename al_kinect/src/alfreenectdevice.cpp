@@ -89,7 +89,6 @@ void ALFreenectDevice::DepthCallback(void *_depth, uint32_t timestamp) {
 }
 
 std::vector<uint8_t> ALFreenectDevice::getRGB() {
-  std::cout << "ALFreenectDevice::getRGB" << std::endl;
   Mutex::ScopedLock lock(m_rgbMutex);
   // if (!m_newRgbFrame)
   // return false;
