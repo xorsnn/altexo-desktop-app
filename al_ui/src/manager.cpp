@@ -32,7 +32,9 @@ void Manager::initSensor(AlSensorCb *sensorCb) {
   boost::thread m_frameThread = boost::thread(&Manager::frameThread, this);
 }
 
-void Manager::newFrame(std::vector<uint8_t> rgbFrame) {
+void Manager::newFrame(std::vector<uint8_t> rgbFrame,
+                       std::vector<uint16_t> depthFrame) {
+
   // std::cout << "Manager::newFrame" << std::endl;
 }
 

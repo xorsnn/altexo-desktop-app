@@ -21,6 +21,9 @@ int HologramRenderer::init() {
   shader.AddUniform("textureMap");
   // pass values of constant uniforms at initialization
   glUniform1i(shader("textureMap"), 0);
+  shader.AddUniform("depthTexMap");
+  // pass values of constant uniforms at initialization
+  glUniform1i(shader("depthTexMap"), 9);
   shader.UnUse();
 
   // GL_CHECK_ERRORS
@@ -80,15 +83,25 @@ int HologramRenderer::init() {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
   // setup OpenGL texture and bind to texture unit 0
-  glGenTextures(1, &textureID);
+  glGenTextures(1, &sensorRGBTexID);
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, textureID);
+  glBindTexture(GL_TEXTURE_2D, sensorRGBTexID);
   // set texture parameters
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-  glBindTexture(GL_TEXTURE_2D, 0);
+  // glBindTexture(GL_TEXTURE_2D, 0);
+  // depth tex
+  glGenTextures(1, &sensorDepthTexID);
+  glActiveTexture(GL_TEXTURE9);
+  glBindTexture(GL_TEXTURE_2D, sensorDepthTexID);
+  // set texture parameters
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  // glBindTexture(GL_TEXTURE_2D, 0);
 
   cout << "Initialization successfull" << endl;
   return 1;
@@ -103,15 +116,22 @@ void HologramRenderer::render() {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIndicesID);
 
   glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, textureID);
+  glBindTexture(GL_TEXTURE_2D, sensorRGBTexID);
 
-  if (m_newFrame && tmpCounter < 100) {
+  if (m_newFrame) {
     // allocate texture
     int w = 640;
     int h = 480;
 
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, sensorRGBTexID);
     glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE,
                  m_rgbFrame.data());
+
+    glActiveTexture(GL_TEXTURE9);
+    glBindTexture(GL_TEXTURE_2D, sensorDepthTexID);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, w, h, 0, GL_RED, GL_UNSIGNED_SHORT,
+                 m_depthFrame.data());
 
     m_newFrame = false;
   }
@@ -130,13 +150,16 @@ void HologramRenderer::render() {
   glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-  glBindTexture(GL_TEXTURE_2D, 0);
+
+  // seems to be needed by something, otherwise some artifacts appears
+  glActiveTexture(GL_TEXTURE0);
 }
 
-void HologramRenderer::newFrame(std::vector<uint8_t> rgbFrame) {
+void HologramRenderer::newFrame(std::vector<uint8_t> rgbFrame,
+                                std::vector<uint16_t> depthFrame) {
   if (!m_newFrame) {
     m_rgbFrame.swap(rgbFrame);
+    m_depthFrame.swap(depthFrame);
     m_newFrame = true;
   }
-  // tmpCounter++;
 }

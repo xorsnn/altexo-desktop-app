@@ -40,7 +40,7 @@ public:
   // Do not call directly even in child
   void DepthCallback(void *_depth, uint32_t timestamp);
 
-  bool getRGB(std::vector<uint8_t> &buffer);
+  std::vector<uint8_t> getRGB();
   std::vector<uint16_t> getDepth();
 
   void createRainbowPallet();

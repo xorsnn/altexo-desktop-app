@@ -18,7 +18,8 @@ public:
   void render();
 
   // sensor cb
-  void newFrame(std::vector<uint8_t> rgbFrame);
+  void newFrame(std::vector<uint8_t> rgbFrame,
+                std::vector<uint16_t> depthFrame);
 
 private:
   // shader reference
@@ -29,7 +30,8 @@ private:
   GLuint vboVerticesID;
   GLuint vboIndicesID;
 
-  GLuint textureID;
+  GLuint sensorRGBTexID;
+  GLuint sensorDepthTexID;
 
   // out vertex struct for interleaved attributes
   struct Vertex {
@@ -47,6 +49,7 @@ private:
 
   // internal data
   std::vector<uint8_t> m_rgbFrame;
+  std::vector<uint16_t> m_depthFrame;
   bool m_newFrame;
   int tmpCounter;
 };

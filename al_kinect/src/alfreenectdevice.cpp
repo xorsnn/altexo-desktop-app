@@ -86,28 +86,20 @@ void ALFreenectDevice::DepthCallback(void *_depth, uint32_t timestamp) {
   //   m_bufferDepth[3 * i + 1] = (int)floorf(color.g);
   //   m_bufferDepth[3 * i + 2] = (int)floorf(color.b);
   // }
-  // std::copy(depth, depth + getDepthBufferSize(), m_bufferDepth.begin());
+  std::copy(depth, depth + getDepthBufferSize() / 2, m_bufferDepth.begin());
   // std::cout << m_bufferDepth.size() << std::endl;
   // std::cout << getDepthBufferSize() << std::endl;
   m_newDepthFrame = true;
 }
 
-bool ALFreenectDevice::getRGB(std::vector<uint8_t> &buffer) {
+std::vector<uint8_t> ALFreenectDevice::getRGB() {
   Mutex::ScopedLock lock(m_rgbMutex);
-  if (!m_newRgbFrame) {
-    return false;
-  }
-  buffer.swap(m_bufferVideo);
   m_newRgbFrame = false;
-  // return m_bufferVideo;
-  return true;
+  return m_bufferVideo;
 }
 
 std::vector<uint16_t> ALFreenectDevice::getDepth() {
   Mutex::ScopedLock lock(m_depthMutex);
-  // if (!m_newDepthFrame)
-  // return false;
-  // buffer.swap(m_bufferDepth);
   m_newDepthFrame = false;
   return m_bufferDepth;
 }
