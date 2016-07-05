@@ -25,15 +25,20 @@ int HologramRenderer::init() {
   vertices[0].color = glm::vec3(1, 0, 0);
   vertices[1].color = glm::vec3(0, 1, 0);
   vertices[2].color = glm::vec3(0, 0, 1);
+  vertices[3].color = glm::vec3(0, 1, 1);
 
-  vertices[0].position = glm::vec3(-1, -1, 0);
-  vertices[1].position = glm::vec3(0, 1, 0);
-  vertices[2].position = glm::vec3(1, -1, 0);
+  vertices[0].position = glm::vec3(-0.5, -0.5, 0);
+  vertices[1].position = glm::vec3(0.5, -0.5, 0);
+  vertices[2].position = glm::vec3(0.5, 0.5, 0);
+  vertices[3].position = glm::vec3(-0.5, 0.5, 0);
 
   // setup triangle indices
   indices[0] = 0;
   indices[1] = 1;
   indices[2] = 2;
+  indices[3] = 0;
+  indices[4] = 2;
+  indices[5] = 3;
 
   // GL_CHECK_ERRORS
 
@@ -87,7 +92,7 @@ void HologramRenderer::render() {
   glUniformMatrix4fv(shader("MVP"), 1, GL_FALSE, glm::value_ptr(P * MV));
 
   // drwa triangle
-  glDrawElements(GL_TRIANGLES, 3, GL_UNSIGNED_SHORT, 0);
+  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
   // unbind the shader
   shader.UnUse();
 

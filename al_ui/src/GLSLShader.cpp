@@ -18,12 +18,7 @@ GLSLShader::~GLSLShader(void) {
 void GLSLShader::DeleteShaderProgram() { glDeleteProgram(_program); }
 
 void GLSLShader::LoadFromString(GLenum type, const string &source) {
-  std::cout << "< 9.5" << std::endl;
-
   GLuint shader = glCreateShader(type);
-
-  std::cout << "< 10" << std::endl;
-
   const char *ptmp = source.c_str();
   glShaderSource(shader, 1, &ptmp, NULL);
 
@@ -98,20 +93,15 @@ GLuint GLSLShader::operator()(const string &uniform) {
 #include <fstream>
 void GLSLShader::LoadFromFile(GLenum whichShader, const string &filename) {
   ifstream fp;
-  std::cout << "< 5" << std::endl;
   fp.open(filename.c_str(), ios_base::in);
-  std::cout << "< 6" << std::endl;
   if (fp) {
-    std::cout << "< 7" << std::endl;
     string line, buffer;
     while (getline(fp, line)) {
       buffer.append(line);
       buffer.append("\r\n");
     }
-    std::cout << "< 8" << std::endl;
     // copy to source
     LoadFromString(whichShader, buffer);
-    std::cout << "< 9" << std::endl;
   } else {
     cerr << "Error loading shader: " << filename << endl;
   }
