@@ -1,9 +1,4 @@
 #version 120
-// #extension GL_EXT_gpu_shader4 : enable
-// layout(location=0) out vec4 vFragColor;	//fragment shader output
-
-//input form the vertex shader
-varying vec4 vSmoothColor;		//interpolated colour to fragment shader
 
 uniform sampler2D textureMap;
 uniform sampler2D depthTexMap;
