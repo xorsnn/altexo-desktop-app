@@ -7,7 +7,8 @@
 class AlSensorCb {
 public:
   virtual ~AlSensorCb() {}
-  virtual void newFrame(std::vector<uint8_t> rgbFrame) = 0;
+  virtual void newFrame(std::vector<uint8_t> rgbFrame,
+                        std::vector<uint16_t> depthFrame) = 0;
 };
 //]
 

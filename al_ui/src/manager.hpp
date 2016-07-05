@@ -13,7 +13,8 @@ public:
   ~Manager();
 
   // sensor cb
-  void newFrame(std::vector<uint8_t> rgbFrame);
+  void newFrame(std::vector<uint8_t> rgbFrame,
+                std::vector<uint16_t> depthFrame);
 
   void frameThread();
 

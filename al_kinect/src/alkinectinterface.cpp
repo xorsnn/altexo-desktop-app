@@ -18,8 +18,8 @@ void ALKinectInterface::init(AlSensorCb *alSensorCb) {
   this->device = &freenect.createDevice<ALFreenectDevice>(0);
   this->start();
   m_sensorCb = alSensorCb;
-  m_needNewFrameSignal.connect(
-      boost::bind(&AlSensorCb::newFrame, m_sensorCb, _1));
+  m_newFrameSignal.connect(
+      boost::bind(&AlSensorCb::newFrame, m_sensorCb, _1, _2));
 }
 
 void ALKinectInterface::start() {
@@ -44,9 +44,9 @@ void ALKinectInterface::updateDeviceState() {
 void ALKinectInterface::needWDataSlot() {
   // std::cout << "ALKinectInterface::needWDataSlot" << std::endl;
   if (this->device->m_newDepthFrame && this->device->m_newDepthFrame) {
-    static std::vector<uint8_t> rgb_(640 * 480 * 3);
-    this->device->getRGB(rgb_);
-    m_needNewFrameSignal(rgb_);
+    // static std::vector<uint8_t> rgb_(640 * 480 * 3);
+    // this->device->getRGB(rgb_);
+    m_newFrameSignal(this->device->getRGB(), this->device->getDepth());
     // static std::vector<uint8_t> depth_(640 * 480 * 3);
     // this->device->getDepth(depth_);
 

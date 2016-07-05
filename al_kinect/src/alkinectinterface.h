@@ -42,8 +42,9 @@ private:
   Freenect::Freenect freenect;
   freenect_video_format requested_format;
   AlSensorCb *m_sensorCb;
-  boost::signals2::signal<void(std::vector<uint8_t> rgbFrame)>
-      m_needNewFrameSignal;
+  boost::signals2::signal<void(std::vector<uint8_t> rgbFrame,
+                               std::vector<uint16_t> depthFrame)>
+      m_newFrameSignal;
 
   // QImage *m_image;
 };
