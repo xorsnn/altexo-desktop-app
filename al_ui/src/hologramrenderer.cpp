@@ -130,8 +130,8 @@ void HologramRenderer::render() {
 
     glActiveTexture(GL_TEXTURE9);
     glBindTexture(GL_TEXTURE_2D, sensorDepthTexID);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R16, w, h, 0, GL_RED, GL_UNSIGNED_SHORT,
-                 m_depthFrame.data());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R16UI, w, h, 0, GL_RED_INTEGER,
+                 GL_UNSIGNED_SHORT, m_depthFrame.data());
 
     m_newFrame = false;
   }
