@@ -144,6 +144,7 @@ int main(int, char **) {
 
     ImGui::Render();
     SDL_GL_SwapWindow(window);
+    SDL_Delay(1000 / 30);
   }
 
   // Cleanup
