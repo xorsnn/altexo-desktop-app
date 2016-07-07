@@ -2,12 +2,11 @@
 
 int SensorDataFboRenderer::init() {
   m_newFrame = false;
-  tmpCounter = 1;
   // GL_CHECK_ERRORS
   // load the shader
   // shader.LoadFromFile(GL_VERTEX_SHADER, "../shaders/shader.vert");
-  shader.LoadFromFile(GL_VERTEX_SHADER, "../shaders/shader.vert");
-  shader.LoadFromFile(GL_FRAGMENT_SHADER, "../shaders/shader.frag");
+  shader.LoadFromFile(GL_VERTEX_SHADER, "../shaders/sensorCompose.vert");
+  shader.LoadFromFile(GL_FRAGMENT_SHADER, "../shaders/sensorCompose.frag");
   // compile and link shader
   shader.CreateAndLinkProgram();
   shader.Use();
@@ -15,12 +14,15 @@ int SensorDataFboRenderer::init() {
   shader.AddAttribute("vVertex");
   shader.AddAttribute("vColor");
   shader.AddUniform("MVP");
+
   shader.AddUniform("textureMap");
   // pass values of constant uniforms at initialization
   glUniform1i(shader("textureMap"), 0);
+
   shader.AddUniform("depthTexMap");
   // pass values of constant uniforms at initialization
   glUniform1i(shader("depthTexMap"), 1);
+
   shader.UnUse();
 
   // GL_CHECK_ERRORS
@@ -100,23 +102,11 @@ int SensorDataFboRenderer::init() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
   glBindTexture(GL_TEXTURE_2D, 0);
 
-  // initFBO();
   cout << "Initialization successfull" << endl;
   return 1;
 }
 
 void SensorDataFboRenderer::render() {
-  // // ============ FBO ==============
-  // // enable FBO
-  // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fboID);
-  // // render to colour attachment 0
-  // glDrawBuffer(GL_COLOR_ATTACHMENT0);
-  // // clear the colour and depth buffers
-  // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  //
-  // // // clear the colour and depth buffer
-  // // ============ ~FBO ==============
-
   glBindVertexArray(vaoID);
   glBindBuffer(GL_ARRAY_BUFFER, vboVerticesID);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIndicesID);
@@ -155,18 +145,7 @@ void SensorDataFboRenderer::render() {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
   // seems to be needed by something, otherwise some artifacts appears
-  glActiveTexture(GL_TEXTURE0);
-
-  // // ============ FBO ==============
-  // // unbind the FBO
-  // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-  // // restore the default back buffer
-  // glDrawBuffer(GL_BACK_LEFT);
-  // // bind the FBO output at the current texture
-  // glBindTexture(GL_TEXTURE_2D, renderTextureID);
-  // // render mirror
-  // // mirror->Render(glm::value_ptr(P * MV));
-  // // ============ ~FBO ==============
+  // glActiveTexture(GL_TEXTURE0);
 }
 
 void SensorDataFboRenderer::newFrame(std::vector<uint8_t> rgbFrame,
@@ -177,50 +156,4 @@ void SensorDataFboRenderer::newFrame(std::vector<uint8_t> rgbFrame,
     m_depthFrame.swap(depthFrame);
     m_newFrame = true;
   }
-}
-
-// initialize FBO
-void SensorDataFboRenderer::initFBO() {
-  // generate and bind fbo ID
-  glGenFramebuffers(1, &fboID);
-  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fboID);
-
-  // generate and bind render buffer ID
-  glGenRenderbuffers(1, &rbID);
-  glBindRenderbuffer(GL_RENDERBUFFER, rbID);
-
-  // set the render buffer storage
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32, WIDTH, HEIGHT);
-
-  // generate the offscreen texture
-  glGenTextures(1, &renderTextureID);
-  glBindTexture(GL_TEXTURE_2D, renderTextureID);
-
-  // set texture parameters
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, WIDTH, HEIGHT, 0, GL_BGRA,
-               GL_UNSIGNED_BYTE, NULL);
-
-  // bind the renderTextureID as colour attachment of FBO
-  glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                         GL_TEXTURE_2D, renderTextureID, 0);
-  // set the render buffer as the depth attachment of FBO
-  glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-                            GL_RENDERBUFFER, rbID);
-
-  // check for frame buffer completeness status
-  GLuint status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
-
-  if (status == GL_FRAMEBUFFER_COMPLETE) {
-    printf("FBO setup succeededa.\n");
-  } else {
-    printf("Error in FBO setup.\n");
-  }
-
-  // unbind the texture and FBO
-  glBindTexture(GL_TEXTURE_2D, 0);
-  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }

@@ -17,10 +17,10 @@ int HologramRenderer::init() {
   shader.AddUniform("MVP");
   shader.AddUniform("textureMap");
   // pass values of constant uniforms at initialization
-  glUniform1i(shader("textureMap"), 0);
-  shader.AddUniform("depthTexMap");
+  glUniform1i(shader("textureMap"), 3);
+  // shader.AddUniform("depthTexMap");
   // pass values of constant uniforms at initialization
-  glUniform1i(shader("depthTexMap"), 9);
+  // glUniform1i(shader("depthTexMap"), 9);
   shader.UnUse();
 
   // GL_CHECK_ERRORS
@@ -79,27 +79,6 @@ int HologramRenderer::init() {
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-  // setup OpenGL texture and bind to texture unit 0
-  glGenTextures(1, &sensorRGBTexID);
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, sensorRGBTexID);
-  // set texture parameters
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-  glBindTexture(GL_TEXTURE_2D, 0);
-  // depth tex
-  glGenTextures(1, &sensorDepthTexID);
-  glActiveTexture(GL_TEXTURE9);
-  glBindTexture(GL_TEXTURE_2D, sensorDepthTexID);
-  // set texture parameters
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-  glBindTexture(GL_TEXTURE_2D, 0);
-
   initFBO();
   m_sensorDataFboRenderer.init();
   cout << "Initialization successfull" << endl;
@@ -107,26 +86,26 @@ int HologramRenderer::init() {
 }
 
 void HologramRenderer::render() {
-  // // ============ FBO ==============
-  // // enable FBO
+  // ============ FBO ==============
+  // enable FBO
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fboID);
   // render to colour attachment 0
   glDrawBuffer(GL_COLOR_ATTACHMENT0);
   // clear the colour and depth buffers
   glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  // // clear the colour and depth buffer
+  // clear the colour and depth buffer
   // ============ ~FBO ==============
+
   m_sensorDataFboRenderer.render();
+
   // ============ FBO ==============
   // unbind the FBO
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
   // restore the default back buffer
   glDrawBuffer(GL_BACK_LEFT);
   // bind the FBO output at the current texture
+  glActiveTexture(GL_TEXTURE3);
   glBindTexture(GL_TEXTURE_2D, renderTextureID);
-  // render mirror
-  // mirror->Render(glm::value_ptr(P * MV));
   // ============ ~FBO ==============
 
   glBindVertexArray(vaoID);
