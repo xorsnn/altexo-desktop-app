@@ -16,7 +16,7 @@ public:
   ~HologramRenderer() {}
 
   int init();
-  void render();
+  void render(int viewWidh, int viewHeight);
 
   void initFBO();
   // Sensor data capturer
@@ -60,7 +60,8 @@ private:
   GLuint renderTextureID;
   // screen resolution
   const int WIDTH = 1280;
-  const int HEIGHT = 960;
+  // const int HEIGHT = 960;
+  const int HEIGHT = 480;
 };
 
 #endif // HOLOGRAMRENDERER_H

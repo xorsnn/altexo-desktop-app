@@ -4,7 +4,6 @@ int SensorDataFboRenderer::init() {
   m_newFrame = false;
   // GL_CHECK_ERRORS
   // load the shader
-  // shader.LoadFromFile(GL_VERTEX_SHADER, "../shaders/shader.vert");
   shader.LoadFromFile(GL_VERTEX_SHADER, "../shaders/sensorCompose.vert");
   shader.LoadFromFile(GL_FRAGMENT_SHADER, "../shaders/sensorCompose.frag");
   // compile and link shader
@@ -34,10 +33,10 @@ int SensorDataFboRenderer::init() {
   vertices[2].color = glm::vec3(0, 0, 1);
   vertices[3].color = glm::vec3(0, 1, 1);
 
-  vertices[0].position = glm::vec3(-0.5, -0.5, 0);
-  vertices[1].position = glm::vec3(0.5, -0.5, 0);
-  vertices[2].position = glm::vec3(0.5, 0.5, 0);
-  vertices[3].position = glm::vec3(-0.5, 0.5, 0);
+  vertices[0].position = glm::vec3(-1.0, -1.0, 0);
+  vertices[1].position = glm::vec3(1.0, -1.0, 0);
+  vertices[2].position = glm::vec3(1.0, 1.0, 0);
+  vertices[3].position = glm::vec3(-1.0, 1.0, 0);
 
   // setup triangle indices
   indices[0] = 0;
@@ -107,6 +106,7 @@ int SensorDataFboRenderer::init() {
 }
 
 void SensorDataFboRenderer::render() {
+  glViewport(0, 0, 1280, 480);
   glBindVertexArray(vaoID);
   glBindBuffer(GL_ARRAY_BUFFER, vboVerticesID);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIndicesID);

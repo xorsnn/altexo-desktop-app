@@ -7,9 +7,10 @@ varying vec2 vUV;
 
 void main()
 {
-	if (vUV.x > 0.5) {
+	if (vUV.x > 1.0) {
 		vec2 vUV1 = vUV;
-		vUV1.x = (vUV1.x-0.5)*2;
+		vUV1.x = (vUV1.x-1.0);
+		vUV1.y /= 2;
 		uint val = texture2D(depthTexMap, vUV1).x;
 		uint cmp = uint(1500);
 		if (val > cmp) {
@@ -19,7 +20,7 @@ void main()
 		}
 	} else {
 		vec2 vUV2 = vUV;
-		vUV2.x*=2;
+		vUV2.y /= 2;
 		gl_FragColor = texture2D(textureMap, vUV2);
 	}
 }

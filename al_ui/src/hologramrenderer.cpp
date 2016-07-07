@@ -85,7 +85,7 @@ int HologramRenderer::init() {
   return 1;
 }
 
-void HologramRenderer::render() {
+void HologramRenderer::render(int viewWidh, int viewHeight) {
   // ============ FBO ==============
   // enable FBO
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fboID);
@@ -107,6 +107,8 @@ void HologramRenderer::render() {
   glActiveTexture(GL_TEXTURE3);
   glBindTexture(GL_TEXTURE_2D, renderTextureID);
   // ============ ~FBO ==============
+
+  glViewport(0, 0, viewWidh, viewHeight);
 
   glBindVertexArray(vaoID);
   glBindBuffer(GL_ARRAY_BUFFER, vboVerticesID);

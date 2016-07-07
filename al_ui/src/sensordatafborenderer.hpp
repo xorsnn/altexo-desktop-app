@@ -52,15 +52,10 @@ private:
   std::vector<uint8_t> m_rgbFrame;
   std::vector<uint16_t> m_depthFrame;
   bool m_newFrame;
-  int tmpCounter;
 
-  // FBO and render buffer object ID
-  GLuint fboID, rbID;
-  // offscreen render texture ID
-  GLuint renderTextureID;
   // screen resolution
   const int WIDTH = 1280;
-  const int HEIGHT = 960;
+  const int HEIGHT = 480;
 };
 
 #endif // SENSORDATAFBORENDERER_H
