@@ -5,12 +5,9 @@ int HologramRenderer::init() {
   tmpCounter = 1;
   // GL_CHECK_ERRORS
   // load the shader
-  std::cout << "< 1" << std::endl;
   // shader.LoadFromFile(GL_VERTEX_SHADER, "../shaders/shader.vert");
   shader.LoadFromFile(GL_VERTEX_SHADER, "../shaders/shader.vert");
-  std::cout << "< 2" << std::endl;
   shader.LoadFromFile(GL_FRAGMENT_SHADER, "../shaders/shader.frag");
-  std::cout << "< 3" << std::endl;
   // compile and link shader
   shader.CreateAndLinkProgram();
   shader.Use();
@@ -20,10 +17,10 @@ int HologramRenderer::init() {
   shader.AddUniform("MVP");
   shader.AddUniform("textureMap");
   // pass values of constant uniforms at initialization
-  glUniform1i(shader("textureMap"), 0);
-  shader.AddUniform("depthTexMap");
+  glUniform1i(shader("textureMap"), 3);
+  // shader.AddUniform("depthTexMap");
   // pass values of constant uniforms at initialization
-  glUniform1i(shader("depthTexMap"), 9);
+  // glUniform1i(shader("depthTexMap"), 9);
   shader.UnUse();
 
   // GL_CHECK_ERRORS
@@ -82,59 +79,40 @@ int HologramRenderer::init() {
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-  // setup OpenGL texture and bind to texture unit 0
-  glGenTextures(1, &sensorRGBTexID);
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, sensorRGBTexID);
-  // set texture parameters
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-  // glBindTexture(GL_TEXTURE_2D, 0);
-  // depth tex
-  glGenTextures(1, &sensorDepthTexID);
-  glActiveTexture(GL_TEXTURE9);
-  glBindTexture(GL_TEXTURE_2D, sensorDepthTexID);
-  // set texture parameters
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-  // glBindTexture(GL_TEXTURE_2D, 0);
-
+  initFBO();
+  m_sensorDataFboRenderer.init();
   cout << "Initialization successfull" << endl;
   return 1;
 }
 
-void HologramRenderer::render() {
-  // // clear the colour and depth buffer
-  // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+void HologramRenderer::render(int viewWidh, int viewHeight) {
+  // ============ FBO ==============
+  // enable FBO
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fboID);
+  // render to colour attachment 0
+  glDrawBuffer(GL_COLOR_ATTACHMENT0);
+  // clear the colour and depth buffers
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  // clear the colour and depth buffer
+  // ============ ~FBO ==============
+
+  m_sensorDataFboRenderer.render();
+
+  // ============ FBO ==============
+  // unbind the FBO
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+  // restore the default back buffer
+  glDrawBuffer(GL_BACK_LEFT);
+  // bind the FBO output at the current texture
+  glActiveTexture(GL_TEXTURE3);
+  glBindTexture(GL_TEXTURE_2D, renderTextureID);
+  // ============ ~FBO ==============
+
+  glViewport(0, 0, viewWidh, viewHeight);
 
   glBindVertexArray(vaoID);
   glBindBuffer(GL_ARRAY_BUFFER, vboVerticesID);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIndicesID);
-
-  glActiveTexture(GL_TEXTURE0);
-  glBindTexture(GL_TEXTURE_2D, sensorRGBTexID);
-
-  if (m_newFrame) {
-    // allocate texture
-    int w = 640;
-    int h = 480;
-
-    glActiveTexture(GL_TEXTURE0);
-    glBindTexture(GL_TEXTURE_2D, sensorRGBTexID);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE,
-                 m_rgbFrame.data());
-
-    glActiveTexture(GL_TEXTURE9);
-    glBindTexture(GL_TEXTURE_2D, sensorDepthTexID);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R16UI, w, h, 0, GL_RED_INTEGER,
-                 GL_UNSIGNED_SHORT, m_depthFrame.data());
-
-    m_newFrame = false;
-  }
 
   // bind the shader
   shader.Use();
@@ -155,11 +133,48 @@ void HologramRenderer::render() {
   glActiveTexture(GL_TEXTURE0);
 }
 
-void HologramRenderer::newFrame(std::vector<uint8_t> rgbFrame,
-                                std::vector<uint16_t> depthFrame) {
-  if (!m_newFrame) {
-    m_rgbFrame.swap(rgbFrame);
-    m_depthFrame.swap(depthFrame);
-    m_newFrame = true;
+// initialize FBO
+void HologramRenderer::initFBO() {
+  // generate and bind fbo ID
+  glGenFramebuffers(1, &fboID);
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fboID);
+
+  // generate and bind render buffer ID
+  glGenRenderbuffers(1, &rbID);
+  glBindRenderbuffer(GL_RENDERBUFFER, rbID);
+
+  // set the render buffer storage
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32, WIDTH, HEIGHT);
+
+  // generate the offscreen texture
+  glGenTextures(1, &renderTextureID);
+  glBindTexture(GL_TEXTURE_2D, renderTextureID);
+
+  // set texture parameters
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, WIDTH, HEIGHT, 0, GL_BGRA,
+               GL_UNSIGNED_BYTE, NULL);
+
+  // bind the renderTextureID as colour attachment of FBO
+  glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
+                         GL_TEXTURE_2D, renderTextureID, 0);
+  // set the render buffer as the depth attachment of FBO
+  glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+                            GL_RENDERBUFFER, rbID);
+
+  // check for frame buffer completeness status
+  GLuint status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
+
+  if (status == GL_FRAMEBUFFER_COMPLETE) {
+    printf("FBO setup succeededa.\n");
+  } else {
+    printf("Error in FBO setup.\n");
   }
+
+  // unbind the texture and FBO
+  glBindTexture(GL_TEXTURE_2D, 0);
+  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
 }

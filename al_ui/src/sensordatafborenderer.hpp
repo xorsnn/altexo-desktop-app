@@ -1,26 +1,26 @@
-#ifndef HOLOGRAMRENDERER_H
-#define HOLOGRAMRENDERER_H
+
+#ifndef SENSORDATAFBORENDERER_H
+#define SENSORDATAFBORENDERER_H
 
 #include "AL_CB/al_sensor_cb.hpp"
 #include "GLSLShader.hpp"
-#include "sensordatafborenderer.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include <vector>
 
-class HologramRenderer {
+class SensorDataFboRenderer : public AlSensorCb {
 public:
-  HologramRenderer() {}
-  ~HologramRenderer() {}
+  SensorDataFboRenderer() {}
+  ~SensorDataFboRenderer() {}
 
   int init();
-  void render(int viewWidh, int viewHeight);
+  void render();
 
-  void initFBO();
-  // Sensor data capturer
-  SensorDataFboRenderer m_sensorDataFboRenderer;
+  // sensor cb
+  void newFrame(std::vector<uint8_t> rgbFrame,
+                std::vector<uint16_t> depthFrame);
 
 private:
   // shader reference
@@ -45,23 +45,17 @@ private:
   GLushort indices[6];
 
   // projection and modelview matrices
-  glm::mat4 P = glm::mat4(1);
   glm::mat4 MV = glm::mat4(1);
+  glm::mat4 P = glm::mat4(1);
 
   // internal data
   std::vector<uint8_t> m_rgbFrame;
   std::vector<uint16_t> m_depthFrame;
   bool m_newFrame;
-  int tmpCounter;
 
-  // FBO and render buffer object ID
-  GLuint fboID, rbID;
-  // offscreen render texture ID
-  GLuint renderTextureID;
   // screen resolution
   const int WIDTH = 1280;
-  // const int HEIGHT = 960;
   const int HEIGHT = 480;
 };
 
-#endif // HOLOGRAMRENDERER_H
+#endif // SENSORDATAFBORENDERER_H

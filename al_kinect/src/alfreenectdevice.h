@@ -55,12 +55,8 @@ public:
   void updateSettings();
 
 private:
-  // std::vector<uint8_t> m_buffer_depth;
   std::vector<uint16_t> m_bufferDepth;
-  // std::vector<uint8_t> m_buffer_depth_new;
   std::vector<uint8_t> m_bufferVideo;
-
-  // uint16_t *m_depth;
 
   Mutex m_rgbMutex;
   Mutex m_depthMutex;

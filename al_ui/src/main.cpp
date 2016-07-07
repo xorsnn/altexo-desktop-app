@@ -69,7 +69,7 @@ int main(int, char **) {
   HologramRenderer hologramRenderer;
   hologramRenderer.init();
   Manager m;
-  m.initSensor(&hologramRenderer);
+  m.initSensor(&(hologramRenderer.m_sensorDataFboRenderer));
   // ~ local init
 
   // Load Fonts
@@ -106,8 +106,6 @@ int main(int, char **) {
     // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in
     // a window automatically called "Debug"
     {
-      // ImGui::SetNextWindowSize(ImVec2(200,100), ImGuiSetCond_FirstUseEver);
-      // ImGui::SetNextWindowPos(ImVec2(100, 100), ImGuiSetCond_FirstUseEver);
       ImGui::SetNextWindowSize(ImVec2(100, 400), ImGuiSetCond_Once);
       ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiSetCond_Once);
 
@@ -140,7 +138,8 @@ int main(int, char **) {
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    hologramRenderer.render();
+    hologramRenderer.render((int)ImGui::GetIO().DisplaySize.x,
+                            (int)ImGui::GetIO().DisplaySize.y);
 
     ImGui::Render();
     SDL_GL_SwapWindow(window);
