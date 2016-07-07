@@ -69,7 +69,7 @@ int main(int, char **) {
   HologramRenderer hologramRenderer;
   hologramRenderer.init();
   Manager m;
-  m.initSensor(&hologramRenderer);
+  m.initSensor(&(hologramRenderer.m_sensorDataFboRenderer));
   // ~ local init
 
   // Load Fonts

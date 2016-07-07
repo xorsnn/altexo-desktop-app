@@ -1,6 +1,6 @@
-#include "hologramrenderer.hpp"
+#include "sensordatafborenderer.hpp"
 
-int HologramRenderer::init() {
+int SensorDataFboRenderer::init() {
   m_newFrame = false;
   tmpCounter = 1;
   // GL_CHECK_ERRORS
@@ -20,7 +20,7 @@ int HologramRenderer::init() {
   glUniform1i(shader("textureMap"), 0);
   shader.AddUniform("depthTexMap");
   // pass values of constant uniforms at initialization
-  glUniform1i(shader("depthTexMap"), 9);
+  glUniform1i(shader("depthTexMap"), 1);
   shader.UnUse();
 
   // GL_CHECK_ERRORS
@@ -91,7 +91,7 @@ int HologramRenderer::init() {
   glBindTexture(GL_TEXTURE_2D, 0);
   // depth tex
   glGenTextures(1, &sensorDepthTexID);
-  glActiveTexture(GL_TEXTURE9);
+  glActiveTexture(GL_TEXTURE1);
   glBindTexture(GL_TEXTURE_2D, sensorDepthTexID);
   // set texture parameters
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
@@ -100,38 +100,44 @@ int HologramRenderer::init() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
   glBindTexture(GL_TEXTURE_2D, 0);
 
-  initFBO();
-  m_sensorDataFboRenderer.init();
+  // initFBO();
   cout << "Initialization successfull" << endl;
   return 1;
 }
 
-void HologramRenderer::render() {
+void SensorDataFboRenderer::render() {
   // // ============ FBO ==============
   // // enable FBO
-  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fboID);
-  // render to colour attachment 0
-  glDrawBuffer(GL_COLOR_ATTACHMENT0);
-  // clear the colour and depth buffers
-  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-
-  // // clear the colour and depth buffer
-  // ============ ~FBO ==============
-  m_sensorDataFboRenderer.render();
-  // ============ FBO ==============
-  // unbind the FBO
-  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
-  // restore the default back buffer
-  glDrawBuffer(GL_BACK_LEFT);
-  // bind the FBO output at the current texture
-  glBindTexture(GL_TEXTURE_2D, renderTextureID);
-  // render mirror
-  // mirror->Render(glm::value_ptr(P * MV));
-  // ============ ~FBO ==============
+  // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fboID);
+  // // render to colour attachment 0
+  // glDrawBuffer(GL_COLOR_ATTACHMENT0);
+  // // clear the colour and depth buffers
+  // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  //
+  // // // clear the colour and depth buffer
+  // // ============ ~FBO ==============
 
   glBindVertexArray(vaoID);
   glBindBuffer(GL_ARRAY_BUFFER, vboVerticesID);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIndicesID);
+
+  if (m_newFrame) {
+    // allocate texture
+    int w = 640;
+    int h = 480;
+
+    glActiveTexture(GL_TEXTURE0);
+    glBindTexture(GL_TEXTURE_2D, sensorRGBTexID);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE,
+                 m_rgbFrame.data());
+
+    glActiveTexture(GL_TEXTURE1);
+    glBindTexture(GL_TEXTURE_2D, sensorDepthTexID);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R16UI, w, h, 0, GL_RED_INTEGER,
+                 GL_UNSIGNED_SHORT, m_depthFrame.data());
+
+    m_newFrame = false;
+  }
 
   // bind the shader
   shader.Use();
@@ -150,10 +156,31 @@ void HologramRenderer::render() {
 
   // seems to be needed by something, otherwise some artifacts appears
   glActiveTexture(GL_TEXTURE0);
+
+  // // ============ FBO ==============
+  // // unbind the FBO
+  // glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+  // // restore the default back buffer
+  // glDrawBuffer(GL_BACK_LEFT);
+  // // bind the FBO output at the current texture
+  // glBindTexture(GL_TEXTURE_2D, renderTextureID);
+  // // render mirror
+  // // mirror->Render(glm::value_ptr(P * MV));
+  // // ============ ~FBO ==============
+}
+
+void SensorDataFboRenderer::newFrame(std::vector<uint8_t> rgbFrame,
+                                     std::vector<uint16_t> depthFrame) {
+  // std::cout << "new frame!!!" << std::endl;
+  if (!m_newFrame) {
+    m_rgbFrame.swap(rgbFrame);
+    m_depthFrame.swap(depthFrame);
+    m_newFrame = true;
+  }
 }
 
 // initialize FBO
-void HologramRenderer::initFBO() {
+void SensorDataFboRenderer::initFBO() {
   // generate and bind fbo ID
   glGenFramebuffers(1, &fboID);
   glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fboID);
