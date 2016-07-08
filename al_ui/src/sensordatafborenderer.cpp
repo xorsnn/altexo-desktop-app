@@ -1,5 +1,14 @@
 #include "sensordatafborenderer.hpp"
 
+SensorDataFboRenderer::SensorDataFboRenderer() {
+  m_outPixel = new GLubyte[1280 * 480 * 3];
+}
+
+SensorDataFboRenderer::~SensorDataFboRenderer() {
+  delete[] m_outPixel;
+  m_outPixel = NULL;
+}
+
 int SensorDataFboRenderer::init() {
   m_newFrame = false;
   // GL_CHECK_ERRORS
@@ -137,6 +146,7 @@ void SensorDataFboRenderer::render() {
 
   // drwa triangle
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+
   // unbind the shader
   shader.UnUse();
 
