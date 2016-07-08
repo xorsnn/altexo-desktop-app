@@ -18,9 +18,7 @@ int HologramRenderer::init() {
   shader.AddUniform("textureMap");
   // pass values of constant uniforms at initialization
   glUniform1i(shader("textureMap"), 3);
-  // shader.AddUniform("depthTexMap");
   // pass values of constant uniforms at initialization
-  // glUniform1i(shader("depthTexMap"), 9);
   shader.UnUse();
 
   // GL_CHECK_ERRORS
@@ -79,7 +77,19 @@ int HologramRenderer::init() {
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
+  // some tex ==============
+  glGenTextures(1, &sensorDepthTexID);
+  glActiveTexture(GL_TEXTURE3);
+  glBindTexture(GL_TEXTURE_2D, sensorDepthTexID);
+  // set texture parameters
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  glBindTexture(GL_TEXTURE_2D, 0);
+  // =====================
   initFBO();
+
   m_sensorDataFboRenderer.init();
   cout << "Initialization successfull" << endl;
   return 1;
@@ -88,7 +98,7 @@ int HologramRenderer::init() {
 void HologramRenderer::render(int viewWidh, int viewHeight) {
   // ============ FBO ==============
   // enable FBO
-  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fboID);
+  glBindFramebuffer(GL_FRAMEBUFFER, fboID);
   // render to colour attachment 0
   glDrawBuffer(GL_COLOR_ATTACHMENT0);
   // clear the colour and depth buffers
@@ -98,9 +108,18 @@ void HologramRenderer::render(int viewWidh, int viewHeight) {
 
   m_sensorDataFboRenderer.render();
 
+  // [AL-153] Getting pixels to bitmap
+  glReadPixels(0, 0, 1280, 480, GL_RGB, GL_UNSIGNED_BYTE,
+               m_sensorDataFboRenderer.m_outPixel);
+  // glActiveTexture(GL_TEXTURE3);
+  // glBindTexture(GL_TEXTURE_2D, sensorDepthTexID);
+  // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1280, 480, 0, GL_RGB,
+  // GL_UNSIGNED_BYTE,
+  //              m_sensorDataFboRenderer.m_outPixel);
+
   // ============ FBO ==============
   // unbind the FBO
-  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
   // restore the default back buffer
   glDrawBuffer(GL_BACK_LEFT);
   // bind the FBO output at the current texture
@@ -137,7 +156,7 @@ void HologramRenderer::render(int viewWidh, int viewHeight) {
 void HologramRenderer::initFBO() {
   // generate and bind fbo ID
   glGenFramebuffers(1, &fboID);
-  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, fboID);
+  glBindFramebuffer(GL_FRAMEBUFFER, fboID);
 
   // generate and bind render buffer ID
   glGenRenderbuffers(1, &rbID);
@@ -159,14 +178,14 @@ void HologramRenderer::initFBO() {
                GL_UNSIGNED_BYTE, NULL);
 
   // bind the renderTextureID as colour attachment of FBO
-  glFramebufferTexture2D(GL_DRAW_FRAMEBUFFER, GL_COLOR_ATTACHMENT0,
-                         GL_TEXTURE_2D, renderTextureID, 0);
+  glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
+                         renderTextureID, 0);
   // set the render buffer as the depth attachment of FBO
-  glFramebufferRenderbuffer(GL_DRAW_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
+  glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
                             GL_RENDERBUFFER, rbID);
 
   // check for frame buffer completeness status
-  GLuint status = glCheckFramebufferStatus(GL_DRAW_FRAMEBUFFER);
+  GLuint status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
 
   if (status == GL_FRAMEBUFFER_COMPLETE) {
     printf("FBO setup succeededa.\n");
@@ -176,5 +195,5 @@ void HologramRenderer::initFBO() {
 
   // unbind the texture and FBO
   glBindTexture(GL_TEXTURE_2D, 0);
-  glBindFramebuffer(GL_DRAW_FRAMEBUFFER, 0);
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }

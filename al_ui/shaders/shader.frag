@@ -2,7 +2,6 @@
 // #extension GL_EXT_gpu_shader4 : enable
 
 uniform sampler2D textureMap;
-// uniform usampler2D depthTexMap;
 varying vec2 vUV;
 
 void main()
