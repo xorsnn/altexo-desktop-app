@@ -9,7 +9,7 @@ std::string SERVER_LINK = "https://dev.lugati.ru";
 AlConnClient::AlConnClient() {
   std::cout << "constructor" << std::endl;
   m_token = "";
-  login("Galya", "ujnm567");
+  // login("Galya", "ujnm567");
 }
 
 AlConnClient::~AlConnClient() {}

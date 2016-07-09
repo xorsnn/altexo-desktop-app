@@ -7,22 +7,22 @@
 #include <boost/dll/import.hpp>
 #include <boost/thread.hpp>
 
-class Manager : public AlSensorCb {
+class Manager {
 public:
   Manager();
   ~Manager();
 
-  // sensor cb
-  void newFrame(std::vector<uint8_t> rgbFrame,
-                std::vector<uint16_t> depthFrame);
-
   void frameThread();
 
   void initSensor(AlSensorCb *sensorCb);
-  void initWsConnection();
+  void initWsConnection(AlWsCb *alWsCb);
+  void initSdk();
+
+  // void initRouting();
+  boost::shared_ptr<AlSdkAPI> m_sdk;
 
 private:
-  boost::shared_ptr<AlWsClientInterface> m_wsClient;
+  boost::shared_ptr<AlWsAPI> m_wsClient;
   boost::shared_ptr<AlSensorAPI> m_sensor;
   boost::thread m_frameThread;
 };

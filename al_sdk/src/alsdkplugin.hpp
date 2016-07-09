@@ -2,23 +2,29 @@
 #define ALSDKPLUGIN_H
 
 #include "AL_API/sdk_api.hpp"
+#include "AL_CB/al_sdk_cb.hpp"
+#include "AL_CB/al_ws_cb.hpp"
 #include <boost/config.hpp>
 #include <string>
 
-class AlCallback;
 class AlManager;
 
-class AlSdkPlugin : public AlSdkInterface {
+class AlSdkPlugin : public AlSdkAPI, public AlWsCb {
 public:
   AlSdkPlugin();
   ~AlSdkPlugin();
 
-  void init(AlCallback *alCallback);
+  void init(AlSDKCb *alSdkCb);
+  AlWsCb *getWsCb();
   void run();
   bool hasConnections();
   void InitializePeerConnection();
   void DeletePeerConnection();
+
+  // TODO: union the two methods
   void OnMessageFromPeer(std::string peer_id, const std::string &message);
+  void onMessageCb(std::string peer_id, const std::string &message);
+
   bool isClientConnected();
   void clientConnect(const std::string &server, int port,
                      const std::string &client_name);

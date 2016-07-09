@@ -22,7 +22,7 @@ public:
   void newFrame(std::vector<uint8_t> rgbFrame,
                 std::vector<uint16_t> depthFrame);
 
-  GLubyte *m_outPixel;
+  std::vector<GLubyte> m_outPixel;
 
 private:
   // shader reference

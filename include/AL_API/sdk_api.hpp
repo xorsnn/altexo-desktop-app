@@ -1,12 +1,14 @@
 #ifndef ALSDKINTERFACE_H
 #define ALSDKINTERFACE_H
 
+#include "AL_CB/al_sdk_cb.hpp"
+#include "AL_CB/al_ws_cb.hpp"
 #include <string>
 
 class AlCallback;
 class AlManager;
 
-class AlSdkInterface {
+class AlSdkAPI {
 public:
   enum DesiredVideoSource {
     IMG_SNAPSHOTS = 1,
@@ -14,9 +16,10 @@ public:
   };
 
   // AlSdkInterface();
-  virtual ~AlSdkInterface() {}
+  virtual ~AlSdkAPI() {}
 
-  virtual void init(AlCallback *alCallback) = 0;
+  virtual void init(AlSDKCb *alSdkCb) = 0;
+  virtual AlWsCb *getWsCb() = 0;
   virtual void run() = 0;
   virtual bool hasConnections() = 0;
   virtual void InitializePeerConnection() = 0;
