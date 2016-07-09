@@ -20,5 +20,10 @@ void AlWsPlugin::init(AlWsCb *alWsCb) {
 
 void AlWsPlugin::threadMain() {
   m_connClient->login("Galya", "ujnm567");
-  newMessageSignal("one", "two"); // testing
+  // ========================
+  std::string peerId = "one";
+  std::string message = "two";
+  std::vector<char> peerIdVec(peerId.begin(), peerId.end());
+  std::vector<char> messageVec(message.begin(), message.end());
+  newMessageSignal(peerIdVec, messageVec); // testing
 }

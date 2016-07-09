@@ -22,7 +22,8 @@ private:
   AlConnClient *m_connClient;
   boost::thread m_internalThread;
 
-  boost::signals2::signal<void(std::string, std::string)> newMessageSignal;
+  boost::signals2::signal<void(std::vector<char>, std::vector<char>)>
+      newMessageSignal;
 };
 
 extern "C" BOOST_SYMBOL_EXPORT AlWsPlugin plugin;

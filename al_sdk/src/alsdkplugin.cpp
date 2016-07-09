@@ -35,8 +35,13 @@ void AlSdkPlugin::OnMessageFromPeer(std::string peerId,
                                     const std::string &message) {
   m_manager->OnMessageFromPeer(peerId, message);
 }
-void AlSdkPlugin::onMessageCb(std::string peerId, const std::string &message) {
-  std::cout << "AlSdkPlugin::onMessageCb" << std::endl;
+void AlSdkPlugin::onMessageCb(std::vector<char> peerId,
+                              std::vector<char> message) {
+  std::string strPeerId(peerId.begin(), peerId.end());
+  std::string strMsg(message.begin(), message.end());
+  std::cout << "===========================" << std::endl;
+  std::cout << strPeerId << std::endl;
+  std::cout << "===========================" << std::endl;
 }
 
 bool AlSdkPlugin::isClientConnected() {

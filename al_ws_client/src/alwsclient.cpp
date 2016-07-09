@@ -110,10 +110,13 @@ int AlWsClient::cbDumbIncrement(struct lws *wsi,
     break;
 
   case LWS_CALLBACK_CLIENT_RECEIVE: {
-    // std::cout << "dfffff" << std::endl;
     ((char *)in)[len] = '\0';
+    std::string msg((char *)in);
+    std::vector<char> msgVec(msg.begin(), msg.end());
+    newMessageSignal(msgVec);
+
     // std::cout << len << std::endl;
-    std::cout << (char *)in << std::endl;
+    // std::cout << (char *)in << std::endl;
     lwsl_info("rx %d '%s'\n", (int)len, (char *)in);
     // n = lws_write(wsi, (unsigned char *)in, len, LWS_WRITE_TEXT);
   } break;

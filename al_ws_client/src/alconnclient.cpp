@@ -9,6 +9,7 @@ std::string SERVER_LINK = "https://dev.lugati.ru";
 AlConnClient::AlConnClient() {
   std::cout << "constructor" << std::endl;
   m_token = "";
+  m_peerId = "";
   // login("Galya", "ujnm567");
 }
 
@@ -65,11 +66,58 @@ void AlConnClient::handleHttpResponse(cpr::Response r, int responseType) {
 
     std::cout << m_wssLink << std::endl;
 
-    m_WsCl.init(m_wssLink, 8888);
+    // TODO: seems like port is not nesessary
+    m_WsCl.init(m_wssLink, 8888, this);
     m_WsCl.run();
     break;
   }
   default:
     std::cout << "unknown http response" << std::endl;
   }
+}
+
+void AlConnClient::onWsMessageCb(std::vector<char> msg) {
+  std::string msgStr(msg.begin(), msg.end());
+  boost::property_tree::ptree pt;
+  std::stringstream ss(msgStr);
+  boost::property_tree::read_json(ss, pt);
+  std::string action = pt.get<std::string>("action");
+  std::cout << action << std::endl;
+  if (action == "logged_in") {
+    m_peerId = pt.get<std::string>("data.id");
+    std::cout << m_peerId << std::endl;
+    //   Q_EMIT OnSignedInSignal();
+  } else if (action == "update_user_list") {
+  } else if (action == "message_from_peer") {
+  }
+  // } else if (action == "peer_connected") {
+  //   this->m_peers[jsonObj["id"].toString()] = jsonObj["name"].toString();
+  //   Q_EMIT OnPeerConnectedSignal(jsonObj["id"].toString(),
+  //                                jsonObj["name"].toString());
+  // } else if (action == "message_from_peer") {
+  //   QString tmp_msg = jsonObj["data"].toObject()["message"].toString();
+  //   QJsonDocument tmp_doc = QJsonDocument::fromJson(tmp_msg.toUtf8());
+  //   QJsonObject tmp_jsonObj = tmp_doc.object();
+  //   if (tmp_jsonObj.contains("callAccepted")) {
+  //     Q_EMIT ConnectToPeerSignal(
+  //         jsonObj["data"].toObject()["sender_id"].toString());
+  //   } else {
+  //     Q_EMIT OnMessageFromPeerSignal(
+  //         jsonObj["data"].toObject()["sender_id"].toString().toStdString(),
+  //         jsonObj["data"].toObject()["message"].toString().toStdString());
+  //   }
+  //
+  // } else if (action == "update_user_list") {
+  //   QJsonArray contactsOnline = jsonObj["data"].toArray();
+  //   for (int i = 0; i < contactsOnline.size(); i++) {
+  //     if (contactsOnline[i].toObject()["id"].toString() != m_connId) {
+  //       this->m_peers[contactsOnline[i].toObject()["id"].toString()] =
+  //           contactsOnline[i].toObject()["name"].toString();
+  //     }
+  //   }
+  //   Q_EMIT OnPeerConnectedSignal(jsonObj["id"].toString(),
+  //                                jsonObj["name"].toString());
+  // } else {
+  //   //        Q_EMIT this->onTextMessageReceivedSignal(message);
+  // }
 }

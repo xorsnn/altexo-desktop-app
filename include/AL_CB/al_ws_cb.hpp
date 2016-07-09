@@ -7,7 +7,9 @@
 class AlWsCb {
 public:
   virtual ~AlWsCb() {}
-  virtual void onMessageCb(std::string peer_id, const std::string &message) = 0;
+
+  // TODO: for some reason std::string doesn't work
+  virtual void onMessageCb(std::vector<char> peerId, std::vector<char> msg) = 0;
 };
 //]
 

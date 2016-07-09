@@ -23,7 +23,7 @@ public:
 
   // TODO: union the two methods
   void OnMessageFromPeer(std::string peer_id, const std::string &message);
-  void onMessageCb(std::string peer_id, const std::string &message);
+  void onMessageCb(std::vector<char> peerId, std::vector<char> message);
 
   bool isClientConnected();
   void clientConnect(const std::string &server, int port,
