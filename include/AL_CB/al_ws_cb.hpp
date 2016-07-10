@@ -10,6 +10,7 @@ public:
 
   // TODO: for some reason std::string doesn't work
   virtual void onMessageCb(std::vector<char> peerId, std::vector<char> msg) = 0;
+  virtual void onWsMessageCb(std::vector<char> msg) = 0;
 };
 //]
 

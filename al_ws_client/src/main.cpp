@@ -81,6 +81,7 @@ int main(int argc, char **argv) {
     }
   }
   std::cout << "one" << std::endl;
-  AlConnClient cl;
+  // TODO: will not  work
+  AlConnClient cl(NULL);
   return 1;
 }

@@ -23,7 +23,9 @@ public:
 
   // TODO: union the two methods
   void OnMessageFromPeer(std::string peer_id, const std::string &message);
+  // AlWsCb
   void onMessageCb(std::vector<char> peerId, std::vector<char> message);
+  void onWsMessageCb(std::vector<char> msg) {}
 
   bool isClientConnected();
   void clientConnect(const std::string &server, int port,

@@ -2,7 +2,6 @@
 
 int HologramRenderer::init() {
   m_newFrame = false;
-  tmpCounter = 1;
   // GL_CHECK_ERRORS
   // load the shader
   shader.LoadFromFile(GL_VERTEX_SHADER, "../al_ui/shaders/shader.vert");

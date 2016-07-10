@@ -3,6 +3,7 @@
 
 #include "AL_CB/al_sensor_cb.hpp"
 #include "GLSLShader.hpp"
+#include "contact.hpp"
 #include "sensordatafborenderer.hpp"
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -52,7 +53,6 @@ private:
   std::vector<uint8_t> m_rgbFrame;
   std::vector<uint16_t> m_depthFrame;
   bool m_newFrame;
-  int tmpCounter;
 
   // FBO and render buffer object ID
   GLuint fboID, rbID;

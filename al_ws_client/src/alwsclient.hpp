@@ -1,6 +1,7 @@
 #ifndef ALWSCLIENT_H
 #define ALWSCLIENT_H
 
+#include "AL_CB/al_ws_cb.hpp"
 #include "boost/thread.hpp"
 #include <boost/signals2/signal.hpp>
 #include <iostream>
@@ -12,22 +13,17 @@
 // 	  "[--ssl] [-k] [-v <ver>] "
 // 	  "[-d <log bitfield>] [-l]\n");
 // }
-class WsCb {
-public:
-  virtual ~WsCb() {}
-  virtual void onWsMessageCb(std::vector<char> msg) = 0;
-};
 
 class AlWsClient {
 public:
   AlWsClient();
   ~AlWsClient();
 
-  int init(std::string path, int port, WsCb *cb) {
+  int init(std::string path, int port, AlWsCb *cb) {
     m_path = path;
     m_port = port;
     m_cb = cb;
-    newMessageSignal.connect(boost::bind(&WsCb::onWsMessageCb, cb, _1));
+    newMessageSignal.connect(boost::bind(&AlWsCb::onWsMessageCb, cb, _1));
     return 1;
   }
 
@@ -50,7 +46,7 @@ private:
   // list of supported protocols and callbacks
   struct lws_protocols m_protocols[2];
   boost::thread m_internalThread;
-  WsCb *m_cb;
+  AlWsCb *m_cb;
   boost::signals2::signal<void(std::vector<char>)> newMessageSignal;
 };
 

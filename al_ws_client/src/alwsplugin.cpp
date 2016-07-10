@@ -13,7 +13,7 @@ AlWsPlugin::~AlWsPlugin() {
 }
 
 void AlWsPlugin::init(AlWsCb *alWsCb) {
-  m_connClient = new AlConnClient();
+  m_connClient = new AlConnClient(alWsCb);
   newMessageSignal.connect(boost::bind(&AlWsCb::onMessageCb, alWsCb, _1, _2));
   m_internalThread = boost::thread(&AlWsPlugin::threadMain, this);
 }

@@ -71,7 +71,8 @@ int main(int, char **) {
   Manager m;
   m.initSensor(&(hologramRenderer.m_sensorDataFboRenderer));
   m.initSdk();
-  m.initWsConnection(m.m_sdk->getWsCb()); // TODO: improve this
+  // m.initWsConnection(m.m_sdk->getWsCb()); // TODO: improve this
+  m.initWsConnection(&m); // TODO: improve this
   // ~ local init
 
   // Load Fonts
@@ -116,9 +117,10 @@ int main(int, char **) {
       ImGui::Begin("Contacts", NULL);
       static int selected = 0;
       ImGui::BeginChild("left pane", ImVec2(-1, 0), true);
-      for (int i = 0; i < 20; i++) {
-        char label[128];
-        sprintf(label, "MyObject %d", i);
+      for (int i = 0; i < m.contactList.size(); i++) {
+        // char label[128];
+        // sprintf(label, i);
+        const char *label = m.contactList[i].name.c_str();
         if (ImGui::Selectable(label, selected == i)) {
           selected = i;
           std::cout << selected << std::endl;
