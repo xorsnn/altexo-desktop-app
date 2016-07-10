@@ -1,10 +1,20 @@
 #include "alconnclient.hpp"
+#include "contact.hpp"
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
 std::string SERVER_LINK = "https://dev.lugati.ru";
+
+template <typename T>
+std::vector<T> as_vector(boost::property_tree::ptree const &pt,
+                         boost::property_tree::ptree::key_type const &key) {
+  std::vector<T> r;
+  for (auto &item : pt.get_child(key))
+    r.push_back(item.second.get_value<T>());
+  return r;
+}
 
 AlConnClient::AlConnClient() {
   std::cout << "constructor" << std::endl;
@@ -78,6 +88,7 @@ void AlConnClient::handleHttpResponse(cpr::Response r, int responseType) {
 
 void AlConnClient::onWsMessageCb(std::vector<char> msg) {
   std::string msgStr(msg.begin(), msg.end());
+  std::cout << msgStr << std::endl;
   boost::property_tree::ptree pt;
   std::stringstream ss(msgStr);
   boost::property_tree::read_json(ss, pt);
@@ -88,6 +99,27 @@ void AlConnClient::onWsMessageCb(std::vector<char> msg) {
     std::cout << m_peerId << std::endl;
     //   Q_EMIT OnSignedInSignal();
   } else if (action == "update_user_list") {
+    std::vector<CONTACT> contactList;
+    for (auto &item : pt.get_child("data")) {
+      std::cout << "new item!!" << std::endl;
+      std::cout << item.second.get<std::string>("name") << std::endl;
+      std::cout << item.second.get<std::string>("id") << std::endl;
+      CONTACT ct;
+      ct.name = item.second.get<std::string>("name");
+      ct.id = item.second.get<std::string>("id");
+      contactList.push_back(ct);
+    }
+    std::cout << "yahoo!!!" << std::endl;
+
+    // QJsonArray contactsOnline = jsonObj["data"].toArray();
+    // for (int i = 0; i < contactsOnline.size(); i++) {
+    //   if (contactsOnline[i].toObject()["id"].toString() != m_connId) {
+    //     this->m_peers[contactsOnline[i].toObject()["id"].toString()] =
+    //         contactsOnline[i].toObject()["name"].toString();
+    //   }
+    // }
+    // Q_EMIT OnPeerConnectedSignal(jsonObj["id"].toString(),
+    //                              jsonObj["name"].toString());
   } else if (action == "message_from_peer") {
   }
   // } else if (action == "peer_connected") {
@@ -108,15 +140,6 @@ void AlConnClient::onWsMessageCb(std::vector<char> msg) {
   //   }
   //
   // } else if (action == "update_user_list") {
-  //   QJsonArray contactsOnline = jsonObj["data"].toArray();
-  //   for (int i = 0; i < contactsOnline.size(); i++) {
-  //     if (contactsOnline[i].toObject()["id"].toString() != m_connId) {
-  //       this->m_peers[contactsOnline[i].toObject()["id"].toString()] =
-  //           contactsOnline[i].toObject()["name"].toString();
-  //     }
-  //   }
-  //   Q_EMIT OnPeerConnectedSignal(jsonObj["id"].toString(),
-  //                                jsonObj["name"].toString());
   // } else {
   //   //        Q_EMIT this->onTextMessageReceivedSignal(message);
   // }
