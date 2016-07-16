@@ -25,6 +25,9 @@ public:
   };
 
   void login(std::string login, std::string password);
+  void sendMessageToPeer(std::vector<char> peerId, std::vector<char> msg);
+
+  AlWsClient *getWsClientRef() { return &m_wsCl; };
 
 private:
   void handleHttpResponse(cpr::Response r, int responseType);
@@ -34,7 +37,7 @@ private:
   std::string m_wssLink;
   std::string m_peerId;
 
-  AlWsClient m_WsCl;
+  AlWsClient m_wsCl;
   boost::thread m_internalThread;
   AlWsCb *m_alWsCb;
 };

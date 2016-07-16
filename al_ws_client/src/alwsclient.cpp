@@ -70,7 +70,7 @@ static int ratelimit_connects(unsigned int *last, unsigned int secs) {
   return 1;
 }
 
-AlWsClient::AlWsClient() {
+AlWsClient::AlWsClient() : m_writable(NULL) {
   me = this;
   lws_protocols pr1 = {
       "dumb-increment-protocol,fake-nonexistant-protocol",
@@ -98,6 +98,8 @@ int AlWsClient::cbDumbIncrement(struct lws *wsi,
   // std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
   // std::cout << reason << std::endl;
   // std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
+  unsigned char buf[LWS_PRE + 4096];
+
   switch (reason) {
 
   case LWS_CALLBACK_CLIENT_ESTABLISHED:
@@ -114,11 +116,32 @@ int AlWsClient::cbDumbIncrement(struct lws *wsi,
     std::string msg((char *)in);
     std::vector<char> msgVec(msg.begin(), msg.end());
     newMessageSignal(msgVec);
+  } break;
 
-    // std::cout << len << std::endl;
-    // std::cout << (char *)in << std::endl;
-    lwsl_info("rx %d '%s'\n", (int)len, (char *)in);
-    // n = lws_write(wsi, (unsigned char *)in, len, LWS_WRITE_TEXT);
+  case LWS_CALLBACK_CLIENT_WRITEABLE: {
+    std::cout << "LWS_CALLBACK_CLIENT_WRITEABLE" << std::endl;
+
+    while (!m_messageQueue.empty()) {
+      std::pair<std::string, std::string> msgPair = m_messageQueue.front();
+      m_messageQueue.pop();
+
+      std::string peerIdStr = msgPair.first;
+      std::string msgStr = msgPair.second;
+
+      std::string sendingMsg =
+          std::string("{\"action\":\"send_to_peer\",\"data\":") +
+          std::string("{\"peer_id\":") + peerIdStr + std::string(",") +
+          std::string("\"message\":") + msgStr + std::string("}}");
+      std::cout << sendingMsg << std::endl;
+
+      std::copy(std::begin(msgStr), std::end(msgStr), &(buf[LWS_PRE]));
+      buf[LWS_PRE + msgStr.size()] = '\0';
+
+      int n = lws_write(wsi, &buf[LWS_PRE], msgStr.size(), LWS_WRITE_TEXT);
+      std::cout << "+++++++++++++++" << std::endl;
+      std::cout << n << std::endl;
+      std::cout << "+++++++++++++++" << std::endl;
+    }
   } break;
 
   /* because we are protocols[0] ... */
@@ -128,10 +151,6 @@ int AlWsClient::cbDumbIncrement(struct lws *wsi,
       lwsl_err("dumb: LWS_CALLBACK_CLIENT_CONNECTION_ERROR\n");
       wsi_dumb = NULL;
     }
-    // if (wsi == wsi_mirror) {
-    //   lwsl_err("mirror: LWS_CALLBACK_CLIENT_CONNECTION_ERROR\n");
-    //   wsi_mirror = NULL;
-    // }
   } break;
 
   case LWS_CALLBACK_CLIENT_CONFIRM_EXTENSION_SUPPORTED: {
@@ -158,13 +177,6 @@ int AlWsClient::run() {
 }
 
 int AlWsClient::threadMain() {
-
-  unsigned int rl_dumb = 0;
-  struct lws_context_creation_info info;
-  struct lws_client_connect_info i;
-  struct lws_context *context;
-  const char *prot, *p;
-  char path[300];
 
   memset(&info, 0, sizeof info);
 
@@ -247,4 +259,14 @@ int AlWsClient::threadMain() {
   // return ret;
 
   return 1;
+}
+
+void AlWsClient::sendMessageToPeer(std::vector<char> peerId,
+                                   std::vector<char> msg) {
+  std::cout << "AlWsClient::sendMessageToPeer" << std::endl;
+  std::string peerIdStr(peerId.begin(), peerId.end());
+  std::string msgStr(msg.begin(), msg.end());
+  std::pair<std::string, std::string> msgPair(peerIdStr, msgStr);
+  m_messageQueue.push(msgPair);
+  lws_callback_on_writable(wsi_dumb);
 }

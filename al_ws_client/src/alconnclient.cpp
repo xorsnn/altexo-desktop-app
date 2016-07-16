@@ -77,11 +77,17 @@ void AlConnClient::handleHttpResponse(cpr::Response r, int responseType) {
     std::cout << m_wssLink << std::endl;
 
     // TODO: seems like port is not nesessary
-    m_WsCl.init(m_wssLink, 8888, m_alWsCb);
-    m_WsCl.run();
+    m_wsCl.init(m_wssLink, 8888, m_alWsCb);
+    m_wsCl.run();
     break;
   }
   default:
     std::cout << "unknown http response" << std::endl;
   }
+}
+
+void AlConnClient::sendMessageToPeer(std::vector<char> peerId,
+                                     std::vector<char> msg) {
+  // TODO:
+  // m_wsCl.sendMessageToPeer(peerId, msg);
 }

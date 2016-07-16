@@ -15,7 +15,10 @@ public:
   AlWsPlugin();
   ~AlWsPlugin();
 
+  // api
   void init(AlWsCb *alWsCb);
+  void sendMessageToPeer(std::vector<char> peerId, std::vector<char> msg);
+
   void threadMain();
 
 private:
@@ -23,7 +26,7 @@ private:
   boost::thread m_internalThread;
 
   boost::signals2::signal<void(std::vector<char>, std::vector<char>)>
-      newMessageSignal;
+      sendWsMessageSignal;
 };
 
 extern "C" BOOST_SYMBOL_EXPORT AlWsPlugin plugin;

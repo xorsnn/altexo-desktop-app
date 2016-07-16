@@ -7,6 +7,10 @@
 class AlSDKCb {
 public:
   virtual ~AlSDKCb() {}
+  virtual void sendMessageToPeer(std::vector<char> peerId,
+                                 std::vector<char> msg) = 0;
+  virtual void initConnection(std::vector<char> peerId,
+                              std::vector<char> mode) = 0;
 };
 //]
 

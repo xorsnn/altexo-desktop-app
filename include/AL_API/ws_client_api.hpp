@@ -8,6 +8,8 @@ class AlWsAPI {
 public:
   virtual ~AlWsAPI() {}
   virtual void init(AlWsCb *alWsCb) = 0;
+  virtual void sendMessageToPeer(std::vector<char> peerId,
+                                 std::vector<char> msg) = 0;
 };
 //]
 

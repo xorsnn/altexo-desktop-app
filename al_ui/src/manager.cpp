@@ -48,67 +48,59 @@ void Manager::initSdk() {
       boost::dll::import<AlSdkAPI>(lib_path / "libaltexo_sdk.so", "plugin",
                                    boost::dll::load_mode::append_decorations);
 
-  m_sdk->init(NULL);
+  m_sdk->init(this);
+  newMessageToSdk.connect(
+      boost::bind(&AlSdkAPI::onMessageFromPeer, m_sdk, _1, _2));
 }
 
 void Manager::onWsMessageCb(std::vector<char> msg) {
-  std::cout << "AAAAAA FUCCL" << std::endl;
+  // std::cout << "AAAAAA FUCCL" << std::endl;
   std::string msgStr(msg.begin(), msg.end());
-  std::cout << msgStr << std::endl;
+  // std::cout << msgStr << std::endl;
   boost::property_tree::ptree pt;
   std::stringstream ss(msgStr);
   boost::property_tree::read_json(ss, pt);
   std::string action = pt.get<std::string>("action");
-  std::cout << action << std::endl;
+  // std::cout << action << std::endl;
   if (action == "logged_in") {
-    m_peerId = pt.get<std::string>("data.id");
-    std::cout << m_peerId << std::endl;
-    //   Q_EMIT OnSignedInSignal();
+    m_id = pt.get<std::string>("data.id");
   } else if (action == "update_user_list") {
-    // std::vector<CONTACT> contactList;
+    // updating contact list
     contactList.clear();
     for (auto &item : pt.get_child("data")) {
-      std::cout << "new item!!" << std::endl;
-      std::cout << item.second.get<std::string>("name") << std::endl;
-      std::cout << item.second.get<std::string>("id") << std::endl;
       CONTACT ct;
       ct.name = item.second.get<std::string>("name");
       ct.id = item.second.get<std::string>("id");
       contactList.push_back(ct);
     }
-
-    std::cout << "yahoo!!!" << std::endl;
-
-    // QJsonArray contactsOnline = jsonObj["data"].toArray();
-    // for (int i = 0; i < contactsOnline.size(); i++) {
-    //   if (contactsOnline[i].toObject()["id"].toString() != m_connId) {
-    //     this->m_peers[contactsOnline[i].toObject()["id"].toString()] =
-    //         contactsOnline[i].toObject()["name"].toString();
-    //   }
-    // }
-    // Q_EMIT OnPeerConnectedSignal(jsonObj["id"].toString(),
-    //                              jsonObj["name"].toString());
   } else if (action == "message_from_peer") {
+    std::string messageStr = pt.get<std::string>("data.message");
+    std::string senderIdStr = pt.get<std::string>("data.sender_id");
+    std::cout << messageStr << std::endl;
+    boost::optional<bool> callAccepted =
+        pt.get_optional<bool>("data.message.callAccepted");
+    if (callAccepted) {
+      std::cout << "callAccepted" << std::endl;
+      //     Q_EMIT ConnectToPeerSignal(
+      //         jsonObj["data"].toObject()["sender_id"].toString());
+    } else {
+      std::cout << "not callAccepted" << std::endl;
+      std::vector<char> message(messageStr.begin(), messageStr.end());
+      std::vector<char> senderId(senderIdStr.begin(), senderIdStr.end());
+      newMessageToSdk(senderId, message);
+      //     Q_EMIT OnMessageFromPeerSignal(
+      //         jsonObj["data"].toObject()["sender_id"].toString().toStdString(),
+      //         jsonObj["data"].toObject()["message"].toString().toStdString());
+    }
   }
-  // } else if (action == "peer_connected") {
-  //   this->m_peers[jsonObj["id"].toString()] = jsonObj["name"].toString();
-  //   Q_EMIT OnPeerConnectedSignal(jsonObj["id"].toString(),
-  //                                jsonObj["name"].toString());
-  // } else if (action == "message_from_peer") {
-  //   QString tmp_msg = jsonObj["data"].toObject()["message"].toString();
-  //   QJsonDocument tmp_doc = QJsonDocument::fromJson(tmp_msg.toUtf8());
-  //   QJsonObject tmp_jsonObj = tmp_doc.object();
-  //   if (tmp_jsonObj.contains("callAccepted")) {
-  //     Q_EMIT ConnectToPeerSignal(
-  //         jsonObj["data"].toObject()["sender_id"].toString());
-  //   } else {
-  //     Q_EMIT OnMessageFromPeerSignal(
-  //         jsonObj["data"].toObject()["sender_id"].toString().toStdString(),
-  //         jsonObj["data"].toObject()["message"].toString().toStdString());
-  //   }
-  //
-  // } else if (action == "update_user_list") {
-  // } else {
-  //   //        Q_EMIT this->onTextMessageReceivedSignal(message);
-  // }
+}
+
+void Manager::initConnection(std::vector<char> peerId, std::vector<char> mode) {
+  std::ostringstream stream;
+  boost::property_tree::ptree pt;
+  pt.put("mode", "hologram");
+  boost::property_tree::write_json(stream, pt);
+  std::string strJson = stream.str();
+  std::cout << "<<<<<" << std::endl;
+  std::cout << strJson << std::endl;
 }

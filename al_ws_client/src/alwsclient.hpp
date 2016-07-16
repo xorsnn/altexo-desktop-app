@@ -6,6 +6,8 @@
 #include <boost/signals2/signal.hpp>
 #include <iostream>
 #include <libwebsockets.h>
+#include <queue>
+#include <utility>
 
 // void usage() {
 //   fprintf(stderr, "Usage: libwebsockets-test-client "
@@ -32,8 +34,8 @@ public:
   // Callbacks
   int cbDumbIncrement(struct lws *wsi, enum lws_callback_reasons reason,
                       void *user, void *in, size_t len);
-  // int cbLwsMirror(struct lws *wsi, enum lws_callback_reasons reason,
-  // 	    void *user, void *in, size_t len);
+
+  void sendMessageToPeer(std::vector<char> peerId, std::vector<char> msg);
 
 private:
   int threadMain();
@@ -43,11 +45,20 @@ private:
   int m_denyDeflate = 1;
   std::string m_path;
 
+  unsigned int rl_dumb = 0;
+  struct lws_context_creation_info info;
+  struct lws_client_connect_info i;
+  struct lws_context *context;
+  const char *prot, *p;
+  char path[300];
   // list of supported protocols and callbacks
   struct lws_protocols m_protocols[2];
   boost::thread m_internalThread;
   AlWsCb *m_cb;
   boost::signals2::signal<void(std::vector<char>)> newMessageSignal;
+
+  std::queue<std::pair<std::string, std::string>> m_messageQueue;
+  char *m_writable;
 };
 
 #endif // ALWsCLIENT_H
