@@ -2,6 +2,8 @@
 
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 #include <signal.h>
 #include <stdio.h>
@@ -128,16 +130,31 @@ int AlWsClient::cbDumbIncrement(struct lws *wsi,
       std::string peerIdStr = msgPair.first;
       std::string msgStr = msgPair.second;
 
-      std::string sendingMsg =
-          std::string("{\"action\":\"send_to_peer\",\"data\":") +
-          std::string("{\"peer_id\":") + peerIdStr + std::string(",") +
-          std::string("\"message\":") + msgStr + std::string("}}");
-      std::cout << sendingMsg << std::endl;
+      // **
+      // * composing message to send
+      // *
+      std::ostringstream stream;
+      boost::property_tree::ptree pt;
+      boost::property_tree::ptree dataNode;
+      pt.put("action", "send_to_peer");
+      dataNode.put("peer_id", peerIdStr);
+      dataNode.put("message", msgStr);
+      pt.add_child("data", dataNode);
+      boost::property_tree::write_json(stream, pt, false);
+      std::string strJson = stream.str();
+      std::cout << strJson << std::endl;
 
-      std::copy(std::begin(msgStr), std::end(msgStr), &(buf[LWS_PRE]));
-      buf[LWS_PRE + msgStr.size()] = '\0';
+      // std::string sendingMsg =
+      //     std::string("{\"action\":\"send_to_peer\",\"data\":") +
+      //     std::string("{\"peer_id\":") + peerIdStr + std::string(",") +
+      //     std::string("\"message\":") + msgStr + std::string("}}");
+      // std::cout << sendingMsg << std::endl;
 
-      int n = lws_write(wsi, &buf[LWS_PRE], msgStr.size(), LWS_WRITE_TEXT);
+      // std::copy(std::begin(msgStr), std::end(msgStr), &(buf[LWS_PRE]));
+      std::copy(std::begin(strJson), std::end(strJson), &(buf[LWS_PRE]));
+      buf[LWS_PRE + strJson.size()] = '\0';
+
+      int n = lws_write(wsi, &buf[LWS_PRE], strJson.size(), LWS_WRITE_TEXT);
       std::cout << "+++++++++++++++" << std::endl;
       std::cout << n << std::endl;
       std::cout << "+++++++++++++++" << std::endl;

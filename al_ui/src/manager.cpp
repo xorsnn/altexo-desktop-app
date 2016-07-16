@@ -96,11 +96,15 @@ void Manager::onWsMessageCb(std::vector<char> msg) {
 }
 
 void Manager::initConnection(std::vector<char> peerId, std::vector<char> mode) {
-  std::ostringstream stream;
-  boost::property_tree::ptree pt;
-  pt.put("mode", "hologram");
-  boost::property_tree::write_json(stream, pt);
-  std::string strJson = stream.str();
-  std::cout << "<<<<<" << std::endl;
-  std::cout << strJson << std::endl;
+  if (m_wsClient != NULL) {
+    std::ostringstream stream;
+    boost::property_tree::ptree pt;
+    pt.put("mode", "hologram");
+    boost::property_tree::write_json(stream, pt, false);
+    std::string strJson = stream.str();
+    // std::cout << "<<<<<" << std::endl;
+    // std::cout << strJson << std::endl;
+    std::vector<char> strVec(strJson.begin(), strJson.end());
+    m_wsClient->sendMessageToPeer(peerId, strVec);
+  }
 }
