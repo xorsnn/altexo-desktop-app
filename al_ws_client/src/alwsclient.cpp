@@ -144,13 +144,6 @@ int AlWsClient::cbDumbIncrement(struct lws *wsi,
       std::string strJson = stream.str();
       std::cout << strJson << std::endl;
 
-      // std::string sendingMsg =
-      //     std::string("{\"action\":\"send_to_peer\",\"data\":") +
-      //     std::string("{\"peer_id\":") + peerIdStr + std::string(",") +
-      //     std::string("\"message\":") + msgStr + std::string("}}");
-      // std::cout << sendingMsg << std::endl;
-
-      // std::copy(std::begin(msgStr), std::end(msgStr), &(buf[LWS_PRE]));
       std::copy(std::begin(strJson), std::end(strJson), &(buf[LWS_PRE]));
       buf[LWS_PRE + strJson.size()] = '\0';
 

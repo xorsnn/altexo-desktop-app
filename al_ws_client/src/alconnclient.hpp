@@ -38,7 +38,7 @@ private:
   std::string m_peerId;
 
   AlWsClient m_wsCl;
-  boost::thread m_internalThread;
+  // boost::thread m_internalThread;
   AlWsCb *m_alWsCb;
 };
 

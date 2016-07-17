@@ -19,6 +19,7 @@ public:
   virtual ~AlSdkAPI() {}
 
   virtual void init(AlSDKCb *alSdkCb) = 0;
+  virtual void initializePeerConnection() = 0;
   // virtual AlWsCb *getWsCb() = 0;
   // virtual void run() = 0;
   // virtual bool hasConnections() = 0;
@@ -27,8 +28,9 @@ public:
   // // TODO: remove this
   // virtual void OnMessageFromPeer(std::string peerId,
   //                                const std::string &message) = 0;
-  virtual void onMessageFromPeer(std::vector<char> peerId,
-                                 std::vector<char> message) = 0;
+  // this lib should not parce json
+  // virtual void onMessageFromPeer(std::vector<char> peerId,
+  //                                std::vector<char> message) = 0;
   // virtual bool isClientConnected() = 0;
   // virtual void clientConnect(const std::string &server, int port,
   //                            const std::string &clientName) = 0;

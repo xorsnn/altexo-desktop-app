@@ -32,7 +32,9 @@ public:
       m_wsClient->sendMessageToPeer(peerId, msg);
     }
   }
-  void initConnection(std::vector<char> peerId, std::vector<char> mode);
+
+  void initConnection(std::string mode);
+  void onMessageFromPeer(boost::property_tree::ptree jsonMsg);
 
   boost::shared_ptr<AlSdkAPI> m_sdk;
   std::vector<CONTACT> contactList;
@@ -43,6 +45,8 @@ private:
   boost::thread m_frameThread;
 
   std::string m_id = "";
+  std::string m_peerId = "-1";
+  std::string m_videoDeviceName = "";
 
   boost::signals2::signal<void(std::vector<char>, std::vector<char>)>
       newMessageToSdk;
