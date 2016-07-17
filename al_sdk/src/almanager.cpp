@@ -4,14 +4,15 @@
 
 using namespace std;
 
-AlManager::AlManager() : m_conductor(NULL), m_debug(true) {}
+AlManager::AlManager()
+    : m_conductor(NULL), m_socketServer(NULL), m_thread(NULL), m_debug(true) {}
 
 void AlManager::init(AlCallback *alCallback) {
   // auto_thread = new rtc::AutoThread();
   rtc::AutoThread auto_thread;
-  this->thread = rtc::Thread::Current();
-  m_socketServer = new CustomSocketServer(thread);
-  thread->set_socketserver(m_socketServer);
+  this->m_thread = rtc::Thread::Current();
+  m_socketServer = new CustomSocketServer(m_thread);
+  m_thread->set_socketserver(m_socketServer);
 
   rtc::InitializeSSL();
   // Must be constructed after we set the socketserver.
@@ -26,8 +27,8 @@ void AlManager::run() {
   if (m_debug) {
     std::cout << "AlManager::run" << std::endl;
   }
-  this->thread->Run();
-  this->thread->set_socketserver(NULL);
+  this->m_thread->Run();
+  this->m_thread->set_socketserver(NULL);
   rtc::CleanupSSL();
 }
 
@@ -39,6 +40,7 @@ bool AlManager::hasConnections() {
 }
 
 void AlManager::InitializePeerConnection() {
+  // m_socketServer->
   if (m_debug) {
     std::cout << "AlManager::InitializePeerConnection" << std::endl;
   }

@@ -26,10 +26,12 @@ public:
   virtual void setImageData(uint8_t *pImageBytes, size_t len, int width,
                             int height);
 
+  // TODO hide
+  CustomSocketServer *m_socketServer;
+
 private:
   // rtc::AutoThread auto_thread;
-  rtc::Thread *thread;
-  CustomSocketServer *m_socketServer;
+  rtc::Thread *m_thread;
   rtc::scoped_refptr<Conductor> m_conductor;
   AlDataManager m_dataManager;
   bool m_debug;

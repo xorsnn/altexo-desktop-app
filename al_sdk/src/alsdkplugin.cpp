@@ -4,14 +4,15 @@
 
 using namespace std;
 
-AlSdkPlugin::AlSdkPlugin() : m_debug(true) {
+AlSdkPlugin::AlSdkPlugin() : m_debug(true), m_newMessage(false) {
   if (m_debug) {
     std::cout << "AlSdkPlugin constructor" << std::endl;
   }
   m_manager = new AlManager();
   // connections
-  initPeerConnectionSignal.connect(
-      boost::bind(&AlManager::InitializePeerConnection, m_manager));
+  // initPeerConnectionSignal.connect(
+  //     boost::bind(&CustomSocketServer::initializePeerConnection,
+  //                 m_manager->m_socketServer));
 }
 
 AlSdkPlugin::~AlSdkPlugin() {
@@ -21,29 +22,36 @@ AlSdkPlugin::~AlSdkPlugin() {
 
 void AlSdkPlugin::init(AlSDKCb *alSdkCb) {
   m_sdkCb = alSdkCb;
-  m_manager->init(this);
 
   // TODO debug, checking init thread
   // m_manager->InitializePeerConnection();
 
   m_internalThread = boost::thread(&AlSdkPlugin::threadMain, this);
-  m_manager->run();
 }
 
 void AlSdkPlugin::initializePeerConnection() {
+  boost::lock_guard<boost::mutex> guard(m_mtx);
   if (m_debug) {
     std::cout << "AlSdkPlugin::initializePeerConnection" << std::endl;
   }
-  initPeerConnectionSignal();
+  m_newMessage = true;
+  // m_manager->m_socketServer->initializePeerConnection();
+
+  // initPeerConnectionSignal();
 }
 
 void AlSdkPlugin::threadMain() {
   if (m_debug) {
     std::cout << "AlSdkPlugin::threadMain" << std::endl;
   }
-  boost::this_thread::sleep(boost::posix_time::milliseconds(5 * 1000));
-  initPeerConnectionSignal();
-  // m_manager->run();
+  m_manager->init(this);
+  // initPeerConnectionSignal.connect(
+  //     boost::bind(&CustomSocketServer::initializePeerConnection,
+  //                 m_manager->m_socketServer));
+  // m_manager->InitializePeerConnection();
+  m_manager->run();
+  // boost::this_thread::sleep(boost::posix_time::milliseconds(5 * 1000));
+  // initPeerConnectionSignal();
 }
 
 // AlWsCb *AlSdkPlugin::getWsCb() { return this; }

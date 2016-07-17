@@ -104,6 +104,14 @@ public:
   //    TODO move to AlManager
   std::string getVideoDeviceName() { return ""; }
 
+  // getters
+  bool ifNewMessage() {
+    boost::lock_guard<boost::mutex> guard(m_mtx);
+    bool result = m_newMessage;
+    m_newMessage = false;
+    return result;
+  }
+
 private:
   AlManager *m_manager;
   AlSDKCb *m_sdkCb;
@@ -113,6 +121,10 @@ private:
   boost::signals2::signal<void()> initPeerConnectionSignal;
 
   bool m_debug;
+
+  // flags
+  bool m_newMessage;
+  boost::mutex m_mtx;
 };
 
 extern "C" BOOST_SYMBOL_EXPORT AlSdkPlugin plugin;
