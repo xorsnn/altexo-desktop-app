@@ -44,6 +44,8 @@ public:
     if (m_debug) {
       std::cout << "sendToPeerCb" << std::endl;
     }
+    std::vector<char> msg(message.begin(), message.end());
+    m_sdkCb->sendMessageToPeer(msg);
   }
   void sendHangUpCb(std::string peer_id) {
     if (m_debug) {

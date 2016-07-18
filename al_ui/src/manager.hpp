@@ -32,6 +32,11 @@ public:
       m_wsClient->sendMessageToPeer(peerId, msg);
     }
   }
+  void sendMessageToPeer(std::vector<char> msg) {
+    // std::string msgStr(msg.begin(), msg.end());
+    std::vector<char> peerIdVec(m_peerId.begin(), m_peerId.end());
+    m_wsClient->sendMessageToPeer(peerIdVec, msg);
+  };
 
   void initConnection(std::string mode);
   void onMessageFromPeer(boost::property_tree::ptree jsonMsg);
