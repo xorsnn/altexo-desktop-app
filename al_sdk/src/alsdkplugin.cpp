@@ -1,18 +1,15 @@
 #include "alsdkplugin.hpp"
+#include "alcallback.h"
 #include "almanager.h"
 #include <iostream>
 
 using namespace std;
 
-AlSdkPlugin::AlSdkPlugin() : m_debug(true), m_newMessage(false) {
+AlSdkPlugin::AlSdkPlugin() : m_debug(true) {
   if (m_debug) {
     std::cout << "AlSdkPlugin constructor" << std::endl;
   }
   m_manager = new AlManager();
-  // connections
-  // initPeerConnectionSignal.connect(
-  //     boost::bind(&CustomSocketServer::initializePeerConnection,
-  //                 m_manager->m_socketServer));
 }
 
 AlSdkPlugin::~AlSdkPlugin() {
@@ -34,10 +31,9 @@ void AlSdkPlugin::initializePeerConnection() {
   if (m_debug) {
     std::cout << "AlSdkPlugin::initializePeerConnection" << std::endl;
   }
-  m_newMessage = true;
-  // m_manager->m_socketServer->initializePeerConnection();
-
-  // initPeerConnectionSignal();
+  std::pair<int, std::vector<char>> msg(AlCallback::SdkMessageType::INIT_SM,
+                                        std::vector<char>());
+  m_messageQueue.push(msg);
 }
 
 void AlSdkPlugin::threadMain() {
@@ -45,13 +41,7 @@ void AlSdkPlugin::threadMain() {
     std::cout << "AlSdkPlugin::threadMain" << std::endl;
   }
   m_manager->init(this);
-  // initPeerConnectionSignal.connect(
-  //     boost::bind(&CustomSocketServer::initializePeerConnection,
-  //                 m_manager->m_socketServer));
-  // m_manager->InitializePeerConnection();
   m_manager->run();
-  // boost::this_thread::sleep(boost::posix_time::milliseconds(5 * 1000));
-  // initPeerConnectionSignal();
 }
 
 // AlWsCb *AlSdkPlugin::getWsCb() { return this; }
@@ -163,3 +153,22 @@ void AlSdkPlugin::threadMain() {
 //                                int height) {
 //   m_manager->setImageData(pImageBytes, len, width, height);
 // }
+
+void AlSdkPlugin::setRemoteSdp(std::vector<char> sdp) {
+  if (m_debug) {
+    std::cout << "++++++++++++++++++++++++++++++" << std::endl;
+    std::cout << AlCallback::SdkMessageType::CANDIDATE_SM << std::endl;
+    std::cout << sdp.size() << std::endl;
+  }
+  boost::lock_guard<boost::mutex> guard(m_mtx);
+  std::pair<int, std::vector<char>> msg(AlCallback::SdkMessageType::SDP_SM,
+                                        sdp);
+  m_messageQueue.push(msg);
+}
+
+void AlSdkPlugin::setRemoteIceCandidate(std::vector<char> candidate) {
+  boost::lock_guard<boost::mutex> guard(m_mtx);
+  std::pair<int, std::vector<char>> msg(
+      AlCallback::SdkMessageType::CANDIDATE_SM, candidate);
+  m_messageQueue.push(msg);
+}

@@ -5,8 +5,6 @@
 #include "webrtc/base/physicalsocketserver.h"
 #include <iostream>
 
-// class AlCallback;
-
 class CustomSocketServer : public rtc::PhysicalSocketServer {
 public:
   CustomSocketServer(rtc::Thread *thread)
@@ -40,19 +38,41 @@ public:
     // }
 
     if (m_alCallback->ifNewMessage()) {
-      std::cout << "CustomSocketServer InitializePeerConnection" << std::endl;
-      if (m_conductor->InitializePeerConnection()) {
-        if (m_debug) {
-          std::cout << "AlManager AlManager CreateOffer" << std::endl;
+      std::pair<int, std::vector<char>> msg = m_alCallback->degueueMessage();
+      if (m_debug) {
+        std::cout << "CustomSocketServer handling message" << std::endl;
+      }
+      int msgType = msg.first;
+      switch (msgType) {
+      case AlCallback::SdkMessageType::INIT_SM: {
+        if (m_conductor->InitializePeerConnection()) {
+          if (m_debug) {
+            std::cout << "CustomSocketServer CreateOffer" << std::endl;
+          }
+          m_conductor->m_peerConnection->CreateOffer(m_conductor, NULL);
+        } else {
+          std::cout << "Error. Failed to initialize PeerConnection"
+                    << std::endl;
         }
-        m_conductor->m_peerConnection->CreateOffer(m_conductor, NULL);
-      } else {
-        std::cout << "Error. Failed to initialize PeerConnection" << std::endl;
+      } break;
+      case AlCallback::SdkMessageType::SDP_SM: {
+        if (m_debug) {
+          std::cout << "AlCallback::SdkMessageType::SDP_SM" << std::endl;
+          // std::cout << msg.second << std::endl;
+        }
+        // std::string msgStr(msg.second.begin(), msg.second.end());
+        m_conductor->OnMessageFromPeer("", msg.second);
+      } break;
+      case AlCallback::SdkMessageType::CANDIDATE_SM: {
+        // std::string msgStr(msg.second.begin(), msg.second.end());
+        m_conductor->OnMessageFromPeer("", msg.second);
+      } break;
       }
     }
 
     // return rtc::PhysicalSocketServer::Wait(0 /*cms == -1 ? 1 : cms*/,
     //  process_io);
+    // return rtc::PhysicalSocketServer::Wait(10, process_io);
     return rtc::PhysicalSocketServer::Wait(cms == -1 ? 1 : cms, process_io);
   }
 
@@ -62,7 +82,6 @@ protected:
   rtc::Thread *m_thread;
   rtc::scoped_refptr<Conductor> m_conductor;
   AlCallback *m_alCallback;
-  // bool m_newMessage;
   bool m_debug;
 };
 

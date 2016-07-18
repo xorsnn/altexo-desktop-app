@@ -72,7 +72,7 @@ static int ratelimit_connects(unsigned int *last, unsigned int secs) {
   return 1;
 }
 
-AlWsClient::AlWsClient() : m_writable(NULL), m_debug(true) {
+AlWsClient::AlWsClient() : m_writable(NULL), m_debug(false) {
   me = this;
   lws_protocols pr1 = {
       "dumb-increment-protocol,fake-nonexistant-protocol",
@@ -97,9 +97,6 @@ AlWsClient::~AlWsClient() {}
 int AlWsClient::cbDumbIncrement(struct lws *wsi,
                                 enum lws_callback_reasons reason, void *user,
                                 void *in, size_t len) {
-  // std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
-  // std::cout << reason << std::endl;
-  // std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
   unsigned char buf[LWS_PRE + 4096];
 
   switch (reason) {
@@ -121,7 +118,9 @@ int AlWsClient::cbDumbIncrement(struct lws *wsi,
   } break;
 
   case LWS_CALLBACK_CLIENT_WRITEABLE: {
-    std::cout << "LWS_CALLBACK_CLIENT_WRITEABLE" << std::endl;
+    if (m_debug) {
+      std::cout << "LWS_CALLBACK_CLIENT_WRITEABLE" << std::endl;
+    }
 
     if (!m_messageQueue.empty()) {
       std::pair<std::string, std::string> msgPair = m_messageQueue.front();
@@ -142,7 +141,6 @@ int AlWsClient::cbDumbIncrement(struct lws *wsi,
       pt.add_child("data", dataNode);
       boost::property_tree::write_json(stream, pt, false);
       std::string strJson = stream.str();
-      std::cout << strJson << std::endl;
 
       std::copy(std::begin(strJson), std::end(strJson), &(buf[LWS_PRE]));
       buf[LWS_PRE + strJson.size()] = '\0';
@@ -150,6 +148,7 @@ int AlWsClient::cbDumbIncrement(struct lws *wsi,
       int n = lws_write(wsi, &buf[LWS_PRE], strJson.size(), LWS_WRITE_TEXT);
       if (m_debug) {
         std::cout << "+++++++++++++++" << std::endl;
+        std::cout << strJson << std::endl;
         std::cout << n << std::endl;
         std::cout << "+++++++++++++++" << std::endl;
       }
@@ -202,7 +201,9 @@ int AlWsClient::threadMain() {
   i.port = m_port;
   char *pathTmp = (char *)(m_path.c_str());
   if (lws_parse_uri(pathTmp, &prot, &i.address, &i.port, &p)) {
-    std::cout << "PARCE!" << std::endl;
+    if (m_debug) {
+      std::cout << "PARCE!" << std::endl;
+    }
     // usage();
   }
 

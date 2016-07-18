@@ -8,7 +8,17 @@ typedef std::map<int, std::string> Peers;
 
 class AlCallback {
 public:
-  virtual void sendToPeerCb(const std::string &message) = 0;
+  // virtual void sendToPeerCb(const std::string &message) = 0;
+  enum SdkMessageType {
+    SDP_SM = 1,
+    CANDIDATE_SM,
+    INIT_SM,
+  };
+
+  // TODO migrate to this 2
+  virtual void onSdpCb(const std::string &message) = 0;
+  virtual void onCandidateCb(const std::string &message) = 0;
+
   virtual void sendHangUpCb(std::string peer_id) = 0;
   virtual void dequeueMessagesFromPeerCb() = 0;
   virtual void stopLocalRendererCb() = 0;
@@ -31,6 +41,7 @@ public:
   virtual std::string getVideoDeviceName() = 0;
 
   virtual bool ifNewMessage() = 0;
+  virtual std::pair<int, std::vector<char>> degueueMessage() = 0;
 };
 
 #endif // ALCALLBACK_H

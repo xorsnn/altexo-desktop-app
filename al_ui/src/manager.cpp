@@ -55,8 +55,10 @@ void Manager::initSdk() {
 
 void Manager::onWsMessageCb(std::vector<char> msg) {
   std::string msgStr(msg.begin(), msg.end());
-  std::cout << "=== ws message ===" << std::endl;
-  std::cout << msgStr << std::endl;
+  if (m_debug) {
+    std::cout << "=== ws message ===" << std::endl;
+    std::cout << msgStr << std::endl;
+  }
   boost::property_tree::ptree pt;
   std::stringstream ss(msgStr);
   boost::property_tree::read_json(ss, pt);
@@ -90,74 +92,133 @@ void Manager::initConnection(std::string mode) {
   }
 }
 
-void Manager::onMessageFromPeer(boost::property_tree::ptree jsonMsg) {
-  std::string senderIdStr = jsonMsg.get<std::string>("data.sender_id");
-  std::string messageStr = jsonMsg.get<std::string>("data.message");
+void Manager::onMessageFromPeer(boost::property_tree::ptree msgPt) {
+  std::string senderIdStr = msgPt.get<std::string>("data.sender_id");
+  std::string messageStr = msgPt.get<std::string>("data.message");
 
-  std::cout << messageStr << std::endl;
+  boost::property_tree::ptree jsonMsg;
+  std::stringstream ss(messageStr);
+  boost::property_tree::read_json(ss, jsonMsg);
+
+  if (m_debug) {
+    std::cout << messageStr << std::endl;
+  }
 
   boost::optional<bool> callAccepted =
-      jsonMsg.get_optional<bool>("data.message.callAccepted");
+      jsonMsg.get_optional<bool>("callAccepted");
+
+  boost::optional<bool> isCall = jsonMsg.get_optional<bool>("call");
+
+  // this is the very first contact we will store peer id
+  if (m_peerId == "-1") {
+    m_peerId = senderIdStr;
+    if (m_videoDeviceName != "") {
+      // m_sdk->setDesiredDataSource(AlManagerInterface::CAMERA);
+    } else {
+      // **
+      // * INITIATE MODE
+      // *
+      // std::cout << "intiate" << std::endl;
+      //
+      // std::vector<char> peerIdVec(m_peerId.begin(), m_peerId.end());
+
+      // initConnection("hologram");
+      initConnection("audio+video");
+      // // Q_EMIT requestNewFrameSignal();
+      // // // TODO: take a look later
+      // // //            QTimer *timer = new QTimer(this);
+      // // //            connect(timer, SIGNAL(timeout()), this,
+      // // //            SLOT(timeoutSlot()));
+      // // //            timer->start(1000);
+    }
+  }
 
   if (callAccepted) {
-    std::cout << "callAccepted" << std::endl;
+    if (m_debug) {
+      std::cout << "callAccepted" << std::endl;
+    }
     //     Q_EMIT ConnectToPeerSignal(
     //         jsonObj["data"].toObject()["sender_id"].toString());
+  } else if (isCall) {
+    if (m_debug) {
+      std::cout << "isCall" << std::endl;
+    }
+    // TODO implement accept call functionality
+    std::ostringstream stream;
+    boost::property_tree::ptree msgToSendPt;
+    msgToSendPt.put("callAccepted", true);
+    boost::property_tree::write_json(stream, msgToSendPt, false);
+    std::string strJson = stream.str();
+    if (m_debug) {
+      // std::cout << strJson << std::endl;
+    }
+    std::vector<char> strVec(strJson.begin(), strJson.end());
+    std::vector<char> peerIdVec(m_peerId.begin(), m_peerId.end());
+    m_wsClient->sendMessageToPeer(peerIdVec, strVec);
+
+    // TODO only for initiating side
+    // m_sdk->initializePeerConnection();
   } else {
-    std::cout << "not callAccepted" << std::endl;
-    if (m_peerId == "-1") {
-      m_peerId = senderIdStr;
-      if (m_videoDeviceName != "") {
-        // m_managerInterface->setDesiredDataSource(AlManagerInterface::CAMERA);
-      } else {
-        // **
-        // * INITIATE MODE
-        // *
-        std::cout << "intiate" << std::endl;
-
-        std::vector<char> peerIdVec(m_peerId.begin(), m_peerId.end());
-
-        initConnection("hologram");
-        // Q_EMIT requestNewFrameSignal();
-        // // TODO: take a look later
-        // //            QTimer *timer = new QTimer(this);
-        // //            connect(timer, SIGNAL(timeout()), this,
-        // //            SLOT(timeoutSlot()));
-        // //            timer->start(1000);
-        m_sdk->initializePeerConnection();
-      }
+    if (m_debug) {
+      std::cout << "================" << std::endl;
+      std::cout << "sdp or candidate" << std::endl;
+      std::cout << "================" << std::endl;
     }
-
-    boost::optional<std::string> sdp =
-        jsonMsg.get_optional<std::string>("data.message.sdp");
+    boost::optional<std::string> sdp = jsonMsg.get_optional<std::string>("sdp");
     if (sdp) {
-      std::cout << "sdb received" << std::endl;
-      //   //   m_managerInterface->OnMessageFromPeer(peer_id, message);
-      //   //   m_remoteSDP = QString::fromStdString(message);
+      if (m_debug) {
+        std::cout << "sdb received" << std::endl;
+      }
+      m_remoteSdp = messageStr;
     } else {
-      std::cout << "ice candidate received" << std::endl;
-      //   //   m_remoteCandidates++;
-      //   // qDebug() << "REMOTE CANDIDATES: ";
-      //   //   qDebug() << m_remoteCandidates;
-      //   //   curMsg[QString::fromStdString(peer_id)] =
-      //   //   QString::fromStdString(message);
-      //   //   m_messageQueue.enqueue(curMsg);
+      if (m_debug) {
+        std::cout << "ice candidate received" << std::endl;
+      }
+      m_remoteCandidates.push(messageStr);
     }
+    handleMessages();
+  }
+}
 
-    // QMap<QString, QString> curMsg;
-    // // defining type
-    // QJsonDocument doc =
-    //     QJsonDocument::fromJson(QString::fromStdString(message).toUtf8());
-    // QJsonObject jsonObj = doc.object();
-    // qDebug() << jsonObj.contains("sdp");
-    //
-    // if (jsonObj.contains("sdp")) {
-    // } else {
-    // }
-    // if (!this->m_processingMsg) {
-    //   if (m_remoteSDP != "" && m_localSDP != "") {
-    //     DequeueMessagesFromPeerSlot();
-    //   }
-    // }
+void Manager::onSdp(std::vector<char> sdp) {
+  if (m_debug) {
+    std::cout << "Manager::onSdp" << std::endl;
+  }
+  m_localSdp = std::string(sdp.begin(), sdp.end());
+  handleMessages();
+}
+void Manager::onCandidate(std::vector<char> candidate) {
+  if (m_debug) {
+    std::cout << "Manager::onCandidate" << std::endl;
+  }
+  m_localCandidates.push(std::string(candidate.begin(), candidate.end()));
+  handleMessages();
+}
+
+void Manager::handleMessages() {
+  std::vector<char> peerIdVec(m_peerId.begin(), m_peerId.end());
+  if (!m_sentLocalSdp && m_localSdp != "") {
+    std::vector<char> localSdpVec(m_localSdp.begin(), m_localSdp.end());
+    m_wsClient->sendMessageToPeer(peerIdVec, localSdpVec);
+    m_sentLocalSdp = true;
+  }
+  if (!m_sentRemoteSdp && m_remoteSdp != "") {
+    std::vector<char> remoteSdpVec(m_remoteSdp.begin(), m_remoteSdp.end());
+    m_sdk->setRemoteSdp(remoteSdpVec);
+    m_sentRemoteSdp = true;
+  }
+  if (m_sentLocalSdp && m_sentRemoteSdp) {
+    while (!m_localCandidates.empty()) {
+      std::string candidate = m_localCandidates.front();
+      m_localCandidates.pop();
+      std::vector<char> candidateVec(candidate.begin(), candidate.end());
+      m_wsClient->sendMessageToPeer(peerIdVec, candidateVec);
+    }
+    while (!m_remoteCandidates.empty()) {
+      std::string candidate = m_remoteCandidates.front();
+      m_remoteCandidates.pop();
+      std::vector<char> candidateVec(candidate.begin(), candidate.end());
+      m_sdk->setRemoteIceCandidate(candidateVec);
+    }
   }
 }

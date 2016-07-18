@@ -69,6 +69,8 @@ public:
     SEND_MESSAGE_TO_PEER,
     NEW_STREAM_ADDED,
     STREAM_REMOVED,
+    SEND_LOCAL_CANDIDATE,
+    SEND_LOCAL_SDP,
   };
 
   Conductor(PeerConnectionClient *client, AlCallback *alCallback,
@@ -144,7 +146,10 @@ public:
   //    virtual void OnDisconnected();
   //    virtual void OnPeerConnected(std::string id, const std::string& name);
   //    virtual void OnPeerDisconnected(std::string id);
-  void OnMessageFromPeer(std::string peer_id, const std::string &message);
+
+  // void OnMessageFromPeer(std::string peer_id, const std::string &message);
+  void OnMessageFromPeer(std::string peer_id, std::vector<char> msgVec);
+
   //    virtual void OnMessageSent(int err);
   //    virtual void OnServerConnectionFailure();
 

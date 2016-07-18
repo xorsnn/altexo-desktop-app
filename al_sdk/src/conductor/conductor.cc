@@ -96,6 +96,9 @@ void Conductor::Close() {
 }
 
 bool Conductor::InitializePeerConnection() {
+  if (m_debug) {
+    std::cout << "Conductor::InitializePeerConnection" << std::endl;
+  }
   ASSERT(peer_connection_factory_.get() == NULL);
   ASSERT(m_peerConnection.get() == NULL);
 
@@ -249,7 +252,10 @@ void Conductor::OnIceCandidate(const webrtc::IceCandidateInterface *candidate) {
   }
   jmessage[kCandidateSdpName] = sdp;
   // TODO move to callback
-  SendMessage(writer.write(jmessage));
+  // std::string *msg = new std::string(writer.write(jmessage));
+  std::string *msg = new std::string(writer.write(jmessage));
+  queueUIThreadCallback(SEND_LOCAL_CANDIDATE, msg);
+  // SendMessage(writer.write(jmessage));
 }
 
 ////
@@ -294,10 +300,12 @@ void Conductor::OnIceCandidate(const webrtc::IceCandidateInterface *candidate) {
 //}
 
 void Conductor::OnMessageFromPeer(std::string peer_id,
-                                  const std::string &message) {
+                                  std::vector<char> msgVec) {
+  std::string message(msgVec.begin(), msgVec.end());
   if (this->m_debug) {
     std::cout << "Conductor::OnMessageFromPeer" << std::endl;
-    // std::cout << peer_id << std::endl;
+    std::cout << msgVec.size() << std::endl;
+    std::cout << message << std::endl;
   }
   //    ASSERT(peer_id_ == peer_id || peer_id_ == "-1");
   ASSERT(!message.empty());
@@ -311,6 +319,7 @@ void Conductor::OnMessageFromPeer(std::string peer_id,
     // TODO HACK!
     this->m_isAcceptingConnection = true;
 
+    std::cout << "< 11" << std::endl;
     if (!InitializePeerConnection()) {
       std::cout << "< 12" << std::endl;
       LOG(LS_ERROR) << "Failed to initialize our PeerConnection instance";
@@ -585,55 +594,64 @@ void Conductor::UIThreadCallback(int msg_id, void *data) {
   case PEER_CONNECTION_CLOSED:
     LOG(INFO) << "PEER_CONNECTION_CLOSED";
     DeletePeerConnection();
-
     ASSERT(m_activeStreams.empty());
-
-    //        if (m_alCallback->IsWindow()) {
-    //            if (m_client->is_connected()) {
-    //                m_alCallback->switchToPeerListCb(m_client->peers());
-    //            } else {
-    //                m_alCallback->SwitchToConnectUI();
-    //            }
-    //        } else {
-    //            DisconnectFromServer();
-    //        }
     break;
-
-  case SEND_MESSAGE_TO_PEER: {
-    LOG(INFO) << "SEND_MESSAGE_TO_PEER";
+  case SEND_LOCAL_CANDIDATE: {
     std::string *msg = reinterpret_cast<std::string *>(data);
     if (msg) {
-      // For convenience, we always run the message through the queue.
-      // This way we can be sure that messages are sent to the server
-      // in the same order they were signaled without much hassle.
       m_pendingMessages.push_back(msg);
     }
-
     if (!m_pendingMessages.empty() && !m_client->IsSendingMessage()) {
       msg = m_pendingMessages.front();
       m_pendingMessages.pop_front();
-
-      // TODO hangle failed sending
-      std::cout
-          << "Q_EMIT SendToPeerSignal(peer_id_, QString::fromStdString(*msg));"
-          << std::endl;
-      //            qDebug() << peer_id_;
-      m_alCallback->sendToPeerCb(*msg);
-      //            Q_EMIT SendToPeerSignal(peer_id_,
-      //            QString::fromStdString(*msg));
-      //            if (!m_client->SendToPeer(peer_id_, *msg) && peer_id_ !=
-      //            "-1") {
-      //                LOG(LS_ERROR) << "SendToPeer failed";
-      //                DisconnectFromServer();
-      //            }
-      delete msg;
+      m_alCallback->onCandidateCb(*msg);
     }
-
-    //        if (!m_peerConnection.get())
-    //            peer_id_ = "-1";
-
-    break;
-  }
+    delete msg;
+  } break;
+  case SEND_LOCAL_SDP: {
+    std::string *msg = reinterpret_cast<std::string *>(data);
+    if (msg) {
+      m_pendingMessages.push_back(msg);
+    }
+    if (!m_pendingMessages.empty() && !m_client->IsSendingMessage()) {
+      msg = m_pendingMessages.front();
+      m_pendingMessages.pop_front();
+      m_alCallback->onSdpCb(*msg);
+    }
+    delete msg;
+  } break;
+  case SEND_MESSAGE_TO_PEER: {
+    LOG(INFO) << "SEND_MESSAGE_TO_PEER";
+    if (m_debug) {
+      std::cout << "SEND_MESSAGE_TO_PEER" << std::endl;
+    }
+    // std::string *msg = reinterpret_cast<std::string *>(data);
+    // if (msg) {
+    //   // For convenience, we always run the message through the queue.
+    //   // This way we can be sure that messages are sent to the server
+    //   // in the same order they were signaled without much hassle.
+    //   m_pendingMessages.push_back(msg);
+    // }
+    //
+    // if (!m_pendingMessages.empty() && !m_client->IsSendingMessage()) {
+    //   msg = m_pendingMessages.front();
+    //   m_pendingMessages.pop_front();
+    //   // TODO hangle failed sending
+    //   std::cout
+    //       << "Q_EMIT SendToPeerSignal(peer_id_,
+    //       QString::fromStdString(*msg));"
+    //       << std::endl;
+    //   m_alCallback->sendToPeerCb(*msg);
+    //   //            Q_EMIT SendToPeerSignal(peer_id_,
+    //   //            QString::fromStdString(*msg));
+    //   //            if (!m_client->SendToPeer(peer_id_, *msg) && peer_id_ !=
+    //   //            "-1") {
+    //   //                LOG(LS_ERROR) << "SendToPeer failed";
+    //   //                DisconnectFromServer();
+    //   //            }
+    //   delete msg;
+    // }
+  } break;
 
   case NEW_STREAM_ADDED: {
     webrtc::MediaStreamInterface *stream =
@@ -691,7 +709,9 @@ void Conductor::OnSuccess(webrtc::SessionDescriptionInterface *desc) {
   jmessage[kSessionDescriptionTypeName] = desc->type();
   jmessage[kSessionDescriptionSdpName] = sdp;
   //  TODO move to callback
-  SendMessage(writer.write(jmessage));
+  // SendMessage(writer.write(jmessage));
+  std::string *msg = new std::string(writer.write(jmessage));
+  queueUIThreadCallback(SEND_LOCAL_SDP, msg);
 }
 
 void Conductor::OnFailure(const std::string &error) {

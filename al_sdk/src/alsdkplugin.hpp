@@ -7,6 +7,7 @@
 #include "boost/thread.hpp"
 #include <boost/config.hpp>
 #include <boost/signals2/signal.hpp>
+#include <queue>
 #include <string>
 
 class AlManager;
@@ -22,6 +23,9 @@ public:
   // bool hasConnections();
   // void InitializePeerConnection();
   void initializePeerConnection();
+  void setRemoteSdp(std::vector<char> sdp);
+  void setRemoteIceCandidate(std::vector<char> candidate);
+
   // void DeletePeerConnection();
   //
   // // TODO: union the two methods
@@ -40,13 +44,23 @@ public:
   void threadMain();
 
   // AlCallback implementation
-  void sendToPeerCb(const std::string &message) {
-    if (m_debug) {
-      std::cout << "sendToPeerCb" << std::endl;
-    }
+  // void sendToPeerCb(const std::string &message) {
+  //   if (m_debug) {
+  //     std::cout << "sendToPeerCb" << std::endl;
+  //   }
+  //   std::vector<char> msg(message.begin(), message.end());
+  //   m_sdkCb->sendMessageToPeer(msg);
+  // }
+
+  void onSdpCb(const std::string &message) {
     std::vector<char> msg(message.begin(), message.end());
-    m_sdkCb->sendMessageToPeer(msg);
+    m_sdkCb->onSdp(msg);
   }
+  void onCandidateCb(const std::string &message) {
+    std::vector<char> msg(message.begin(), message.end());
+    m_sdkCb->onCandidate(msg);
+  }
+
   void sendHangUpCb(std::string peer_id) {
     if (m_debug) {
       std::cout << "sendHangUpCb" << std::endl;
@@ -100,7 +114,7 @@ public:
   }
   void updateFrameCb(const uint8_t *image, int width, int height) {
     if (m_debug) {
-      std::cout << "updateFrameCb" << std::endl;
+      // std::cout << "updateFrameCb" << std::endl;
     }
   }
   //    TODO move to AlManager
@@ -109,8 +123,12 @@ public:
   // getters
   bool ifNewMessage() {
     boost::lock_guard<boost::mutex> guard(m_mtx);
-    bool result = m_newMessage;
-    m_newMessage = false;
+    return !m_messageQueue.empty();
+  }
+  std::pair<int, std::vector<char>> degueueMessage() {
+    boost::lock_guard<boost::mutex> guard(m_mtx);
+    std::pair<int, std::vector<char>> result = m_messageQueue.front();
+    m_messageQueue.pop();
     return result;
   }
 
@@ -124,9 +142,9 @@ private:
 
   bool m_debug;
 
-  // flags
-  bool m_newMessage;
   boost::mutex m_mtx;
+
+  std::queue<std::pair<int, std::vector<char>>> m_messageQueue;
 };
 
 extern "C" BOOST_SYMBOL_EXPORT AlSdkPlugin plugin;

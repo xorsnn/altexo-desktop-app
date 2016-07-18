@@ -59,7 +59,8 @@ void AlManager::DeletePeerConnection() { m_conductor->DeletePeerConnection(); }
 void AlManager::OnMessageFromPeer(std::string peer_id,
                                   const std::string &message) {
   std::cout << "AlManager::OnMessageFromPeer" << std::endl;
-  m_conductor->OnMessageFromPeer(peer_id, message);
+  std::vector<char> msgVec(message.begin(), message.end());
+  m_conductor->OnMessageFromPeer(peer_id, msgVec);
 }
 
 void AlManager::setDesiredDataSource(int dataSource) {

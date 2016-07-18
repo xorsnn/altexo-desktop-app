@@ -20,6 +20,8 @@ public:
 
   virtual void init(AlSDKCb *alSdkCb) = 0;
   virtual void initializePeerConnection() = 0;
+  virtual void setRemoteSdp(std::vector<char> sdp) = 0;
+  virtual void setRemoteIceCandidate(std::vector<char> candidate) = 0;
   // virtual AlWsCb *getWsCb() = 0;
   // virtual void run() = 0;
   // virtual bool hasConnections() = 0;
