@@ -59,6 +59,8 @@ private:
 
   std::queue<std::pair<std::string, std::string>> m_messageQueue;
   char *m_writable;
+
+  bool m_debug;
 };
 
 #endif // ALWsCLIENT_H

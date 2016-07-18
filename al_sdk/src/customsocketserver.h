@@ -10,7 +10,8 @@
 class CustomSocketServer : public rtc::PhysicalSocketServer {
 public:
   CustomSocketServer(rtc::Thread *thread)
-      : m_thread(thread), m_conductor(NULL), m_alCallback(NULL) {}
+      : m_thread(thread), m_conductor(NULL), m_alCallback(NULL), m_debug(true) {
+  }
   virtual ~CustomSocketServer() {}
 
   void set_conductor(rtc::scoped_refptr<Conductor> conductor) {
@@ -34,8 +35,20 @@ public:
     // if (m_alCallback) {
     //   m_alCallback->processUiEventsCb();
     // }
-    if (false && !m_conductor->connection_active()) {
-      m_thread->Quit();
+    // if (false && !m_conductor->connection_active()) {
+    //   m_thread->Quit();
+    // }
+
+    if (m_alCallback->ifNewMessage()) {
+      std::cout << "CustomSocketServer InitializePeerConnection" << std::endl;
+      if (m_conductor->InitializePeerConnection()) {
+        if (m_debug) {
+          std::cout << "AlManager AlManager CreateOffer" << std::endl;
+        }
+        m_conductor->m_peerConnection->CreateOffer(m_conductor, NULL);
+      } else {
+        std::cout << "Error. Failed to initialize PeerConnection" << std::endl;
+      }
     }
 
     // return rtc::PhysicalSocketServer::Wait(0 /*cms == -1 ? 1 : cms*/,
@@ -49,6 +62,8 @@ protected:
   rtc::Thread *m_thread;
   rtc::scoped_refptr<Conductor> m_conductor;
   AlCallback *m_alCallback;
+  // bool m_newMessage;
+  bool m_debug;
 };
 
 #endif // CUSTOMSOCKETSERVER_H

@@ -72,13 +72,13 @@ static int ratelimit_connects(unsigned int *last, unsigned int secs) {
   return 1;
 }
 
-AlWsClient::AlWsClient() : m_writable(NULL) {
+AlWsClient::AlWsClient() : m_writable(NULL), m_debug(true) {
   me = this;
   lws_protocols pr1 = {
       "dumb-increment-protocol,fake-nonexistant-protocol",
       // boost::bind(&AlWsClient::cbDumbIncrement, this, _1, _2, _3, _4, _5),
       cbDumbIncrementStatic, 0,
-      1024, // 20 was before
+      4096, // 20 was before
   };
   m_protocols[0] = pr1;
 
@@ -123,7 +123,7 @@ int AlWsClient::cbDumbIncrement(struct lws *wsi,
   case LWS_CALLBACK_CLIENT_WRITEABLE: {
     std::cout << "LWS_CALLBACK_CLIENT_WRITEABLE" << std::endl;
 
-    while (!m_messageQueue.empty()) {
+    if (!m_messageQueue.empty()) {
       std::pair<std::string, std::string> msgPair = m_messageQueue.front();
       m_messageQueue.pop();
 
@@ -148,9 +148,11 @@ int AlWsClient::cbDumbIncrement(struct lws *wsi,
       buf[LWS_PRE + strJson.size()] = '\0';
 
       int n = lws_write(wsi, &buf[LWS_PRE], strJson.size(), LWS_WRITE_TEXT);
-      std::cout << "+++++++++++++++" << std::endl;
-      std::cout << n << std::endl;
-      std::cout << "+++++++++++++++" << std::endl;
+      if (m_debug) {
+        std::cout << "+++++++++++++++" << std::endl;
+        std::cout << n << std::endl;
+        std::cout << "+++++++++++++++" << std::endl;
+      }
     }
   } break;
 
@@ -260,6 +262,11 @@ int AlWsClient::threadMain() {
       wsi_dumb = lws_client_connect_via_info(&i);
     }
 
+    // TODO: dirty solution
+    if (!m_messageQueue.empty()) {
+      lws_callback_on_writable(wsi_dumb);
+    }
+
     lws_service(context, 500);
   }
 
@@ -273,7 +280,9 @@ int AlWsClient::threadMain() {
 
 void AlWsClient::sendMessageToPeer(std::vector<char> peerId,
                                    std::vector<char> msg) {
-  std::cout << "AlWsClient::sendMessageToPeer" << std::endl;
+  if (m_debug) {
+    std::cout << "AlWsClient::sendMessageToPeer" << std::endl;
+  }
   std::string peerIdStr(peerId.begin(), peerId.end());
   std::string msgStr(msg.begin(), msg.end());
   std::pair<std::string, std::string> msgPair(peerIdStr, msgStr);

@@ -44,6 +44,8 @@ public:
     if (m_debug) {
       std::cout << "sendToPeerCb" << std::endl;
     }
+    std::vector<char> msg(message.begin(), message.end());
+    m_sdkCb->sendMessageToPeer(msg);
   }
   void sendHangUpCb(std::string peer_id) {
     if (m_debug) {
@@ -104,6 +106,14 @@ public:
   //    TODO move to AlManager
   std::string getVideoDeviceName() { return ""; }
 
+  // getters
+  bool ifNewMessage() {
+    boost::lock_guard<boost::mutex> guard(m_mtx);
+    bool result = m_newMessage;
+    m_newMessage = false;
+    return result;
+  }
+
 private:
   AlManager *m_manager;
   AlSDKCb *m_sdkCb;
@@ -113,6 +123,10 @@ private:
   boost::signals2::signal<void()> initPeerConnectionSignal;
 
   bool m_debug;
+
+  // flags
+  bool m_newMessage;
+  boost::mutex m_mtx;
 };
 
 extern "C" BOOST_SYMBOL_EXPORT AlSdkPlugin plugin;
