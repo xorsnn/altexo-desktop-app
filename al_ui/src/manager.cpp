@@ -49,8 +49,6 @@ void Manager::initSdk() {
                                    boost::dll::load_mode::append_decorations);
 
   m_sdk->init(this);
-  // newMessageToSdk.connect(
-  //     boost::bind(&AlSdkAPI::onMessageFromPeer, m_sdk, _1, _2));
 }
 
 void Manager::onWsMessageCb(std::vector<char> msg) {
@@ -113,8 +111,12 @@ void Manager::onMessageFromPeer(boost::property_tree::ptree msgPt) {
   if (m_peerId == "-1") {
     m_peerId = senderIdStr;
     if (m_videoDeviceName != "") {
-      // m_sdk->setDesiredDataSource(AlManagerInterface::CAMERA);
+      m_sdk->setDesiredDataSource(AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS);
+      // m_sdk->setDesiredDataSource(AlSdkAPI::DesiredVideoSource::CAMERA);
+
     } else {
+      m_sdk->setDesiredDataSource(AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS);
+      // m_sdk->setDesiredDataSource(AlSdkAPI::DesiredVideoSource::CAMERA);
       // **
       // * INITIATE MODE
       // *
@@ -220,5 +222,14 @@ void Manager::handleMessages() {
       std::vector<char> candidateVec(candidate.begin(), candidate.end());
       m_sdk->setRemoteIceCandidate(candidateVec);
     }
+  }
+  if (m_sentLocalSdp && m_sentRemoteSdp && m_localCandidates.empty() &&
+      m_remoteCandidates.empty() && !connectionInitialized) {
+    std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
+    std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
+    std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
+    std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
+    std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
+    connectionInitialized = true;
   }
 }

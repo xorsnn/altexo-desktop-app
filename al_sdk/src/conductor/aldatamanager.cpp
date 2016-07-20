@@ -1,17 +1,21 @@
 #include "aldatamanager.h"
 #include <iostream>
 AlDataManager::AlDataManager() : m_debug(true), m_alVideoCapturer(NULL) {
-  m_desiredVideoSource = 2; // 1 for sensor 2 for camera
+  m_desiredVideoSource = 1; // 1 for sensor 2 for camera
 }
 
 void AlDataManager::startRemoteRenderer(
     webrtc::VideoTrackInterface *remote_video, AlCallback *alCallback) {
-  std::cout << "AlDataManager::startRemoteRenderer" << std::endl;
+  if (m_debug) {
+    std::cout << "AlDataManager::startRemoteRenderer" << std::endl;
+  }
   m_remoteRenderer.reset(new AlVideoRenderer(1, remote_video, alCallback));
 }
 
 void AlDataManager::setDesiredDataSource(int dataSource) {
-  std::cout << "AlDataManager::setDesiredDataSource" << std::endl;
+  if (m_debug) {
+    std::cout << "AlDataManager::setDesiredDataSource" << std::endl;
+  }
   m_desiredVideoSource = dataSource;
 }
 

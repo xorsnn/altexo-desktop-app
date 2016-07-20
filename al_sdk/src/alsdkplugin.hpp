@@ -25,6 +25,8 @@ public:
   void initializePeerConnection();
   void setRemoteSdp(std::vector<char> sdp);
   void setRemoteIceCandidate(std::vector<char> candidate);
+  void setImageData(std::vector<unsigned char> imageBytes, int width,
+                    int height);
 
   // void DeletePeerConnection();
   //
@@ -39,7 +41,7 @@ public:
   // void clientConnect(const std::string &server, int port,
   //                    const std::string &client_name);
   // void clientSignOut();
-  // void setDesiredDataSource(int dataSource);
+  void setDesiredDataSource(int dataSource);
   // void setImageData(uint8_t *pImageBytes, size_t len, int width, int height);
   void threadMain();
 
@@ -145,6 +147,7 @@ private:
   boost::mutex m_mtx;
 
   std::queue<std::pair<int, std::vector<char>>> m_messageQueue;
+  uint8_t *m_pImageBytes;
 };
 
 extern "C" BOOST_SYMBOL_EXPORT AlSdkPlugin plugin;

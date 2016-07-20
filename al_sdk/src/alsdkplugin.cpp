@@ -144,9 +144,9 @@ void AlSdkPlugin::threadMain() {
 //
 // void AlSdkPlugin::clientSignOut() { m_manager->m_client.SignOut(); }
 //
-// void AlSdkPlugin::setDesiredDataSource(int dataSource) {
-//   m_manager->setDesiredDataSource(dataSource);
-// }
+void AlSdkPlugin::setDesiredDataSource(int dataSource) {
+  m_manager->setDesiredDataSource(dataSource);
+}
 //
 // // TODO: reconfigure this
 // void AlSdkPlugin::setImageData(uint8_t *pImageBytes, size_t len, int width,
@@ -171,4 +171,14 @@ void AlSdkPlugin::setRemoteIceCandidate(std::vector<char> candidate) {
   std::pair<int, std::vector<char>> msg(
       AlCallback::SdkMessageType::CANDIDATE_SM, candidate);
   m_messageQueue.push(msg);
+}
+
+void AlSdkPlugin::setImageData(std::vector<unsigned char> imageBytes, int width,
+                               int height) {
+  if (m_debug) {
+    // std::cout << "AlSdkPlugin::setImageData" << std::endl;
+    // std::cout << imageBytes.size() << std::endl;
+  }
+  // m_pImageBytes = reinterpret_cast<uint8_t *>(imageBytes.data());
+  // m_manager->setImageData(m_pImageBytes, imageBytes.size(), width, height);
 }

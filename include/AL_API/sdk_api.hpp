@@ -22,6 +22,7 @@ public:
   virtual void initializePeerConnection() = 0;
   virtual void setRemoteSdp(std::vector<char> sdp) = 0;
   virtual void setRemoteIceCandidate(std::vector<char> candidate) = 0;
+  virtual void setDesiredDataSource(int dataSource) = 0;
   // virtual AlWsCb *getWsCb() = 0;
   // virtual void run() = 0;
   // virtual bool hasConnections() = 0;
@@ -37,9 +38,10 @@ public:
   // virtual void clientConnect(const std::string &server, int port,
   //                            const std::string &clientName) = 0;
   // virtual void clientSignOut() = 0;
-  // virtual void setDesiredDataSource(int dataSource) = 0;
   // virtual void setImageData(uint8_t *pImageBytes, size_t len, int width,
   //                           int height) = 0;
+  virtual void setImageData(std::vector<unsigned char> imageBytes, int width,
+                            int height) = 0;
 };
 //]
 

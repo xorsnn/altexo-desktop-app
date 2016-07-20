@@ -8,7 +8,6 @@
 #include "contact.hpp"
 #include <boost/dll/import.hpp>
 #include <boost/property_tree/ptree.hpp>
-#include <boost/signals2/signal.hpp>
 #include <boost/thread.hpp>
 #include <queue>
 
@@ -28,18 +27,6 @@ public:
   void onWsMessageCb(std::vector<char> msg);
 
   // sdk cb
-  // void sendMessageToPeer(std::vector<char> peerId, std::vector<char> msg) {
-  //   if (m_wsClient != NULL) {
-  //     m_wsClient->sendMessageToPeer(peerId, msg);
-  //   }
-  // }
-  // void sendMessageToPeer(std::vector<char> msg) {
-  //   // std::string msgStr(msg.begin(), msg.end());
-  //   if (m_wsClient) {
-  //     std::vector<char> peerIdVec(m_peerId.begin(), m_peerId.end());
-  //     m_wsClient->sendMessageToPeer(peerIdVec, msg);
-  //   }
-  // };
   void onSdp(std::vector<char> sdp);
   void onCandidate(std::vector<char> candidate);
 
@@ -50,6 +37,8 @@ public:
 
   boost::shared_ptr<AlSdkAPI> m_sdk;
   std::vector<CONTACT> contactList;
+
+  bool connectionInitialized = false;
 
 private:
   boost::shared_ptr<AlWsAPI> m_wsClient;
@@ -67,8 +56,8 @@ private:
   bool m_sentRemoteSdp = false;
   std::queue<std::string> m_remoteCandidates;
 
-  boost::signals2::signal<void(std::vector<char>, std::vector<char>)>
-      newMessageToSdk;
+  // boost::signals2::signal<void(std::vector<char>, std::vector<char>)>
+  //     newMessageToSdk;
 
   bool m_debug;
 };

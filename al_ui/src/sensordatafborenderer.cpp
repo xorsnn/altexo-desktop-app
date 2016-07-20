@@ -1,6 +1,6 @@
 #include "sensordatafborenderer.hpp"
 
-SensorDataFboRenderer::SensorDataFboRenderer() : m_outPixel(1280 * 480 * 3) {
+SensorDataFboRenderer::SensorDataFboRenderer() {
   // m_outPixel = new GLubyte[1280 * 480 * 3];
   // m_outPixel.resize(1280 * 480 * 4);
 }
