@@ -9,21 +9,18 @@
  */
 
 #include "conductor/conductor.h"
-
-#include <utility>
-#include <vector>
-
-#include <iostream>
-
+#include "AL_API/sdk_api.hpp"
+#include "alvideocapturer.h"
 #include "webrtc/api/test/fakeconstraints.h"
 #include "webrtc/base/common.h"
 #include "webrtc/base/json.h"
 #include "webrtc/base/logging.h"
-//#include "webrtc/examples/peerconnection/client/defaults.h"
 #include "webrtc/media/engine/webrtcvideocapturerfactory.h"
 #include "webrtc/modules/video_capture/video_capture_factory.h"
-
-#include "alvideocapturer.h"
+#include <iostream>
+#include <utility>
+#include <vector>
+//#include "webrtc/examples/peerconnection/client/defaults.h"
 
 // Names used for a IceCandidate JSON object.
 const char kCandidateSdpMidName[] = "sdpMid";
@@ -482,7 +479,7 @@ cricket::VideoCapturer *Conductor::OpenVideoCaptureDevice() {
     // std::cout << m_dataManager->m_desiredVideoSource << std::endl;
   }
   if (m_dataManager->m_desiredVideoSource ==
-      AlManagerInterface::IMG_SNAPSHOTS) {
+      AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS) {
     //  sending image snapshots
     if (m_debug) {
       std::cout << "sending snapshots" << std::endl;
@@ -724,4 +721,14 @@ void Conductor::OnFailure(const std::string &error) {
 void Conductor::SendMessage(const std::string &json_object) {
   std::string *msg = new std::string(json_object);
   queueUIThreadCallback(SEND_MESSAGE_TO_PEER, msg);
+}
+
+void Conductor::setImageData(uint8_t *pImageBytes, size_t len, int width,
+                             int height) {
+  m_dataManager->setImageData(pImageBytes, len, width, height);
+}
+
+void Conductor::setImageData(std::vector<unsigned char> imageBytes, int width,
+                             int height) {
+  m_dataManager->m_alVideoCapturer->setImageData(imageBytes, width, height);
 }

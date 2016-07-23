@@ -20,9 +20,8 @@
 #include "webrtc/api/mediastreaminterface.h"
 #include "webrtc/api/peerconnectioninterface.h"
 
-#include "peer_connection_client.h"
-//#include "webrtc/base/scoped_ptr.h"
 #include "chromium/src/breakpad/src/common/scoped_ptr.h"
+#include "peer_connection_client.h"
 
 #include "defaults.h"
 
@@ -33,8 +32,6 @@
 #include "alcallback.h"
 #include "alvideorenderer.h"
 #include "conductor/aldatamanager.h"
-
-#include "almanagerinterface.h"
 
 namespace webrtc {
 class VideoCaptureModule;
@@ -87,6 +84,10 @@ public:
   void DeletePeerConnection();
 
   bool hasConnections() { return (m_peerConnection.get()); }
+
+  void setImageData(uint8_t *pImageBytes, size_t len, int width, int height);
+  void setImageData(std::vector<unsigned char> imageBytes, int width,
+                    int height);
 
 protected:
   ~Conductor();

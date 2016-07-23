@@ -179,6 +179,11 @@ void AlSdkPlugin::setImageData(std::vector<unsigned char> imageBytes, int width,
     // std::cout << "AlSdkPlugin::setImageData" << std::endl;
     // std::cout << imageBytes.size() << std::endl;
   }
+  boost::lock_guard<boost::mutex> guard(m_mtx);
+  m_imageBytes = imageBytes;
+  std::pair<int, std::vector<char>> msg(
+      AlCallback::SdkMessageType::NEW_FRAME_SM, std::vector<char>());
+  m_messageQueue.push(msg);
   // m_pImageBytes = reinterpret_cast<uint8_t *>(imageBytes.data());
   // m_manager->setImageData(m_pImageBytes, imageBytes.size(), width, height);
 }

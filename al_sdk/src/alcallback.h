@@ -13,6 +13,7 @@ public:
     SDP_SM = 1,
     CANDIDATE_SM,
     INIT_SM,
+    NEW_FRAME_SM,
   };
 
   // TODO migrate to this 2
@@ -36,6 +37,7 @@ public:
   onDevicesListChangedCb(std::vector<std::string> device_names) = 0;
 
   virtual void updateFrameCb(const uint8_t *image, int width, int height) = 0;
+  virtual std::vector<uint8_t> *getFrameRef() = 0;
 
   //    TODO move to AlManager
   virtual std::string getVideoDeviceName() = 0;

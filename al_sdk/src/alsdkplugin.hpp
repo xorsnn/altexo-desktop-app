@@ -134,6 +134,8 @@ public:
     return result;
   }
 
+  std::vector<unsigned char> *getFrameRef() { return &m_imageBytes; }
+
 private:
   AlManager *m_manager;
   AlSDKCb *m_sdkCb;
@@ -145,6 +147,7 @@ private:
   bool m_debug;
 
   boost::mutex m_mtx;
+  std::vector<unsigned char> m_imageBytes;
 
   std::queue<std::pair<int, std::vector<char>>> m_messageQueue;
   uint8_t *m_pImageBytes;

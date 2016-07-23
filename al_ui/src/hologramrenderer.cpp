@@ -110,8 +110,10 @@ void HologramRenderer::render(int viewWidh, int viewHeight) {
   m_sensorDataFboRenderer.render();
 
   // [AL-153] Getting pixels to bitmap
-  glReadPixels(0, 0, 1280, 480, GL_RGB, GL_UNSIGNED_BYTE, &(m_outPixel[0]));
-  newFrameSignal(m_outPixel, 1280, 480);
+  if (sendingFrames) {
+    glReadPixels(0, 0, 1280, 480, GL_RGB, GL_UNSIGNED_BYTE, &(m_outPixel[0]));
+    newFrameSignal(m_outPixel, 1280, 480);
+  }
   // glActiveTexture(GL_TEXTURE3);
   // glBindTexture(GL_TEXTURE_2D, sensorDepthTexID);
   // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1280, 480, 0, GL_RGB,
