@@ -8,20 +8,23 @@ using namespace cricket;
 
 AlVideoCapturer::AlVideoCapturer()
     : m_prevTimestamp(0), m_pImageBytes(NULL), m_debug(true) {
-  // m_captureThread = new (this);
-  //    m_stopped = false;
-  // m_pImageBytes = 0;
+  // m_stopped = false;
   m_width = 0;
   m_height = 0;
   m_imageDataLen = 0;
-  // m_pImageBytes = new uint8_t(1280 * 480 * 3);
+  m_pImageBytes = (unsigned char *)malloc(1280 * 480 * 3);
+  if (m_debug) {
+    std::cout << "starting thread" << std::endl;
+  }
   // this must be the last
   m_internalThread = boost::thread(&AlVideoCapturer::threadMain, this);
 }
 
 AlVideoCapturer::~AlVideoCapturer() {
-  delete[] m_pImageBytes;
-  m_pImageBytes = NULL;
+  if (m_pImageBytes) {
+    free(m_pImageBytes);
+    m_pImageBytes = NULL;
+  }
   m_internalThread.interrupt();
   m_internalThread.join();
 }
@@ -80,11 +83,9 @@ void AlVideoCapturer::threadMain() {
         frame.data = m_pImageBytes;
         frame.width = m_width;
         frame.height = m_height;
-        // frame.fourcc = cricket::FOURCC_ABGR;
-        frame.fourcc = cricket::FOURCC_RAW; // trying rgb
+        frame.fourcc = cricket::FOURCC_RAW;
         frame.data_size = m_imageDataLen;
 
-        // if (frame.width * frame.height * 4 != m_imageDataLen)
         if (frame.width * frame.height * 3 != m_imageDataLen)
           std::cout << "AlVideoCapturerThread: with and height don't match "
                        "size for ABGR data, skipping frame"
@@ -113,68 +114,14 @@ void AlVideoCapturer::threadMain() {
 
 void AlVideoCapturer::setImageData(uint8_t *pImageBytes, size_t len, int width,
                                    int height) {
-
-  // m_imageMutex.lock();
-  //
-  // delete[] m_pImageBytes;
-  //
-  // m_pImageBytes = pImageBytes;
-  // m_imageDataLen = len;
-  // m_width = width;
-  // m_height = height;
-  //
-  // m_imageMutex.unlock();
-
-  // m_captureThread->setImageData(pImageBytes, len, width, height);
-  //    if (m_pImageBytes != NULL) {
-  //        delete [] m_pImageBytes;
-  //    }
-
-  //    m_pImageBytes = pImageBytes;
-  //    m_imageDataLen = len;
-  //    m_width = width;
-  //    m_height = height;
-
-  ////    m_captureThread.setImageData(pImageBytes, len, width, height);
-  //    CapturedFrame frame;
-
-  ////		frame.elapsed_time = 33333333;
-  //    frame.time_stamp = m_prevTimestamp;
-  ////    m_prevTimestamp += frame.elapsed_time;  // 30 fps
-  //    m_prevTimestamp += 33333333;
-
-  ////    m_imageMutex.lock();
-  //    if (m_pImageBytes && m_imageDataLen > 0 && m_width > 0 && m_height > 0)
-  //    {
-  //        frame.data = m_pImageBytes;
-  //        frame.width = m_width;
-  //        frame.height = m_height;
-  //        frame.fourcc = FOURCC_ABGR;
-  //        frame.data_size = m_imageDataLen;
-
-  //        if (frame.width*frame.height*4 != m_imageDataLen)
-  //            LOG(LS_INFO) << "AlVideoCapturerThread: with and height don't
-  //            match size for ABGR data, skipping frame";
-  //        else
-  //        {
-  ////                qDebug() << "test 2";
-  //            //LOG(LS_INFO) << "AlVideoCapturerThread: got frame " <<
-  //            (int)frameVal << " glGetError: " << glGetError();
-  //            SignalFrameCaptured(this, &frame);
-  //        }
-  //    }
+  // TODO: check if nesessary
 }
 
 void AlVideoCapturer::setImageData(std::vector<unsigned char> imageBytes,
                                    int width, int height) {
   m_imageMutex.lock();
-  if (m_pImageBytes) {
-    free(m_pImageBytes);
-    m_pImageBytes = NULL;
-  }
-  m_pImageBytes = (unsigned char *)malloc(imageBytes.size());
   std::copy(imageBytes.begin(), imageBytes.end(), m_pImageBytes);
-  m_imageDataLen = imageBytes.size();
+  m_imageDataLen = 1280 * 480 * 3;
   m_width = width;
   m_height = height;
   m_imageMutex.unlock();
