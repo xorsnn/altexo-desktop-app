@@ -2,6 +2,8 @@
 
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
+#include <boost/property_tree/json_parser.hpp>
+#include <boost/property_tree/ptree.hpp>
 
 #include <signal.h>
 #include <stdio.h>
@@ -70,13 +72,13 @@ static int ratelimit_connects(unsigned int *last, unsigned int secs) {
   return 1;
 }
 
-AlWsClient::AlWsClient() {
+AlWsClient::AlWsClient() : m_writable(NULL), m_debug(false) {
   me = this;
   lws_protocols pr1 = {
       "dumb-increment-protocol,fake-nonexistant-protocol",
       // boost::bind(&AlWsClient::cbDumbIncrement, this, _1, _2, _3, _4, _5),
       cbDumbIncrementStatic, 0,
-      1024, // 20 was before
+      4096, // 20 was before
   };
   m_protocols[0] = pr1;
 
@@ -95,9 +97,8 @@ AlWsClient::~AlWsClient() {}
 int AlWsClient::cbDumbIncrement(struct lws *wsi,
                                 enum lws_callback_reasons reason, void *user,
                                 void *in, size_t len) {
-  // std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
-  // std::cout << reason << std::endl;
-  // std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
+  unsigned char buf[LWS_PRE + 4096];
+
   switch (reason) {
 
   case LWS_CALLBACK_CLIENT_ESTABLISHED:
@@ -110,12 +111,48 @@ int AlWsClient::cbDumbIncrement(struct lws *wsi,
     break;
 
   case LWS_CALLBACK_CLIENT_RECEIVE: {
-    // std::cout << "dfffff" << std::endl;
     ((char *)in)[len] = '\0';
-    // std::cout << len << std::endl;
-    std::cout << (char *)in << std::endl;
-    lwsl_info("rx %d '%s'\n", (int)len, (char *)in);
-    // n = lws_write(wsi, (unsigned char *)in, len, LWS_WRITE_TEXT);
+    std::string msg((char *)in);
+    std::vector<char> msgVec(msg.begin(), msg.end());
+    newMessageSignal(msgVec);
+  } break;
+
+  case LWS_CALLBACK_CLIENT_WRITEABLE: {
+    if (m_debug) {
+      std::cout << "LWS_CALLBACK_CLIENT_WRITEABLE" << std::endl;
+    }
+
+    if (!m_messageQueue.empty()) {
+      std::pair<std::string, std::string> msgPair = m_messageQueue.front();
+      m_messageQueue.pop();
+
+      std::string peerIdStr = msgPair.first;
+      std::string msgStr = msgPair.second;
+
+      // **
+      // * composing message to send
+      // *
+      std::ostringstream stream;
+      boost::property_tree::ptree pt;
+      boost::property_tree::ptree dataNode;
+      pt.put("action", "send_to_peer");
+      dataNode.put("peer_id", peerIdStr);
+      dataNode.put("message", msgStr);
+      pt.add_child("data", dataNode);
+      boost::property_tree::write_json(stream, pt, false);
+      std::string strJson = stream.str();
+
+      std::copy(std::begin(strJson), std::end(strJson), &(buf[LWS_PRE]));
+      buf[LWS_PRE + strJson.size()] = '\0';
+
+      int n = lws_write(wsi, &buf[LWS_PRE], strJson.size(), LWS_WRITE_TEXT);
+      if (m_debug) {
+        std::cout << "+++++++++++++++" << std::endl;
+        std::cout << strJson << std::endl;
+        std::cout << n << std::endl;
+        std::cout << "+++++++++++++++" << std::endl;
+      }
+    }
   } break;
 
   /* because we are protocols[0] ... */
@@ -125,10 +162,6 @@ int AlWsClient::cbDumbIncrement(struct lws *wsi,
       lwsl_err("dumb: LWS_CALLBACK_CLIENT_CONNECTION_ERROR\n");
       wsi_dumb = NULL;
     }
-    // if (wsi == wsi_mirror) {
-    //   lwsl_err("mirror: LWS_CALLBACK_CLIENT_CONNECTION_ERROR\n");
-    //   wsi_mirror = NULL;
-    // }
   } break;
 
   case LWS_CALLBACK_CLIENT_CONFIRM_EXTENSION_SUPPORTED: {
@@ -156,13 +189,6 @@ int AlWsClient::run() {
 
 int AlWsClient::threadMain() {
 
-  unsigned int rl_dumb = 0;
-  struct lws_context_creation_info info;
-  struct lws_client_connect_info i;
-  struct lws_context *context;
-  const char *prot, *p;
-  char path[300];
-
   memset(&info, 0, sizeof info);
 
   lwsl_notice("libwebsockets test client - license LGPL2.1+SLE\n");
@@ -175,7 +201,9 @@ int AlWsClient::threadMain() {
   i.port = m_port;
   char *pathTmp = (char *)(m_path.c_str());
   if (lws_parse_uri(pathTmp, &prot, &i.address, &i.port, &p)) {
-    std::cout << "PARCE!" << std::endl;
+    if (m_debug) {
+      std::cout << "PARCE!" << std::endl;
+    }
     // usage();
   }
 
@@ -235,6 +263,11 @@ int AlWsClient::threadMain() {
       wsi_dumb = lws_client_connect_via_info(&i);
     }
 
+    // TODO: dirty solution
+    if (!m_messageQueue.empty()) {
+      lws_callback_on_writable(wsi_dumb);
+    }
+
     lws_service(context, 500);
   }
 
@@ -244,4 +277,16 @@ int AlWsClient::threadMain() {
   // return ret;
 
   return 1;
+}
+
+void AlWsClient::sendMessageToPeer(std::vector<char> peerId,
+                                   std::vector<char> msg) {
+  if (m_debug) {
+    std::cout << "AlWsClient::sendMessageToPeer" << std::endl;
+  }
+  std::string peerIdStr(peerId.begin(), peerId.end());
+  std::string msgStr(msg.begin(), msg.end());
+  std::pair<std::string, std::string> msgPair(peerIdStr, msgStr);
+  m_messageQueue.push(msgPair);
+  lws_callback_on_writable(wsi_dumb);
 }

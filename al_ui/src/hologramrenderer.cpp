@@ -1,13 +1,14 @@
 #include "hologramrenderer.hpp"
 
+HologramRenderer::HologramRenderer()
+    : m_outPixel(1280 * 480 * 3), m_debug(true) {}
+
 int HologramRenderer::init() {
   m_newFrame = false;
-  tmpCounter = 1;
   // GL_CHECK_ERRORS
   // load the shader
-  // shader.LoadFromFile(GL_VERTEX_SHADER, "../shaders/shader.vert");
-  shader.LoadFromFile(GL_VERTEX_SHADER, "../shaders/shader.vert");
-  shader.LoadFromFile(GL_FRAGMENT_SHADER, "../shaders/shader.frag");
+  shader.LoadFromFile(GL_VERTEX_SHADER, "../al_ui/shaders/shader.vert");
+  shader.LoadFromFile(GL_FRAGMENT_SHADER, "../al_ui/shaders/shader.frag");
   // compile and link shader
   shader.CreateAndLinkProgram();
   shader.Use();
@@ -109,13 +110,15 @@ void HologramRenderer::render(int viewWidh, int viewHeight) {
   m_sensorDataFboRenderer.render();
 
   // [AL-153] Getting pixels to bitmap
-  glReadPixels(0, 0, 1280, 480, GL_RGB, GL_UNSIGNED_BYTE,
-               m_sensorDataFboRenderer.m_outPixel);
+  if (sendingFrames) {
+    glReadPixels(0, 0, 1280, 480, GL_RGB, GL_UNSIGNED_BYTE, &(m_outPixel[0]));
+    newFrameSignal(m_outPixel, 1280, 480);
+  }
   // glActiveTexture(GL_TEXTURE3);
   // glBindTexture(GL_TEXTURE_2D, sensorDepthTexID);
   // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1280, 480, 0, GL_RGB,
   // GL_UNSIGNED_BYTE,
-  //              m_sensorDataFboRenderer.m_outPixel);
+  //              &(m_sensorDataFboRenderer.m_outPixel[0]));
 
   // ============ FBO ==============
   // unbind the FBO

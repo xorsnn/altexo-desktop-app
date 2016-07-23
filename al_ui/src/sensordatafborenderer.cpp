@@ -1,20 +1,22 @@
 #include "sensordatafborenderer.hpp"
 
 SensorDataFboRenderer::SensorDataFboRenderer() {
-  m_outPixel = new GLubyte[1280 * 480 * 3];
+  // m_outPixel = new GLubyte[1280 * 480 * 3];
+  // m_outPixel.resize(1280 * 480 * 4);
 }
 
 SensorDataFboRenderer::~SensorDataFboRenderer() {
-  delete[] m_outPixel;
-  m_outPixel = NULL;
+  // delete[] m_outPixel;
+  // m_outPixel = NULL;
 }
 
 int SensorDataFboRenderer::init() {
   m_newFrame = false;
   // GL_CHECK_ERRORS
   // load the shader
-  shader.LoadFromFile(GL_VERTEX_SHADER, "../shaders/sensorCompose.vert");
-  shader.LoadFromFile(GL_FRAGMENT_SHADER, "../shaders/sensorCompose.frag");
+  shader.LoadFromFile(GL_VERTEX_SHADER, "../al_ui/shaders/sensorCompose.vert");
+  shader.LoadFromFile(GL_FRAGMENT_SHADER,
+                      "../al_ui/shaders/sensorCompose.frag");
   // compile and link shader
   shader.CreateAndLinkProgram();
   shader.Use();

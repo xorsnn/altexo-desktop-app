@@ -1,4 +1,5 @@
 #include "alconnclient.hpp"
+#include "contact.hpp"
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <boost/property_tree/json_parser.hpp>
@@ -6,10 +7,20 @@
 
 std::string SERVER_LINK = "https://dev.lugati.ru";
 
-AlConnClient::AlConnClient() {
+template <typename T>
+std::vector<T> as_vector(boost::property_tree::ptree const &pt,
+                         boost::property_tree::ptree::key_type const &key) {
+  std::vector<T> r;
+  for (auto &item : pt.get_child(key))
+    r.push_back(item.second.get_value<T>());
+  return r;
+}
+
+AlConnClient::AlConnClient(AlWsCb *alWsCb) {
   std::cout << "constructor" << std::endl;
+  m_alWsCb = alWsCb;
   m_token = "";
-  login("Galya", "ujnm567");
+  // login("Galya", "ujnm567");
 }
 
 AlConnClient::~AlConnClient() {}
@@ -65,11 +76,18 @@ void AlConnClient::handleHttpResponse(cpr::Response r, int responseType) {
 
     std::cout << m_wssLink << std::endl;
 
-    m_WsCl.init(m_wssLink, 8888);
-    m_WsCl.run();
+    // TODO: seems like port is not nesessary
+    m_wsCl.init(m_wssLink, 8888, m_alWsCb);
+    m_wsCl.run();
     break;
   }
   default:
     std::cout << "unknown http response" << std::endl;
   }
+}
+
+void AlConnClient::sendMessageToPeer(std::vector<char> peerId,
+                                     std::vector<char> msg) {
+  // TODO:
+  // m_wsCl.sendMessageToPeer(peerId, msg);
 }

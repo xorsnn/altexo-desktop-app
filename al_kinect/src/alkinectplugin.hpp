@@ -9,7 +9,6 @@
 #include <boost/thread.hpp>
 #include <string>
 
-class AlCallback;
 class AlManager;
 
 class AlKinectPlugin : public AlSensorAPI {
