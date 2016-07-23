@@ -1,7 +1,6 @@
 #ifndef ALFREENECTDEVICE_H
 #define ALFREENECTDEVICE_H
 
-#include "alcolor.h"
 #include "libfreenect.hpp"
 #include <cmath>
 #include <iostream>
@@ -42,15 +41,6 @@ public:
 
   std::vector<uint8_t> getRGB();
   std::vector<uint16_t> getDepth();
-
-  void createRainbowPallet();
-
-  int getMaxDepth();
-  void setMaxDepth(int newDepth);
-
-  ALColor huePixelForDepth(uint16_t pix);
-  float ofMap(float value, float inputMin, float inputMax, float outputMin,
-              float outputMax, bool clamp);
 
   void updateSettings();
 

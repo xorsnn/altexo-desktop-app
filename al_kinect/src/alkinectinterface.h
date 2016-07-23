@@ -28,7 +28,6 @@ public:
 
   void needWDataSlot();
   void updateDeviceState();
-  void changeMaxDepth(int delta);
   void updateSettingsSlot();
 
 public:

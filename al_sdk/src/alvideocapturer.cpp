@@ -1,9 +1,7 @@
 #include "alvideocapturer.h"
 #include "webrtc/system_wrappers/include/logging.h"
-//#include <QElapsedTimer>
 #include <stdlib.h>
-//#include <QDebug>
-//#include <QDateTime>
+
 using namespace cricket;
 
 AlVideoCapturer::AlVideoCapturer()
@@ -13,9 +11,6 @@ AlVideoCapturer::AlVideoCapturer()
   m_height = 0;
   m_imageDataLen = 0;
   m_pImageBytes = (unsigned char *)malloc(1280 * 480 * 3);
-  if (m_debug) {
-    std::cout << "starting thread" << std::endl;
-  }
   // this must be the last
   m_internalThread = boost::thread(&AlVideoCapturer::threadMain, this);
 }
@@ -69,6 +64,13 @@ bool AlVideoCapturer::GetPreferredFourccs(std::vector<uint32_t> *fourccs) {
 }
 
 void AlVideoCapturer::threadMain() {
+  if (m_debug) {
+    std::cout << "===========================" << std::endl;
+    std::cout << "===========================" << std::endl;
+    std::cout << "===========================" << std::endl;
+    std::cout << "AlVideoCapturer::threadMain" << std::endl;
+    std::cout << "===========================" << std::endl;
+  }
   try {
     bool stopped = false;
     uint64_t prevTimestamp = 0;
@@ -98,9 +100,9 @@ void AlVideoCapturer::threadMain() {
 
       boost::this_thread::sleep(boost::posix_time::milliseconds(33));
 
-      //            m_stopMutex.lock();
-      //            stopped = m_stopped;
-      //            m_stopMutex.unlock();
+      // m_stopMutex.lock();
+      // stopped = m_stopped;
+      // m_stopMutex.unlock();
     }
   } catch (boost::thread_interrupted &interruption) {
     // thread was interrupted, this is expected.
