@@ -32,11 +32,6 @@ void ALKinectInterface::stop() {
   this->device->stopDepth();
 }
 
-void ALKinectInterface::changeMaxDepth(int delta) {
-  std::cout << (this->device->getMaxDepth() + delta) << std::endl;
-  this->device->setMaxDepth(this->device->getMaxDepth() + delta);
-}
-
 void ALKinectInterface::updateDeviceState() {
   //    this->device->updateState();
 }
