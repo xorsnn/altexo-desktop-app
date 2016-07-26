@@ -105,14 +105,14 @@ vec4 huePixelForDepth(float distanceMm) {
 
 void main() {
   if (vUV.x > 1.0) {
+    vec2 vUV2 = vUV;
+    vUV2.x = vUV2.x - 1.0;
+    vUV2.y /= 2;
+    gl_FragColor = texture2D(textureMap, vUV2);
+  } else {
     vec2 vUV1 = vUV;
-    vUV1.x = (vUV1.x - 1.0);
     vUV1.y /= 2;
     uint val = texture2D(depthTexMap, vUV1).x;
     gl_FragColor = huePixelForDepth(float(val));
-  } else {
-    vec2 vUV2 = vUV;
-    vUV2.y /= 2;
-    gl_FragColor = texture2D(textureMap, vUV2);
   }
 }
