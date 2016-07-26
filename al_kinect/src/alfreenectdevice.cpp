@@ -11,16 +11,13 @@ ALFreenectDevice::ALFreenectDevice(freenect_context *_ctx, int _index)
                         .bytes),
       m_newRgbFrame(false), m_newDepthFrame(false) {
   setDepthFormat(FREENECT_DEPTH_REGISTERED);
-  this->updateSettings();
 }
 
 void ALFreenectDevice::VideoCallback(void *_rgb, uint32_t timestamp) {
   Mutex::ScopedLock lock(m_rgbMutex);
   uint8_t *rgb = static_cast<uint8_t *>(_rgb);
-  if (!m_newRgbFrame) {
-    std::copy(rgb, rgb + getVideoBufferSize(), m_bufferVideo.begin());
-    m_newRgbFrame = true;
-  }
+  std::copy(rgb, rgb + getVideoBufferSize(), m_bufferVideo.begin());
+  m_newRgbFrame = true;
 }
 
 void ALFreenectDevice::DepthCallback(void *_depth, uint32_t timestamp) {
@@ -40,9 +37,4 @@ std::vector<uint16_t> ALFreenectDevice::getDepth() {
   Mutex::ScopedLock lock(m_depthMutex);
   m_newDepthFrame = false;
   return m_bufferDepth;
-}
-
-void ALFreenectDevice::updateSettings() {
-  this->minDepth = 555;
-  this->maxDepth = 1005;
 }

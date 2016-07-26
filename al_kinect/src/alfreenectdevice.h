@@ -42,8 +42,6 @@ public:
   std::vector<uint8_t> getRGB();
   std::vector<uint16_t> getDepth();
 
-  void updateSettings();
-
 private:
   std::vector<uint16_t> m_bufferDepth;
   std::vector<uint8_t> m_bufferVideo;
@@ -54,9 +52,6 @@ private:
 public:
   bool m_newRgbFrame;
   bool m_newDepthFrame;
-
-  int minDepth = 555;
-  int maxDepth = 1005;
 };
 
 #endif // ALFREENECTDEVICE_H

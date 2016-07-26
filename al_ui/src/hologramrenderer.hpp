@@ -6,12 +6,16 @@
 #include "GLSLShader.hpp"
 #include "contact.hpp"
 #include "sensordatafborenderer.hpp"
+#include "targetcamera.h"
 #include <boost/signals2/signal.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
 #include <iostream>
 #include <vector>
+
+const int MOUSE_HISTORY_BUFFER_SIZE = 10;
+const float MOUSE_FILTER_WEIGHT = 0.75f;
 
 class HologramRenderer {
 public:
@@ -32,6 +36,70 @@ public:
     sendingFrames = true;
   }
 
+  void OnStartMouseMove(int initX, int initY) {
+    oldX = initX;
+    oldY = initY;
+  }
+  // mouse move handler
+  void OnMouseMove(int x, int y) {
+
+    if (state == 0) {
+      dist = (y - oldY) / 5.0f;
+      cam.Zoom(dist);
+    } else if (state == 2) {
+      float dy = float(y - oldY) / 100.0f;
+      float dx = float(oldX - x) / 100.0f;
+      if (useFiltering) {
+        // filterMouseMoves(dx, dy);
+      } else {
+        mouseX = dx;
+        mouseY = dy;
+      }
+
+      cam.Pan(mouseX, mouseY);
+    } else {
+      rY += (y - oldY) / 5.0f;
+      rX += (oldX - x) / 5.0f;
+      if (useFiltering) {
+        filterMouseMoves(rX, rY);
+      } else {
+        mouseX = rX;
+        mouseY = rY;
+      }
+      cam.Rotate(mouseX, mouseY, 0);
+    }
+    oldX = x;
+    oldY = y;
+
+    // glutPostRedisplay();
+  }
+  // mouse move filtering function
+  void filterMouseMoves(float dx, float dy) {
+    for (int i = MOUSE_HISTORY_BUFFER_SIZE - 1; i > 0; --i) {
+      mouseHistory[i] = mouseHistory[i - 1];
+    }
+
+    // Store current mouse entry at front of array.
+    mouseHistory[0] = glm::vec2(dx, dy);
+
+    float averageX = 0.0f;
+    float averageY = 0.0f;
+    float averageTotal = 0.0f;
+    float currentWeight = 1.0f;
+
+    // Filter the mouse.
+    for (int i = 0; i < MOUSE_HISTORY_BUFFER_SIZE; ++i) {
+      glm::vec2 tmp = mouseHistory[i];
+      averageX += tmp.x * currentWeight;
+      averageY += tmp.y * currentWeight;
+      averageTotal += 1.0f * currentWeight;
+      currentWeight *= MOUSE_FILTER_WEIGHT;
+    }
+
+    mouseX = averageX / averageTotal;
+    mouseY = averageY / averageTotal;
+  }
+
   // Sensor data capturer
   SensorDataFboRenderer m_sensorDataFboRenderer;
 
@@ -39,6 +107,9 @@ public:
 
 private:
   bool m_debug;
+
+  // mouse history buffer
+  glm::vec2 mouseHistory[MOUSE_HISTORY_BUFFER_SIZE];
 
   // shader reference
   GLSLShader shader;
@@ -53,17 +124,16 @@ private:
 
   // out vertex struct for interleaved attributes
   struct Vertex {
-    glm::vec3 position;
-    glm::vec3 color;
+    glm::vec2 position;
+    glm::vec2 coord;
   };
 
   // triangle vertices and indices
-  Vertex vertices[4];
-  GLushort indices[6];
+  Vertex vertices[320 * 240];
 
   // projection and modelview matrices
-  glm::mat4 P = glm::mat4(1);
-  glm::mat4 MV = glm::mat4(1);
+  // glm::mat4 P = glm::mat4(1);
+  // glm::mat4 MV = glm::mat4(1);
 
   // internal data
   std::vector<uint8_t> m_rgbFrame;
@@ -80,6 +150,17 @@ private:
   const int HEIGHT = 480;
   std::vector<GLubyte> m_outPixel;
   boost::signals2::signal<void(std::vector<GLubyte>, int, int)> newFrameSignal;
+
+  // target camera instance
+  CTargetCamera cam;
+  // camera tranformation variables
+  int state = 1, oldX = 0, oldY = 0;
+  float rX = 0, rY = 0, dist = 10;
+
+  float mouseX = 0, mouseY = 0; // filtered mouse values
+
+  // flag to enable filtering
+  bool useFiltering = true;
 };
 
 #endif // HOLOGRAMRENDERER_H

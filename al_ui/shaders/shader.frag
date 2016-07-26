@@ -1,17 +1,13 @@
 #version 120
-// #extension GL_EXT_gpu_shader4 : enable
 
 uniform sampler2D textureMap;
 varying vec2 vUV;
+varying float visibility;
 
-void main()
-{
-	// if ((vUV.x < 0.01) ||
-	// 		(vUV.x > 0.99) ||
-	// 		(vUV.y < 0.05) ||
-	// 		(vUV.y > 0.95)) {
-	// 	gl_FragColor = vec4(0.1, 0.1, 0.1, 1.0);
-	// } else {
-		gl_FragColor = texture2D(textureMap, vUV);
-	// }
+void main() {
+  if (visibility > 0.95) {
+    gl_FragColor = texture2D(textureMap, vUV);
+  } else {
+    discard;
+  }
 }

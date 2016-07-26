@@ -18,17 +18,12 @@ class ALKinectInterface {
 public:
   ALKinectInterface();
 
-  // Q_SIGNALS:
-  // void newWFrameSignal(QImage *image);
-  // public Q_SLOTS:
-
   void init(AlSensorCb *alSensorCb);
   void start();
   void stop();
 
-  void needWDataSlot();
+  void needDataSlot();
   void updateDeviceState();
-  void updateSettingsSlot();
 
 public:
   ALFreenectDevice *device;
@@ -44,8 +39,6 @@ private:
   boost::signals2::signal<void(std::vector<uint8_t> rgbFrame,
                                std::vector<uint16_t> depthFrame)>
       m_newFrameSignal;
-
-  // QImage *m_image;
 };
 
 #endif // ALKINECTINTERFACE_H

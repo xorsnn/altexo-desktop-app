@@ -94,21 +94,37 @@ int main(int, char **) {
 
   ImVec4 clear_color = ImColor(114, 144, 154);
 
+  bool mouseDown = false;
   // Main loop
-
   bool done = false;
   while (!done) {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
       ImGui_ImplSdl_ProcessEvent(&event);
-      if (event.type == SDL_QUIT)
+      switch (event.type) {
+      case SDL_MOUSEMOTION: {
+        if (mouseDown) {
+          hologramRenderer.OnMouseMove(event.motion.x, event.motion.y);
+        }
+      } break;
+      case SDL_MOUSEBUTTONDOWN: {
+        hologramRenderer.OnStartMouseMove(event.button.x, event.button.y);
+        mouseDown = true;
+      } break;
+      case SDL_MOUSEBUTTONUP: {
+        mouseDown = false;
+      } break;
+      case SDL_QUIT: {
         done = true;
+      } break;
+      default: { } break; }
     }
 
     ImGui_ImplSdl_NewFrame(window);
 
     // 1. Show a simple window
-    // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears in
+    // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears
+    // in
     // a window automatically called "Debug"
     {
       ImGui::SetNextWindowSize(ImVec2(100, 400), ImGuiSetCond_Once);

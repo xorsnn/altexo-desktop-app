@@ -14,7 +14,7 @@ int HologramRenderer::init() {
   shader.Use();
   // add attributes and uniforms
   shader.AddAttribute("vVertex");
-  shader.AddAttribute("vColor");
+  shader.AddAttribute("vCoord");
   shader.AddUniform("MVP");
   shader.AddUniform("textureMap");
   // pass values of constant uniforms at initialization
@@ -24,25 +24,19 @@ int HologramRenderer::init() {
 
   // GL_CHECK_ERRORS
 
-  // setup triangle geometry
-  // setup triangle vertices
-  vertices[0].color = glm::vec3(1, 0, 0);
-  vertices[1].color = glm::vec3(0, 1, 0);
-  vertices[2].color = glm::vec3(0, 0, 1);
-  vertices[3].color = glm::vec3(0, 1, 1);
+  // vertices[0].coord = glm::vec2(1, 0);
+  // vertices[1].coord = glm::vec2(0, 1);
+  // vertices[2].coord = glm::vec2(0, 0);
+  // vertices[3].coord = glm::vec2(0, 1);
 
-  vertices[0].position = glm::vec3(-0.5, -0.5, 0);
-  vertices[1].position = glm::vec3(0.5, -0.5, 0);
-  vertices[2].position = glm::vec3(0.5, 0.5, 0);
-  vertices[3].position = glm::vec3(-0.5, 0.5, 0);
-
-  // setup triangle indices
-  indices[0] = 0;
-  indices[1] = 1;
-  indices[2] = 2;
-  indices[3] = 0;
-  indices[4] = 2;
-  indices[5] = 3;
+  int index = 0;
+  for (int yCoord = 0; yCoord < 240; yCoord++) {
+    for (int xCoord = 0; xCoord < 320; xCoord++) {
+      vertices[index].position =
+          glm::vec2(float(xCoord) / 320 - 0.5, float(yCoord) / 240 - 0.5);
+      index++;
+    }
+  }
 
   // GL_CHECK_ERRORS
 
@@ -60,17 +54,17 @@ int HologramRenderer::init() {
   // GL_CHECK_ERRORS
   // enable vertex attribute array for position
   glEnableVertexAttribArray(shader["vVertex"]);
-  glVertexAttribPointer(shader["vVertex"], 3, GL_FLOAT, GL_FALSE, stride, 0);
+  glVertexAttribPointer(shader["vVertex"], 2, GL_FLOAT, GL_FALSE, stride, 0);
   // GL_CHECK_ERRORS
   // enable vertex attribute array for colour
-  glEnableVertexAttribArray(shader["vColor"]);
-  glVertexAttribPointer(shader["vColor"], 3, GL_FLOAT, GL_FALSE, stride,
-                        (const GLvoid *)offsetof(Vertex, color));
+  glEnableVertexAttribArray(shader["vCoord"]);
+  glVertexAttribPointer(shader["vCoord"], 2, GL_FLOAT, GL_FALSE, stride,
+                        (const GLvoid *)offsetof(Vertex, coord));
   // GL_CHECK_ERRORS
   // pass indices to element array buffer
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIndicesID);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices[0],
-               GL_STATIC_DRAW);
+  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIndicesID);
+  // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices[0],
+  //              GL_STATIC_DRAW);
   // GL_CHECK_ERRORS
 
   // unbinding
@@ -92,11 +86,29 @@ int HologramRenderer::init() {
   initFBO();
 
   m_sensorDataFboRenderer.init();
+
+  // setup the camera position and target
+  cam.SetPosition(glm::vec3(1, 1, 1));
+  cam.SetTarget(glm::vec3(0, 0, 0));
+
+  // also rotate the camera for proper orientation
+  glm::vec3 look = glm::normalize(cam.GetTarget() - cam.GetPosition());
+
+  float yaw = glm::degrees(float(atan2(look.z, look.x) + M_PI));
+  float pitch = glm::degrees(asin(look.y));
+  rX = yaw;
+  rY = pitch;
+
+  cam.Rotate(rX, rY, 0);
+
   cout << "Initialization successfull" << endl;
   return 1;
 }
 
 void HologramRenderer::render(int viewWidh, int viewHeight) {
+  // TODO: move to 'onResize' event
+  cam.SetupProjection(45, (GLfloat)viewWidh / viewHeight);
+
   // ============ FBO ==============
   // enable FBO
   glBindFramebuffer(GL_FRAMEBUFFER, fboID);
@@ -109,16 +121,10 @@ void HologramRenderer::render(int viewWidh, int viewHeight) {
 
   m_sensorDataFboRenderer.render();
 
-  // [AL-153] Getting pixels to bitmap
   if (sendingFrames) {
     glReadPixels(0, 0, 1280, 480, GL_RGB, GL_UNSIGNED_BYTE, &(m_outPixel[0]));
     newFrameSignal(m_outPixel, 1280, 480);
   }
-  // glActiveTexture(GL_TEXTURE3);
-  // glBindTexture(GL_TEXTURE_2D, sensorDepthTexID);
-  // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1280, 480, 0, GL_RGB,
-  // GL_UNSIGNED_BYTE,
-  //              &(m_sensorDataFboRenderer.m_outPixel[0]));
 
   // ============ FBO ==============
   // unbind the FBO
@@ -134,16 +140,29 @@ void HologramRenderer::render(int viewWidh, int viewHeight) {
 
   glBindVertexArray(vaoID);
   glBindBuffer(GL_ARRAY_BUFFER, vboVerticesID);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIndicesID);
+  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIndicesID);
 
   // bind the shader
   shader.Use();
 
+  // set the camera transformation
+  glm::mat4 MV = cam.GetViewMatrix();
+  glm::mat4 P = cam.GetProjectionMatrix();
+
+  glm::mat4 MVP = P * MV;
+  // if (m_debug) {
+  //   std::cout << MV[0][0] << std::endl;
+  // }
+
   // pass the shader uniform
-  glUniformMatrix4fv(shader("MVP"), 1, GL_FALSE, glm::value_ptr(P * MV));
+  // glUniformMatrix4fv(shader("MVP"), 1, GL_FALSE, glm::value_ptr(P * MV));
+  glUniformMatrix4fv(shader("MVP"), 1, GL_FALSE, glm::value_ptr(MVP));
 
   // drwa triangle
-  glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+  glEnable(GL_PROGRAM_POINT_SIZE);
+  // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
+  // glDrawElements(GL_POINTS, 4, GL_FLOAT, 0);
+  glDrawArrays(GL_POINTS, 0, 320 * 240);
   // unbind the shader
   shader.UnUse();
 
