@@ -6,8 +6,10 @@
 #include "AL_API/ws_client_api.hpp"
 #include "AL_CB/al_sdk_cb.hpp"
 #include "contact.hpp"
+#include "hologramrenderer.hpp"
 #include <boost/dll/import.hpp>
 #include <boost/property_tree/ptree.hpp>
+#include <boost/signals2/signal.hpp>
 #include <boost/thread.hpp>
 #include <queue>
 
@@ -34,6 +36,7 @@ public:
   void onMessageFromPeer(boost::property_tree::ptree msgPt);
 
   void handleMessages();
+  void initHoloRenderer(HologramRenderer *holoRenderer);
 
   boost::shared_ptr<AlSdkAPI> m_sdk;
   std::vector<CONTACT> contactList;
@@ -56,8 +59,11 @@ private:
   bool m_sentRemoteSdp = false;
   std::queue<std::string> m_remoteCandidates;
 
-  // boost::signals2::signal<void(std::vector<char>, std::vector<char>)>
-  //     newMessageToSdk;
+  boost::signals2::signal<void(int, int)> updateResolutionSignal;
+
+  // TODO move mode selection to UI
+  int WIDTH = 320;
+  int HEIGHT = 240;
 
   bool m_debug;
 };

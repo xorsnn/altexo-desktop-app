@@ -16,13 +16,14 @@ public:
   ~SensorDataFboRenderer();
 
   int init();
-  void render();
+  void render(int viewWidth, int viewHeigt);
 
   // sensor cb
   void newFrame(std::vector<uint8_t> rgbFrame,
                 std::vector<uint16_t> depthFrame);
 
 private:
+  bool m_debug;
   // shader reference
   GLSLShader shader;
 
@@ -53,9 +54,10 @@ private:
   std::vector<uint16_t> m_depthFrame;
   bool m_newFrame;
 
-  // screen resolution
-  const int WIDTH = 1280;
-  const int HEIGHT = 480;
+  // sensor data resolution
+  // this depends from sensor
+  const int WIDTH_SENSOR = 640;
+  const int HEIGHT_SENSOR = 480;
 };
 
 #endif // SENSORDATAFBORENDERER_H

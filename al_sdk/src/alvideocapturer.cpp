@@ -10,7 +10,7 @@ AlVideoCapturer::AlVideoCapturer()
   m_width = 0;
   m_height = 0;
   m_imageDataLen = 0;
-  m_pImageBytes = (unsigned char *)malloc(1280 * 480 * 3);
+  m_pImageBytes = NULL;
   // this must be the last
   m_internalThread = boost::thread(&AlVideoCapturer::threadMain, this);
 }
@@ -74,7 +74,6 @@ void AlVideoCapturer::threadMain() {
   try {
     bool stopped = false;
     uint64_t prevTimestamp = 0;
-    std::cout << "tread body" << std::endl;
     while (!stopped) {
       cricket::CapturedFrame frame;
       frame.time_stamp = prevTimestamp;
@@ -122,9 +121,15 @@ void AlVideoCapturer::setImageData(uint8_t *pImageBytes, size_t len, int width,
 void AlVideoCapturer::setImageData(std::vector<unsigned char> imageBytes,
                                    int width, int height) {
   m_imageMutex.lock();
+  if (m_pImageBytes == NULL || m_width != width || m_height != height) {
+    m_imageDataLen = width * height * 2 * 3;
+    m_width = width * 2;
+    m_height = height;
+    if (m_pImageBytes != NULL) {
+      free(m_pImageBytes);
+    }
+    m_pImageBytes = (unsigned char *)malloc(m_imageDataLen);
+  }
   std::copy(imageBytes.begin(), imageBytes.end(), m_pImageBytes);
-  m_imageDataLen = 1280 * 480 * 3;
-  m_width = width;
-  m_height = height;
   m_imageMutex.unlock();
 }

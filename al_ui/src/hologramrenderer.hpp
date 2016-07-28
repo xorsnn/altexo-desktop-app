@@ -22,9 +22,11 @@ public:
   HologramRenderer();
   ~HologramRenderer() {}
 
+  void updateResolution(int width, int height);
   int init();
   void render(int viewWidh, int viewHeight);
   void initFBO();
+  void resizeRenderTex();
   void initFrameSending(AlSdkAPI *alSdkApi) {
     if (m_debug) {
       std::cout << "HologramRenderer::initFrameSending" << std::endl;
@@ -131,10 +133,6 @@ private:
   // triangle vertices and indices
   Vertex vertices[320 * 240];
 
-  // projection and modelview matrices
-  // glm::mat4 P = glm::mat4(1);
-  // glm::mat4 MV = glm::mat4(1);
-
   // internal data
   std::vector<uint8_t> m_rgbFrame;
   std::vector<uint16_t> m_depthFrame;
@@ -145,9 +143,10 @@ private:
   // offscreen render texture ID
   GLuint renderTextureID;
 
-  // screen resolution
-  const int WIDTH = 1280;
-  const int HEIGHT = 480;
+  // rendering data resolution
+  int WIDTH;
+  int HEIGHT;
+
   std::vector<GLubyte> m_outPixel;
   boost::signals2::signal<void(std::vector<GLubyte>, int, int)> newFrameSignal;
 
@@ -161,6 +160,7 @@ private:
 
   // flag to enable filtering
   bool useFiltering = true;
+  bool pendingRenderTexResize;
 };
 
 #endif // HOLOGRAMRENDERER_H
