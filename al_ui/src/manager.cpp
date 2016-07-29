@@ -10,15 +10,19 @@ Manager::Manager() : m_wsClient(NULL), m_sensor(NULL), m_sdk(NULL) {
 
 Manager::~Manager() {}
 
+void Manager::initHoloRenderer(HologramRenderer *holoRenderer) {
+  updateResolutionSignal.connect(
+      boost::bind(&HologramRenderer::updateResolution, holoRenderer, _1, _2));
+  updateResolutionSignal(WIDTH, HEIGHT);
+}
+
 void Manager::initSensor(AlSensorCb *sensorCb) {
   boost::filesystem::path lib_path("/home/xors/workspace/QT/altexo/build/");
   std::cout << "Loading sensor plugin" << std::endl;
   m_sensor = boost::dll::import<AlSensorAPI>(
       lib_path / "libal_kinect_1.so", "plugin",
       boost::dll::load_mode::append_decorations);
-
   m_sensor->init(sensorCb);
-
   // tread requesting new sensor frame every 30 milliseconds
   boost::thread m_frameThread = boost::thread(&Manager::frameThread, this);
 }
@@ -37,7 +41,6 @@ void Manager::initWsConnection(AlWsCb *alWsCb) {
   m_wsClient =
       boost::dll::import<AlWsAPI>(lib_path / "libws_client.so", "plugin",
                                   boost::dll::load_mode::append_decorations);
-
   m_wsClient->init(alWsCb);
 }
 
@@ -47,8 +50,10 @@ void Manager::initSdk() {
   m_sdk =
       boost::dll::import<AlSdkAPI>(lib_path / "libaltexo_sdk.so", "plugin",
                                    boost::dll::load_mode::append_decorations);
-
   m_sdk->init(this);
+  updateResolutionSignal.connect(
+      boost::bind(&AlSdkAPI::updateResolution, m_sdk, _1, _2));
+  updateResolutionSignal(WIDTH, HEIGHT);
 }
 
 void Manager::onWsMessageCb(std::vector<char> msg) {
@@ -113,25 +118,11 @@ void Manager::onMessageFromPeer(boost::property_tree::ptree msgPt) {
     if (m_videoDeviceName != "") {
       m_sdk->setDesiredDataSource(AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS);
       // m_sdk->setDesiredDataSource(AlSdkAPI::DesiredVideoSource::CAMERA);
-
     } else {
       m_sdk->setDesiredDataSource(AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS);
       // m_sdk->setDesiredDataSource(AlSdkAPI::DesiredVideoSource::CAMERA);
-      // **
-      // * INITIATE MODE
-      // *
-      // std::cout << "intiate" << std::endl;
-      //
-      // std::vector<char> peerIdVec(m_peerId.begin(), m_peerId.end());
-
       // initConnection("hologram");
       initConnection("audio+video");
-      // // Q_EMIT requestNewFrameSignal();
-      // // // TODO: take a look later
-      // // //            QTimer *timer = new QTimer(this);
-      // // //            connect(timer, SIGNAL(timeout()), this,
-      // // //            SLOT(timeoutSlot()));
-      // // //            timer->start(1000);
     }
   }
 
@@ -225,11 +216,6 @@ void Manager::handleMessages() {
   }
   if (m_sentLocalSdp && m_sentRemoteSdp && m_localCandidates.empty() &&
       m_remoteCandidates.empty() && !connectionInitialized) {
-    std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
-    std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
-    std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
-    std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
-    std::cout << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA" << std::endl;
     connectionInitialized = true;
   }
 }

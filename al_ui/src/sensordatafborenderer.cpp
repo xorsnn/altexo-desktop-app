@@ -1,14 +1,8 @@
 #include "sensordatafborenderer.hpp"
 
-SensorDataFboRenderer::SensorDataFboRenderer() {
-  // m_outPixel = new GLubyte[1280 * 480 * 3];
-  // m_outPixel.resize(1280 * 480 * 4);
-}
+SensorDataFboRenderer::SensorDataFboRenderer() : m_debug(true) {}
 
-SensorDataFboRenderer::~SensorDataFboRenderer() {
-  // delete[] m_outPixel;
-  // m_outPixel = NULL;
-}
+SensorDataFboRenderer::~SensorDataFboRenderer() {}
 
 int SensorDataFboRenderer::init() {
   m_newFrame = false;
@@ -112,30 +106,29 @@ int SensorDataFboRenderer::init() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
   glBindTexture(GL_TEXTURE_2D, 0);
 
-  cout << "Initialization successfull" << endl;
+  if (m_debug) {
+    cout << "Initialization successfull" << endl;
+  }
   return 1;
 }
 
-void SensorDataFboRenderer::render() {
-  glViewport(0, 0, 1280, 480);
+void SensorDataFboRenderer::render(int viewWidth, int viewHeight) {
+  glViewport(0, 0, viewWidth, viewHeight);
   glBindVertexArray(vaoID);
   glBindBuffer(GL_ARRAY_BUFFER, vboVerticesID);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIndicesID);
 
   if (m_newFrame) {
     // allocate texture
-    int w = 640;
-    int h = 480;
-
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, sensorRGBTexID);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, w, h, 0, GL_RGB, GL_UNSIGNED_BYTE,
-                 m_rgbFrame.data());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, WIDTH_SENSOR, HEIGHT_SENSOR, 0,
+                 GL_RGB, GL_UNSIGNED_BYTE, m_rgbFrame.data());
 
     glActiveTexture(GL_TEXTURE1);
     glBindTexture(GL_TEXTURE_2D, sensorDepthTexID);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_R16UI, w, h, 0, GL_RED_INTEGER,
-                 GL_UNSIGNED_SHORT, m_depthFrame.data());
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_R16UI, WIDTH_SENSOR, HEIGHT_SENSOR, 0,
+                 GL_RED_INTEGER, GL_UNSIGNED_SHORT, m_depthFrame.data());
 
     m_newFrame = false;
   }
@@ -155,14 +148,10 @@ void SensorDataFboRenderer::render() {
   glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-  // seems to be needed by something, otherwise some artifacts appears
-  // glActiveTexture(GL_TEXTURE0);
 }
 
 void SensorDataFboRenderer::newFrame(std::vector<uint8_t> rgbFrame,
                                      std::vector<uint16_t> depthFrame) {
-  // std::cout << "new frame!!!" << std::endl;
   if (!m_newFrame) {
     m_rgbFrame.swap(rgbFrame);
     m_depthFrame.swap(depthFrame);

@@ -1,7 +1,15 @@
 #include "hologramrenderer.hpp"
 
 HologramRenderer::HologramRenderer()
-    : m_outPixel(1280 * 480 * 3), m_debug(true) {}
+    : WIDTH(0), HEIGHT(0), m_outPixel(0), pendingRenderTexResize(false),
+      m_debug(true) {}
+
+void HologramRenderer::updateResolution(int width, int height) {
+  WIDTH = width;
+  HEIGHT = height;
+  m_outPixel.resize(WIDTH * HEIGHT * 2 * 3);
+  pendingRenderTexResize = true;
+}
 
 int HologramRenderer::init() {
   m_newFrame = false;
@@ -109,6 +117,11 @@ void HologramRenderer::render(int viewWidh, int viewHeight) {
   // TODO: move to 'onResize' event
   cam.SetupProjection(45, (GLfloat)viewWidh / viewHeight);
 
+  if (pendingRenderTexResize) {
+    pendingRenderTexResize = false;
+    resizeRenderTex();
+  }
+
   // ============ FBO ==============
   // enable FBO
   glBindFramebuffer(GL_FRAMEBUFFER, fboID);
@@ -119,11 +132,13 @@ void HologramRenderer::render(int viewWidh, int viewHeight) {
   // clear the colour and depth buffer
   // ============ ~FBO ==============
 
-  m_sensorDataFboRenderer.render();
+  m_sensorDataFboRenderer.render(WIDTH * 2, HEIGHT);
 
   if (sendingFrames) {
-    glReadPixels(0, 0, 1280, 480, GL_RGB, GL_UNSIGNED_BYTE, &(m_outPixel[0]));
-    newFrameSignal(m_outPixel, 1280, 480);
+    glReadPixels(0, 0, WIDTH * 2, HEIGHT, GL_RGB, GL_UNSIGNED_BYTE,
+                 &(m_outPixel[0]));
+    // TODO: NOT SURE IF IT IS OK TO MULTIPLY BY 2
+    newFrameSignal(m_outPixel, WIDTH * 2, HEIGHT);
   }
 
   // ============ FBO ==============
@@ -185,7 +200,8 @@ void HologramRenderer::initFBO() {
   glBindRenderbuffer(GL_RENDERBUFFER, rbID);
 
   // set the render buffer storage
-  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32, WIDTH, HEIGHT);
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32, WIDTH * 2,
+                        HEIGHT);
 
   // generate the offscreen texture
   glGenTextures(1, &renderTextureID);
@@ -196,7 +212,7 @@ void HologramRenderer::initFBO() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, WIDTH, HEIGHT, 0, GL_BGRA,
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, WIDTH * 2, HEIGHT, 0, GL_BGRA,
                GL_UNSIGNED_BYTE, NULL);
 
   // bind the renderTextureID as colour attachment of FBO
@@ -214,8 +230,17 @@ void HologramRenderer::initFBO() {
   } else {
     printf("Error in FBO setup.\n");
   }
-
   // unbind the texture and FBO
   glBindTexture(GL_TEXTURE_2D, 0);
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
+}
+
+void HologramRenderer::resizeRenderTex() {
+  glBindRenderbuffer(GL_RENDERBUFFER, rbID);
+  // set the render buffer storage
+  glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32, WIDTH * 2,
+                        HEIGHT);
+  glBindTexture(GL_TEXTURE_2D, renderTextureID);
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, WIDTH * 2, HEIGHT, 0, GL_BGRA,
+               GL_UNSIGNED_BYTE, NULL);
 }

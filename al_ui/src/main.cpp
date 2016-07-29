@@ -28,11 +28,7 @@ int main(int, char **) {
   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
 
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
-  // SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-  // SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 3);
-  // SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK,
-  // SDL_GL_CONTEXT_PROFILE_CORE);
 
   SDL_DisplayMode current;
   SDL_GetCurrentDisplayMode(0, &current);
@@ -69,10 +65,10 @@ int main(int, char **) {
   HologramRenderer hologramRenderer;
   hologramRenderer.init();
   Manager manager;
+  manager.initHoloRenderer(&hologramRenderer);
   manager.initSensor(&(hologramRenderer.m_sensorDataFboRenderer));
   manager.initSdk();
-  // m.initWsConnection(m.m_sdk->getWsCb()); // TODO: improve this
-  manager.initWsConnection(&manager); // TODO: improve this
+  manager.initWsConnection(&manager);
   // ~ local init
 
   // Load Fonts

@@ -27,6 +27,7 @@ public:
   void setRemoteIceCandidate(std::vector<char> candidate);
   void setImageData(std::vector<unsigned char> imageBytes, int width,
                     int height);
+  void updateResolution(int widht, int height);
 
   // void DeletePeerConnection();
   //
@@ -136,6 +137,15 @@ public:
 
   std::vector<unsigned char> *getFrameRef() { return &m_imageBytes; }
 
+  int getWidth() {
+    boost::lock_guard<boost::mutex> guard(m_mtx);
+    return WIDTH;
+  }
+  int getHeight() {
+    boost::lock_guard<boost::mutex> guard(m_mtx);
+    return HEIGHT;
+  }
+
 private:
   AlManager *m_manager;
   AlSDKCb *m_sdkCb;
@@ -150,7 +160,9 @@ private:
   std::vector<unsigned char> m_imageBytes;
 
   std::queue<std::pair<int, std::vector<char>>> m_messageQueue;
-  uint8_t *m_pImageBytes;
+
+  int WIDTH;
+  int HEIGHT;
 };
 
 extern "C" BOOST_SYMBOL_EXPORT AlSdkPlugin plugin;

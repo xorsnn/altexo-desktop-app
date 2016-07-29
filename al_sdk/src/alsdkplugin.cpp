@@ -5,7 +5,7 @@
 
 using namespace std;
 
-AlSdkPlugin::AlSdkPlugin() : m_debug(true) {
+AlSdkPlugin::AlSdkPlugin() : m_debug(true), WIDTH(0), HEIGHT(0) {
   if (m_debug) {
     std::cout << "AlSdkPlugin constructor" << std::endl;
   }
@@ -19,10 +19,8 @@ AlSdkPlugin::~AlSdkPlugin() {
 
 void AlSdkPlugin::init(AlSDKCb *alSdkCb) {
   m_sdkCb = alSdkCb;
-
   // TODO debug, checking init thread
   // m_manager->InitializePeerConnection();
-
   m_internalThread = boost::thread(&AlSdkPlugin::threadMain, this);
 }
 
@@ -147,12 +145,6 @@ void AlSdkPlugin::threadMain() {
 void AlSdkPlugin::setDesiredDataSource(int dataSource) {
   m_manager->setDesiredDataSource(dataSource);
 }
-//
-// // TODO: reconfigure this
-// void AlSdkPlugin::setImageData(uint8_t *pImageBytes, size_t len, int width,
-//                                int height) {
-//   m_manager->setImageData(pImageBytes, len, width, height);
-// }
 
 void AlSdkPlugin::setRemoteSdp(std::vector<char> sdp) {
   if (m_debug) {
@@ -175,15 +167,23 @@ void AlSdkPlugin::setRemoteIceCandidate(std::vector<char> candidate) {
 
 void AlSdkPlugin::setImageData(std::vector<unsigned char> imageBytes, int width,
                                int height) {
-  if (m_debug) {
-    // std::cout << "AlSdkPlugin::setImageData" << std::endl;
-    // std::cout << imageBytes.size() << std::endl;
-  }
   boost::lock_guard<boost::mutex> guard(m_mtx);
   m_imageBytes = imageBytes;
   std::pair<int, std::vector<char>> msg(
       AlCallback::SdkMessageType::NEW_FRAME_SM, std::vector<char>());
   m_messageQueue.push(msg);
-  // m_pImageBytes = reinterpret_cast<uint8_t *>(imageBytes.data());
-  // m_manager->setImageData(m_pImageBytes, imageBytes.size(), width, height);
+}
+
+void AlSdkPlugin::updateResolution(int width, int height) {
+  if (m_debug) {
+    std::cout << "AlSdkPlugin::updateResolution" << std::endl;
+    std::cout << width << std::endl;
+    std::cout << height << std::endl;
+  }
+  boost::lock_guard<boost::mutex> guard(m_mtx);
+  WIDTH = width;
+  HEIGHT = height;
+  std::pair<int, std::vector<char>> msg(
+      AlCallback::SdkMessageType::UPDATE_RESOLUTION_SM, std::vector<char>());
+  m_messageQueue.push(msg);
 }

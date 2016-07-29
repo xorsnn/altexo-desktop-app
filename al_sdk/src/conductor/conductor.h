@@ -173,6 +173,8 @@ public:
   //    void SendHangUpSignal(QString peer_id_);
   //    void DequeueMessagesFromPeerSignal();
 
+  AlDataManager *m_dataManager;
+
 protected:
   // Send a message to the remote peer.
   void SendMessage(const std::string &json_object);
@@ -192,7 +194,6 @@ protected:
   std::queue<std::map<std::string, std::string>> m_messageQueue;
   bool m_processingMsg;
   bool m_isAcceptingConnection;
-  AlDataManager *m_dataManager;
 
 public:
   rtc::scoped_refptr<webrtc::PeerConnectionInterface> m_peerConnection;

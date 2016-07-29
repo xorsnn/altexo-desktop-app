@@ -14,6 +14,7 @@ public:
     CANDIDATE_SM,
     INIT_SM,
     NEW_FRAME_SM,
+    UPDATE_RESOLUTION_SM,
   };
 
   // TODO migrate to this 2
@@ -44,6 +45,8 @@ public:
 
   virtual bool ifNewMessage() = 0;
   virtual std::pair<int, std::vector<char>> degueueMessage() = 0;
+  virtual int getWidth() = 0;
+  virtual int getHeight() = 0;
 };
 
 #endif // ALCALLBACK_H
