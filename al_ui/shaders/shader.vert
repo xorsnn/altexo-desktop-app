@@ -62,7 +62,7 @@ void main() {
   // vec3 pos = position;
   visibility = 1.0;
 
-  vUv = vec2(vVertex.x + 0.5, 1-(vVertex.y + 0.5));
+  vUv = vec2(vVertex.x + 0.5, 1 - (vVertex.y + 0.5));
   vUv.x = vUv.x * 0.5;
   vec3 hsl = rgb2hsl(texture2D(textureMap, vUv).xyz);
   vUv.x += 0.5;
@@ -75,7 +75,6 @@ void main() {
   // vertex position
   // gl_Position = MVP * vec4(vVertex, 0.0, 1.0);
   gl_Position = MVP * vec4(vVertex.x, vVertex.y, pos.z / 640, 1.0);
-  // gl_Position = MVP * vec4(vVertex.x, vVertex.y, 0.0, 1.0);
-  vUV = vec2((vVertex.x + 0.5)/2.0+0.5, 1-(vVertex.y + 0.5));
+  vUV = vec2((vVertex.x + 0.5) / 2.0 + 0.5, 1 - (vVertex.y + 0.5));
   gl_PointSize = 2.0;
 }
