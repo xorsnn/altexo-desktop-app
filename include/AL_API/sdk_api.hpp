@@ -2,7 +2,7 @@
 #define ALSDKINTERFACE_H
 
 #include "AL_CB/al_sdk_cb.hpp"
-// #include "AL_CB/al_ws_cb.hpp"
+#include "altextmessage.hpp"
 #include <string>
 
 class AlCallback;
@@ -23,6 +23,7 @@ public:
   virtual void setRemoteSdp(std::vector<char> sdp) = 0;
   virtual void setRemoteIceCandidate(std::vector<char> candidate) = 0;
   virtual void setDesiredDataSource(int dataSource) = 0;
+  virtual void setDesiredVideDeviceName(AlTextMessage deviceName) = 0;
   virtual void setImageData(std::vector<unsigned char> imageBytes, int width,
                             int height) = 0;
   virtual void updateResolution(int widht, int height) = 0;

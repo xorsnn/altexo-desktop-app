@@ -4,11 +4,19 @@
 #include <boost/property_tree/ptree.hpp>
 #include <iostream>
 
-Manager::Manager() : m_wsClient(NULL), m_sensor(NULL), m_sdk(NULL) {
+Manager::Manager()
+    : m_wsClient(NULL), m_sensor(NULL), m_sdk(NULL), m_debug(true),
+      m_videoDeviceType(-1), m_videoDeviceName(""), m_id(""), m_peerId("-1"),
+      m_frameThread(NULL) {
   std::cout << "Manager constructor" << std::endl;
 }
 
-Manager::~Manager() {}
+Manager::~Manager() {
+  m_frameThread->interrupt();
+  m_frameThread->join();
+  delete m_frameThread;
+  m_frameThread = NULL;
+}
 
 void Manager::initHoloRenderer(HologramRenderer *holoRenderer) {
   updateResolutionSignal.connect(
@@ -23,8 +31,13 @@ void Manager::initSensor(AlSensorCb *sensorCb) {
       lib_path / "libal_kinect_1.so", "plugin",
       boost::dll::load_mode::append_decorations);
   m_sensor->init(sensorCb);
-  // tread requesting new sensor frame every 30 milliseconds
-  boost::thread m_frameThread = boost::thread(&Manager::frameThread, this);
+
+  sensorList.push_back(AlTextMessage("Kinect"));
+  // set sensor as default source
+  setDeviceName(sensorList[sensorList.size() - 1],
+                AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS);
+  // tread requesting new sensor frame every 30 times per second
+  m_frameThread = new boost::thread(&Manager::frameThread, this);
 }
 
 void Manager::frameThread() {
@@ -115,14 +128,19 @@ void Manager::onMessageFromPeer(boost::property_tree::ptree msgPt) {
   // this is the very first contact we will store peer id
   if (m_peerId == "-1") {
     m_peerId = senderIdStr;
-    if (m_videoDeviceName != "") {
-      m_sdk->setDesiredDataSource(AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS);
-      // m_sdk->setDesiredDataSource(AlSdkAPI::DesiredVideoSource::CAMERA);
-    } else {
-      m_sdk->setDesiredDataSource(AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS);
-      // m_sdk->setDesiredDataSource(AlSdkAPI::DesiredVideoSource::CAMERA);
-      // initConnection("hologram");
+    switch (m_videoDeviceType) {
+    case AlSdkAPI::DesiredVideoSource::CAMERA: {
+      m_sdk->setDesiredDataSource(m_videoDeviceType);
       initConnection("audio+video");
+    } break;
+    case AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS: {
+      m_sdk->setDesiredDataSource(m_videoDeviceType);
+      // initConnection("audio+video");
+      initConnection("hologram");
+    } break;
+    default: {
+      // unhandled video device
+    }
     }
   }
 
@@ -218,4 +236,16 @@ void Manager::handleMessages() {
       m_remoteCandidates.empty() && !connectionInitialized) {
     connectionInitialized = true;
   }
+}
+
+void Manager::onDevicesListChangedCb(std::vector<AlTextMessage> deviceNames) {
+  if (m_debug) {
+    std::cout << "Manager::onDevicesListChangedCb" << std::endl;
+  }
+  webcamList = deviceNames;
+}
+
+void Manager::setDeviceName(AlTextMessage deviceName, int deviceType) {
+  m_videoDeviceName = deviceName.getText();
+  m_videoDeviceType = deviceType;
 }

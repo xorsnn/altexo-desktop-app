@@ -125,16 +125,45 @@ int main(int, char **) {
     {
       ImGui::SetNextWindowSize(ImVec2(100, 400), ImGuiSetCond_Once);
       ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiSetCond_Once);
-
       ImGui::Begin("Contacts", NULL);
       static int selected = 0;
       ImGui::BeginChild("left pane", ImVec2(-1, 0), true);
       for (int i = 0; i < manager.contactList.size(); i++) {
-        // char label[128];
-        // sprintf(label, i);
         const char *label = manager.contactList[i].name.c_str();
         if (ImGui::Selectable(label, selected == i)) {
           selected = i;
+          std::cout << selected << std::endl;
+        }
+      }
+      ImGui::EndChild();
+      ImGui::End();
+    }
+
+    {
+      ImGui::SetNextWindowSize(ImVec2(100, 100), ImGuiSetCond_Once);
+      ImGui::SetNextWindowPos(ImVec2(10, 420), ImGuiSetCond_Once);
+      ImGui::Begin("Input", NULL);
+      static int selected = 0;
+      ImGui::BeginChild("webcam list", ImVec2(-1, 50), true);
+      for (int i = 0; i < manager.webcamList.size(); i++) {
+        std::string devName = manager.webcamList[i].getText();
+        const char *label = devName.c_str();
+        if (ImGui::Selectable(label, selected == i)) {
+          selected = i;
+          manager.setDeviceName(manager.webcamList[i],
+                                AlSdkAPI::DesiredVideoSource::CAMERA);
+          std::cout << selected << std::endl;
+        }
+      }
+      ImGui::EndChild();
+      ImGui::BeginChild("sensor list", ImVec2(-1, 50), true);
+      for (int i = 0; i < manager.sensorList.size(); i++) {
+        std::string devName = manager.sensorList[i].getText();
+        const char *label = devName.c_str();
+        if (ImGui::Selectable(label, selected == i)) {
+          selected = i;
+          manager.setDeviceName(manager.sensorList[i],
+                                AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS);
           std::cout << selected << std::endl;
         }
       }
@@ -160,7 +189,9 @@ int main(int, char **) {
                             (int)ImGui::GetIO().DisplaySize.y);
 
     // has to be called once
-    if (!hologramRenderer.sendingFrames && manager.connectionInitialized) {
+    if (!hologramRenderer.sendingFrames && manager.connectionInitialized &&
+        manager.getDeviceType() ==
+            AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS) {
       hologramRenderer.initFrameSending(manager.m_sdk.get());
     }
 
