@@ -5,7 +5,8 @@
 
 using namespace std;
 
-AlSdkPlugin::AlSdkPlugin() : m_debug(true), WIDTH(0), HEIGHT(0) {
+AlSdkPlugin::AlSdkPlugin()
+    : m_debug(true), WIDTH(0), HEIGHT(0), m_videoDeviceName("") {
   if (m_debug) {
     std::cout << "AlSdkPlugin constructor" << std::endl;
   }
@@ -186,4 +187,8 @@ void AlSdkPlugin::updateResolution(int width, int height) {
   std::pair<int, std::vector<char>> msg(
       AlCallback::SdkMessageType::UPDATE_RESOLUTION_SM, std::vector<char>());
   m_messageQueue.push(msg);
+}
+
+void AlSdkPlugin::setDesiredVideDeviceName(AlTextMessage deviceName) {
+  m_videoDeviceName = deviceName.getText();
 }

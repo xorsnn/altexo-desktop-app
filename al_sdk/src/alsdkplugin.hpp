@@ -4,6 +4,7 @@
 #include "AL_API/sdk_api.hpp"
 #include "AL_CB/al_sdk_cb.hpp"
 #include "alcallback.h"
+#include "altextmessage.hpp"
 #include "boost/thread.hpp"
 #include <boost/config.hpp>
 #include <boost/signals2/signal.hpp>
@@ -31,13 +32,6 @@ public:
 
   // void DeletePeerConnection();
   //
-  // // TODO: union the two methods
-  // void OnMessageFromPeer(std::string peer_id, const std::string &message);
-  // AlWsCb
-  // void onMessageFromPeer(std::vector<char> peerId, std::vector<char>
-  // message);
-  // void onWsMessageCb(std::vector<char> msg) {}
-
   // bool isClientConnected();
   // void clientConnect(const std::string &server, int port,
   //                    const std::string &client_name);
@@ -46,19 +40,11 @@ public:
   // void setImageData(uint8_t *pImageBytes, size_t len, int width, int height);
   void threadMain();
 
-  // AlCallback implementation
-  // void sendToPeerCb(const std::string &message) {
-  //   if (m_debug) {
-  //     std::cout << "sendToPeerCb" << std::endl;
-  //   }
-  //   std::vector<char> msg(message.begin(), message.end());
-  //   m_sdkCb->sendMessageToPeer(msg);
-  // }
-
   void onSdpCb(const std::string &message) {
     std::vector<char> msg(message.begin(), message.end());
     m_sdkCb->onSdp(msg);
   }
+
   void onCandidateCb(const std::string &message) {
     std::vector<char> msg(message.begin(), message.end());
     m_sdkCb->onCandidate(msg);
@@ -69,6 +55,7 @@ public:
       std::cout << "sendHangUpCb" << std::endl;
     }
   }
+
   void dequeueMessagesFromPeerCb() {
     if (m_debug) {
       std::cout << "dequeueMessagesFromPeerCb" << std::endl;
@@ -110,18 +97,25 @@ public:
     // }
   }
   void SwitchToStreamingUI() {} // ????
-  void onDevicesListChangedCb(std::vector<std::string> device_names) {
+  void onDevicesListChangedCb(std::vector<std::string> deviceNames) {
     if (m_debug) {
       std::cout << "onDevicesListChangedCb" << std::endl;
     }
+    std::vector<AlTextMessage> deviceNamesMsg;
+    for (int i = 0; i < deviceNames.size(); i++) {
+      AlTextMessage newMsg(deviceNames[i]);
+      deviceNamesMsg.push_back(newMsg);
+    }
+    m_sdkCb->onDevicesListChangedCb(deviceNamesMsg);
   }
   void updateFrameCb(const uint8_t *image, int width, int height) {
     if (m_debug) {
       // std::cout << "updateFrameCb" << std::endl;
     }
   }
+  void setDesiredVideDeviceName(AlTextMessage deviceName);
   //    TODO move to AlManager
-  std::string getVideoDeviceName() { return ""; }
+  std::string getVideoDeviceName() { return m_videoDeviceName; }
 
   // getters
   bool ifNewMessage() {
@@ -160,6 +154,8 @@ private:
   std::vector<unsigned char> m_imageBytes;
 
   std::queue<std::pair<int, std::vector<char>>> m_messageQueue;
+
+  std::string m_videoDeviceName;
 
   int WIDTH;
   int HEIGHT;

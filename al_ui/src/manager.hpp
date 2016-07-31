@@ -31,6 +31,7 @@ public:
   // sdk cb
   void onSdp(std::vector<char> sdp);
   void onCandidate(std::vector<char> candidate);
+  void onDevicesListChangedCb(std::vector<AlTextMessage> deviceNames);
 
   void initConnection(std::string mode);
   void onMessageFromPeer(boost::property_tree::ptree msgPt);
@@ -38,19 +39,25 @@ public:
   void handleMessages();
   void initHoloRenderer(HologramRenderer *holoRenderer);
 
+  void setDeviceName(AlTextMessage deviceNama, int deviceType);
+  int getDeviceType() { return m_videoDeviceType; }
+
   boost::shared_ptr<AlSdkAPI> m_sdk;
   std::vector<CONTACT> contactList;
+  std::vector<AlTextMessage> webcamList;
+  std::vector<AlTextMessage> sensorList;
 
   bool connectionInitialized = false;
 
 private:
   boost::shared_ptr<AlWsAPI> m_wsClient;
   boost::shared_ptr<AlSensorAPI> m_sensor;
-  boost::thread m_frameThread;
+  boost::thread *m_frameThread;
 
-  std::string m_id = "";
-  std::string m_peerId = "-1";
-  std::string m_videoDeviceName = "";
+  std::string m_id;
+  std::string m_peerId;
+  std::string m_videoDeviceName;
+  int m_videoDeviceType;
 
   std::string m_localSdp = "";
   bool m_sentLocalSdp = false;

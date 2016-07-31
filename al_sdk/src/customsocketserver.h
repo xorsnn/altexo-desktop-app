@@ -69,6 +69,9 @@ public:
         width = m_alCallback->getWidth();
         height = m_alCallback->getHeight();
       } break;
+      default: {
+        // unhandled
+      }
       }
     }
 
