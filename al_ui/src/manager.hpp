@@ -33,7 +33,8 @@ public:
   void onCandidate(std::vector<char> candidate);
   void onDevicesListChangedCb(std::vector<AlTextMessage> deviceNames);
 
-  void initConnection(std::string mode);
+  void initConnection(std::string peerId);
+  void setConnectionMode(std::string mode);
   void onMessageFromPeer(boost::property_tree::ptree msgPt);
 
   void handleMessages();
@@ -41,6 +42,8 @@ public:
 
   void setDeviceName(AlTextMessage deviceNama, int deviceType);
   int getDeviceType() { return m_videoDeviceType; }
+
+  void callToPeer(std::string peerId);
 
   boost::shared_ptr<AlSdkAPI> m_sdk;
   std::vector<CONTACT> contactList;
@@ -50,6 +53,8 @@ public:
   bool connectionInitialized = false;
 
 private:
+  void _initVideoDevice();
+
   boost::shared_ptr<AlWsAPI> m_wsClient;
   boost::shared_ptr<AlSensorAPI> m_sensor;
   boost::thread *m_frameThread;
@@ -71,8 +76,6 @@ private:
   // TODO move mode selection to UI
   int WIDTH = 320;
   int HEIGHT = 240;
-
-  bool m_debug;
 };
 
 #endif // MANAGER_H

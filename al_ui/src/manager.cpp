@@ -1,13 +1,12 @@
 #include "manager.hpp"
-#include "contact.hpp"
+#include "allog.hpp"
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <iostream>
 
 Manager::Manager()
-    : m_wsClient(NULL), m_sensor(NULL), m_sdk(NULL), m_debug(true),
-      m_videoDeviceType(-1), m_videoDeviceName(""), m_id(""), m_peerId("-1"),
-      m_frameThread(NULL) {
+    : m_wsClient(NULL), m_sensor(NULL), m_sdk(NULL), m_videoDeviceType(-1),
+      m_videoDeviceName(""), m_id(""), m_peerId("-1"), m_frameThread(NULL) {
   std::cout << "Manager constructor" << std::endl;
 }
 
@@ -35,8 +34,8 @@ void Manager::initSensor(AlSensorCb *sensorCb) {
   // m_sensor->init(sensorCb);
   sensorList.push_back(AlTextMessage("Kinect"));
   // set sensor as default source
-  setDeviceName(sensorList[sensorList.size() - 1],
-                AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS);
+  // setDeviceName(sensorList[sensorList.size() - 1],
+  //               AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS);
   // tread requesting new sensor frame every 30 times per second
   m_frameThread = new boost::thread(&Manager::frameThread, this);
 }
@@ -71,10 +70,8 @@ void Manager::initSdk() {
 
 void Manager::onWsMessageCb(std::vector<char> msg) {
   std::string msgStr(msg.begin(), msg.end());
-  if (m_debug) {
-    std::cout << "=== ws message ===" << std::endl;
-    std::cout << msgStr << std::endl;
-  }
+  alLog("=== ws message ===");
+  alLog(msgStr);
   boost::property_tree::ptree pt;
   std::stringstream ss(msgStr);
   boost::property_tree::read_json(ss, pt);
@@ -95,16 +92,29 @@ void Manager::onWsMessageCb(std::vector<char> msg) {
   }
 }
 
-void Manager::initConnection(std::string mode) {
+void Manager::initConnection(std::string peerId) {
+  // TODO: controll assigning once for a call
+  m_peerId = peerId;
+  if (m_wsClient != NULL) {
+    std::ostringstream stream;
+    boost::property_tree::ptree pt;
+    pt.put("call", true);
+    boost::property_tree::write_json(stream, pt, false);
+    std::string strJson = stream.str();
+    m_wsClient->sendMessageToPeer(AlTextMessage(m_peerId),
+                                  AlTextMessage(strJson));
+  }
+}
+
+void Manager::setConnectionMode(std::string mode) {
   if (m_wsClient != NULL) {
     std::ostringstream stream;
     boost::property_tree::ptree pt;
     pt.put("mode", mode);
     boost::property_tree::write_json(stream, pt, false);
     std::string strJson = stream.str();
-    std::vector<char> strVec(strJson.begin(), strJson.end());
-    std::vector<char> peerIdVec(m_peerId.begin(), m_peerId.end());
-    m_wsClient->sendMessageToPeer(peerIdVec, strVec);
+    m_wsClient->sendMessageToPeer(AlTextMessage(m_peerId),
+                                  AlTextMessage(strJson));
   }
 }
 
@@ -116,9 +126,7 @@ void Manager::onMessageFromPeer(boost::property_tree::ptree msgPt) {
   std::stringstream ss(messageStr);
   boost::property_tree::read_json(ss, jsonMsg);
 
-  if (m_debug) {
-    std::cout << messageStr << std::endl;
-  }
+  alLog(messageStr);
 
   boost::optional<bool> callAccepted =
       jsonMsg.get_optional<bool>("callAccepted");
@@ -128,63 +136,31 @@ void Manager::onMessageFromPeer(boost::property_tree::ptree msgPt) {
   // this is the very first contact we will store peer id
   if (m_peerId == "-1") {
     m_peerId = senderIdStr;
-    switch (m_videoDeviceType) {
-    case AlSdkAPI::DesiredVideoSource::CAMERA: {
-      m_sdk->setDesiredDataSource(m_videoDeviceType);
-      initConnection("audio+video");
-    } break;
-    case AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS: {
-      m_sdk->setDesiredDataSource(m_videoDeviceType);
-      // initConnection("audio+video");
-      initConnection("hologram");
-    } break;
-    default: {
-      // unhandled video device
-    }
-    }
+    _initVideoDevice();
   }
 
   if (callAccepted) {
-    if (m_debug) {
-      std::cout << "callAccepted" << std::endl;
-    }
-    //     Q_EMIT ConnectToPeerSignal(
-    //         jsonObj["data"].toObject()["sender_id"].toString());
+    alLog("callAccepted");
+    _initVideoDevice();
+    m_sdk->initializePeerConnection();
   } else if (isCall) {
-    if (m_debug) {
-      std::cout << "isCall" << std::endl;
-    }
+    alLog("isCall");
     // TODO implement accept call functionality
     std::ostringstream stream;
     boost::property_tree::ptree msgToSendPt;
     msgToSendPt.put("callAccepted", true);
     boost::property_tree::write_json(stream, msgToSendPt, false);
     std::string strJson = stream.str();
-    if (m_debug) {
-      // std::cout << strJson << std::endl;
-    }
-    std::vector<char> strVec(strJson.begin(), strJson.end());
-    std::vector<char> peerIdVec(m_peerId.begin(), m_peerId.end());
-    m_wsClient->sendMessageToPeer(peerIdVec, strVec);
-
-    // TODO only for initiating side
-    // m_sdk->initializePeerConnection();
+    m_wsClient->sendMessageToPeer(AlTextMessage(m_peerId),
+                                  AlTextMessage(strJson));
   } else {
-    if (m_debug) {
-      std::cout << "================" << std::endl;
-      std::cout << "sdp or candidate" << std::endl;
-      std::cout << "================" << std::endl;
-    }
+    alLog("================");
+    alLog("sdp or candidate");
+    alLog("================");
     boost::optional<std::string> sdp = jsonMsg.get_optional<std::string>("sdp");
     if (sdp) {
-      if (m_debug) {
-        std::cout << "sdb received" << std::endl;
-      }
       m_remoteSdp = messageStr;
     } else {
-      if (m_debug) {
-        std::cout << "ice candidate received" << std::endl;
-      }
       m_remoteCandidates.push(messageStr);
     }
     handleMessages();
@@ -192,25 +168,20 @@ void Manager::onMessageFromPeer(boost::property_tree::ptree msgPt) {
 }
 
 void Manager::onSdp(std::vector<char> sdp) {
-  if (m_debug) {
-    std::cout << "Manager::onSdp" << std::endl;
-  }
+  alLog("Manager::onSdp");
   m_localSdp = std::string(sdp.begin(), sdp.end());
   handleMessages();
 }
 void Manager::onCandidate(std::vector<char> candidate) {
-  if (m_debug) {
-    std::cout << "Manager::onCandidate" << std::endl;
-  }
+  alLog("Manager::onCandidate");
   m_localCandidates.push(std::string(candidate.begin(), candidate.end()));
   handleMessages();
 }
 
 void Manager::handleMessages() {
-  std::vector<char> peerIdVec(m_peerId.begin(), m_peerId.end());
   if (!m_sentLocalSdp && m_localSdp != "") {
-    std::vector<char> localSdpVec(m_localSdp.begin(), m_localSdp.end());
-    m_wsClient->sendMessageToPeer(peerIdVec, localSdpVec);
+    m_wsClient->sendMessageToPeer(AlTextMessage(m_peerId),
+                                  AlTextMessage(m_localSdp));
     m_sentLocalSdp = true;
   }
   if (!m_sentRemoteSdp && m_remoteSdp != "") {
@@ -222,8 +193,8 @@ void Manager::handleMessages() {
     while (!m_localCandidates.empty()) {
       std::string candidate = m_localCandidates.front();
       m_localCandidates.pop();
-      std::vector<char> candidateVec(candidate.begin(), candidate.end());
-      m_wsClient->sendMessageToPeer(peerIdVec, candidateVec);
+      m_wsClient->sendMessageToPeer(AlTextMessage(m_peerId),
+                                    AlTextMessage(candidate));
     }
     while (!m_remoteCandidates.empty()) {
       std::string candidate = m_remoteCandidates.front();
@@ -239,13 +210,30 @@ void Manager::handleMessages() {
 }
 
 void Manager::onDevicesListChangedCb(std::vector<AlTextMessage> deviceNames) {
-  if (m_debug) {
-    std::cout << "Manager::onDevicesListChangedCb" << std::endl;
-  }
+  alLog("Manager::onDevicesListChangedCb");
   webcamList = deviceNames;
 }
 
 void Manager::setDeviceName(AlTextMessage deviceName, int deviceType) {
   m_videoDeviceName = deviceName.getText();
   m_videoDeviceType = deviceType;
+}
+
+void Manager::callToPeer(std::string peerId) { initConnection(peerId); }
+
+void Manager::_initVideoDevice() {
+  switch (m_videoDeviceType) {
+  case AlSdkAPI::DesiredVideoSource::CAMERA: {
+    m_sdk->setDesiredDataSource(m_videoDeviceType);
+    setConnectionMode("audio+video");
+  } break;
+  case AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS: {
+    m_sdk->setDesiredDataSource(m_videoDeviceType);
+    // setConnectionMode("audio+video");
+    setConnectionMode("hologram");
+  } break;
+  default: {
+    // unhandled video device
+  }
+  }
 }

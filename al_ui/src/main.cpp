@@ -132,7 +132,7 @@ int main(int, char **) {
         const char *label = manager.contactList[i].name.c_str();
         if (ImGui::Selectable(label, selected == i)) {
           selected = i;
-          std::cout << selected << std::endl;
+          manager.callToPeer(manager.contactList[i].id);
         }
       }
       ImGui::EndChild();
