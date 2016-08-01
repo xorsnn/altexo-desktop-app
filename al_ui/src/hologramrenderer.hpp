@@ -27,80 +27,14 @@ public:
   void render(int viewWidh, int viewHeight);
   void initFBO();
   void resizeRenderTex();
-  void initFrameSending(AlSdkAPI *alSdkApi) {
-    if (m_debug) {
-      std::cout << "HologramRenderer::initFrameSending" << std::endl;
-    }
-    if (!sendingFrames) {
-      newFrameSignal.connect(
-          boost::bind(&AlSdkAPI::setImageData, alSdkApi, _1, _2, _3));
-    }
-    sendingFrames = true;
-  }
+  void initFrameSending(AlSdkAPI *alSdkApi);
 
-  void OnStartMouseMove(int initX, int initY) {
-    oldX = initX;
-    oldY = initY;
-  }
+  void OnStartMouseMove(int initX, int initY);
   // mouse move handler
-  void OnMouseMove(int x, int y) {
+  void OnMouseMove(int x, int y);
 
-    if (state == 0) {
-      dist = (y - oldY) / 5.0f;
-      cam.Zoom(dist);
-    } else if (state == 2) {
-      float dy = float(y - oldY) / 100.0f;
-      float dx = float(oldX - x) / 100.0f;
-      if (useFiltering) {
-        // filterMouseMoves(dx, dy);
-      } else {
-        mouseX = dx;
-        mouseY = dy;
-      }
-
-      cam.Pan(mouseX, mouseY);
-    } else {
-      rY += (y - oldY) / 5.0f;
-      rX += (oldX - x) / 5.0f;
-      if (useFiltering) {
-        filterMouseMoves(rX, rY);
-      } else {
-        mouseX = rX;
-        mouseY = rY;
-      }
-      cam.Rotate(mouseX, mouseY, 0);
-    }
-    oldX = x;
-    oldY = y;
-
-    // glutPostRedisplay();
-  }
   // mouse move filtering function
-  void filterMouseMoves(float dx, float dy) {
-    for (int i = MOUSE_HISTORY_BUFFER_SIZE - 1; i > 0; --i) {
-      mouseHistory[i] = mouseHistory[i - 1];
-    }
-
-    // Store current mouse entry at front of array.
-    mouseHistory[0] = glm::vec2(dx, dy);
-
-    float averageX = 0.0f;
-    float averageY = 0.0f;
-    float averageTotal = 0.0f;
-    float currentWeight = 1.0f;
-
-    // Filter the mouse.
-    for (int i = 0; i < MOUSE_HISTORY_BUFFER_SIZE; ++i) {
-      glm::vec2 tmp = mouseHistory[i];
-      averageX += tmp.x * currentWeight;
-      averageY += tmp.y * currentWeight;
-      averageTotal += 1.0f * currentWeight;
-      currentWeight *= MOUSE_FILTER_WEIGHT;
-    }
-
-    mouseX = averageX / averageTotal;
-    mouseY = averageY / averageTotal;
-  }
+  void filterMouseMoves(float dx, float dy);
 
   // Sensor data capturer
   SensorDataFboRenderer m_sensorDataFboRenderer;
@@ -121,7 +55,8 @@ private:
   GLuint vboVerticesID;
   GLuint vboIndicesID;
 
-  GLuint sensorRGBTexID;
+  // TODO remove unnesessary, rename used
+  // GLuint sensorRGBTexID;
   GLuint sensorDepthTexID;
 
   // out vertex struct for interleaved attributes

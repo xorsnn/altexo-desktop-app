@@ -30,8 +30,9 @@ void Manager::initSensor(AlSensorCb *sensorCb) {
   m_sensor = boost::dll::import<AlSensorAPI>(
       lib_path / "libal_kinect_1.so", "plugin",
       boost::dll::load_mode::append_decorations);
-  m_sensor->init(sensorCb);
 
+  // TODO move this to call initialization
+  // m_sensor->init(sensorCb);
   sensorList.push_back(AlTextMessage("Kinect"));
   // set sensor as default source
   setDeviceName(sensorList[sensorList.size() - 1],
@@ -41,7 +42,6 @@ void Manager::initSensor(AlSensorCb *sensorCb) {
 }
 
 void Manager::frameThread() {
-  // TODO: add finishing when destroying object
   while (true) {
     m_sensor->requestNewFrame();
     boost::this_thread::sleep(boost::posix_time::milliseconds(1000 / 30));
