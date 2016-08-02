@@ -12,6 +12,7 @@ public:
   virtual void onCandidate(std::vector<char> candidate) = 0;
   virtual void
   onDevicesListChangedCb(std::vector<AlTextMessage> deviceNames) = 0;
+  virtual void updateFrameCb(const uint8_t *image, int width, int height) = 0;
 };
 //]
 

@@ -108,13 +108,11 @@ public:
     }
     m_sdkCb->onDevicesListChangedCb(deviceNamesMsg);
   }
-  void updateFrameCb(const uint8_t *image, int width, int height) {
-    if (m_debug) {
-      // std::cout << "updateFrameCb" << std::endl;
-    }
-  }
+
+  void updateFrameCb(const uint8_t *image, int width, int height);
   void setDesiredVideDeviceName(AlTextMessage deviceName);
-  //    TODO move to AlManager
+
+  //  TODO move to AlManager
   std::string getVideoDeviceName() { return m_videoDeviceName; }
 
   // getters
@@ -143,7 +141,7 @@ public:
 private:
   AlManager *m_manager;
   AlSDKCb *m_sdkCb;
-  boost::thread m_internalThread;
+  boost::thread *m_internalThread;
 
   // signals
   boost::signals2::signal<void()> initPeerConnectionSignal;

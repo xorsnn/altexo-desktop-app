@@ -7,7 +7,7 @@
 Manager::Manager()
     : m_wsClient(NULL), m_sensor(NULL), m_sdk(NULL), m_videoDeviceType(-1),
       m_videoDeviceName(""), m_id(""), m_peerId("-1"), m_frameThread(NULL) {
-  std::cout << "Manager constructor" << std::endl;
+  alLog("Manager constructor");
 }
 
 Manager::~Manager() {
@@ -212,6 +212,14 @@ void Manager::handleMessages() {
 void Manager::onDevicesListChangedCb(std::vector<AlTextMessage> deviceNames) {
   alLog("Manager::onDevicesListChangedCb");
   webcamList = deviceNames;
+}
+
+void Manager::updateFrameCb(const uint8_t *image, int width, int height) {
+  if (m_remoteFrame.size() != width * height * 4) {
+    m_remoteFrame.resize(width * height * 4);
+  }
+  alLog("Manager::updateFrameCb");
+  std::copy(image, image + width * height * 4, m_remoteFrame.begin());
 }
 
 void Manager::setDeviceName(AlTextMessage deviceName, int deviceType) {

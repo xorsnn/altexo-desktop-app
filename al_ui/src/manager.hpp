@@ -32,6 +32,7 @@ public:
   void onSdp(std::vector<char> sdp);
   void onCandidate(std::vector<char> candidate);
   void onDevicesListChangedCb(std::vector<AlTextMessage> deviceNames);
+  void updateFrameCb(const uint8_t *image, int width, int height); // REMOTE
 
   void initConnection(std::string peerId);
   void setConnectionMode(std::string mode);
@@ -72,6 +73,8 @@ private:
   std::queue<std::string> m_remoteCandidates;
 
   boost::signals2::signal<void(int, int)> updateResolutionSignal;
+
+  std::vector<uint8_t> m_remoteFrame;
 
   // TODO move mode selection to UI
   int WIDTH = 320;
