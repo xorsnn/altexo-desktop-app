@@ -2,6 +2,7 @@
 // If you are new to ImGui, see examples/README.txt and documentation at the top
 // of imgui.cpp.
 
+// #include "allog.hpp"
 #include "hologramrenderer.hpp"
 #include "imgui/imgui.h"
 #include "imgui_impl_sdl.h"
@@ -200,11 +201,18 @@ int main(int, char **) {
     SDL_Delay(1000 / 30);
   }
 
+  // TODO: use alLog here
+  std::cout << "1-----" << std::endl;
+
   // Cleanup
   ImGui_ImplSdl_Shutdown();
+  std::cout << "2-----" << std::endl;
   SDL_GL_DeleteContext(glcontext);
+  std::cout << "3-----" << std::endl;
   SDL_DestroyWindow(window);
+  std::cout << "4-----" << std::endl;
   SDL_Quit();
+  std::cout << "5-----" << std::endl;
 
   return 0;
 }

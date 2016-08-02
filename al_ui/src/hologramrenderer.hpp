@@ -5,6 +5,7 @@
 #include "AL_CB/al_sensor_cb.hpp"
 #include "GLSLShader.hpp"
 #include "contact.hpp"
+#include "remoteframerenderer.hpp"
 #include "sensordatafborenderer.hpp"
 #include "targetcamera.h"
 #include <boost/signals2/signal.hpp>
@@ -38,6 +39,9 @@ public:
 
   // Sensor data capturer
   SensorDataFboRenderer m_sensorDataFboRenderer;
+
+  // Plain video stream renderer
+  RemoteFrameRenderer m_remoteFrameRenderer;
 
   bool sendingFrames = false;
 

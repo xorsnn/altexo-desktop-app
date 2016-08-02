@@ -95,6 +95,8 @@ int HologramRenderer::init() {
 
   m_sensorDataFboRenderer.init();
 
+  m_remoteFrameRenderer.init();
+
   // setup the camera position and target
   cam.SetPosition(glm::vec3(1, 1, 1));
   cam.SetTarget(glm::vec3(0, 0, 0));
@@ -163,14 +165,8 @@ void HologramRenderer::render(int viewWidh, int viewHeight) {
   // set the camera transformation
   glm::mat4 MV = cam.GetViewMatrix();
   glm::mat4 P = cam.GetProjectionMatrix();
-
   glm::mat4 MVP = P * MV;
-  // if (m_debug) {
-  //   std::cout << MV[0][0] << std::endl;
-  // }
-
   // pass the shader uniform
-  // glUniformMatrix4fv(shader("MVP"), 1, GL_FALSE, glm::value_ptr(P * MV));
   glUniformMatrix4fv(shader("MVP"), 1, GL_FALSE, glm::value_ptr(MVP));
 
   // drwa triangle
