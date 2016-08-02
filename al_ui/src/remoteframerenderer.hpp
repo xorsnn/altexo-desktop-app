@@ -7,6 +7,7 @@
 #include "contact.hpp"
 #include "sensordatafborenderer.hpp"
 #include <boost/signals2/signal.hpp>
+#include <boost/thread.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
 #include <glm/gtc/type_ptr.hpp>
@@ -19,7 +20,8 @@ public:
   ~RemoteFrameRenderer() {}
 
   int init();
-  void render(int viewWidh, int viewHeight, vector<uint8_t> *frame);
+  void render(int viewWidh, int viewHeight);
+  void updateRemoteFrame(const uint8_t *image, int width, int height);
   // void initFBO();
   // void initFrameSending(AlSdkAPI *alSdkApi) {
   //   if (m_debug) {
@@ -74,6 +76,10 @@ private:
   const int HEIGHT = 480;
   std::vector<GLubyte> m_outPixel;
   boost::signals2::signal<void(std::vector<GLubyte>, int, int)> newFrameSignal;
+
+  boost::mutex m_remoteFrameMtx;
+  bool m_newFrame;
+  std::vector<uint8_t> m_remoteFrame;
 };
 
 #endif // REMOTEFRAMERENDERER_H

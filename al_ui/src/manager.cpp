@@ -18,6 +18,7 @@ Manager::~Manager() {
 }
 
 void Manager::initHoloRenderer(HologramRenderer *holoRenderer) {
+  m_holoRenderer = holoRenderer;
   updateResolutionSignal.connect(
       boost::bind(&HologramRenderer::updateResolution, holoRenderer, _1, _2));
   updateResolutionSignal(WIDTH, HEIGHT);
@@ -215,11 +216,7 @@ void Manager::onDevicesListChangedCb(std::vector<AlTextMessage> deviceNames) {
 }
 
 void Manager::updateFrameCb(const uint8_t *image, int width, int height) {
-  if (m_remoteFrame.size() != width * height * 4) {
-    m_remoteFrame.resize(width * height * 4);
-  }
-  alLog("Manager::updateFrameCb");
-  std::copy(image, image + width * height * 4, m_remoteFrame.begin());
+  m_holoRenderer->updateRemoteFrame(image, width, height);
 }
 
 void Manager::setDeviceName(AlTextMessage deviceName, int deviceType) {

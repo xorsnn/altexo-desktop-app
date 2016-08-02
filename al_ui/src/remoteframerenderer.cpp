@@ -1,6 +1,7 @@
 #include "remoteframerenderer.hpp"
 
-RemoteFrameRenderer::RemoteFrameRenderer() : m_outPixel(1280 * 480 * 3) {}
+RemoteFrameRenderer::RemoteFrameRenderer()
+    : m_outPixel(1280 * 480 * 3), m_newFrame(false) {}
 
 int RemoteFrameRenderer::init() {
   // GL_CHECK_ERRORS
@@ -95,8 +96,7 @@ int RemoteFrameRenderer::init() {
   return 1;
 }
 
-void RemoteFrameRenderer::render(int viewWidh, int viewHeight,
-                                 vector<uint8_t> *frame) {
+void RemoteFrameRenderer::render(int viewWidh, int viewHeight) {
   // // ============ FBO ==============
   // // enable FBO
   // glBindFramebuffer(GL_FRAMEBUFFER, fboID);
@@ -130,7 +130,7 @@ void RemoteFrameRenderer::render(int viewWidh, int viewHeight,
   // glBindTexture(GL_TEXTURE_2D, renderTextureID);
   // // ============ ~FBO ==============
 
-  glViewport(0, 0, viewWidh, viewHeight);
+  // glViewport(0, 0, viewWidh, viewHeight);
 
   glBindVertexArray(vaoID);
   glBindBuffer(GL_ARRAY_BUFFER, vboVerticesID);
@@ -201,3 +201,13 @@ void RemoteFrameRenderer::render(int viewWidh, int viewHeight,
 //   glBindTexture(GL_TEXTURE_2D, 0);
 //   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 // }
+
+void RemoteFrameRenderer::updateRemoteFrame(const uint8_t *image, int width,
+                                            int height) {
+  boost::lock_guard<boost::mutex> guard(m_remoteFrameMtx);
+  if (m_remoteFrame.size() != width * height * 4) {
+    m_remoteFrame.resize(width * height * 4);
+  }
+  std::copy(image, image + width * height * 4, m_remoteFrame.begin());
+  m_newFrame = true;
+}

@@ -11,9 +11,11 @@ AlSdkPlugin::AlSdkPlugin()
 }
 
 AlSdkPlugin::~AlSdkPlugin() {
-  if (m_internalThread->joinable()) {
-    m_internalThread->join();
-  }
+  m_internalThread->interrupt();
+  // TODO interrupt custom sockerserver
+  // if (m_internalThread->joinable()) {
+  // m_internalThread->join();
+  // }
   delete m_internalThread;
   m_internalThread = NULL;
   delete m_manager;

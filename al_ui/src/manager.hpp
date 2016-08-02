@@ -74,7 +74,7 @@ private:
 
   boost::signals2::signal<void(int, int)> updateResolutionSignal;
 
-  std::vector<uint8_t> m_remoteFrame;
+  HologramRenderer *m_holoRenderer;
 
   // TODO move mode selection to UI
   int WIDTH = 320;

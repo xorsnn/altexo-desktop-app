@@ -41,6 +41,7 @@ public:
   SensorDataFboRenderer m_sensorDataFboRenderer;
 
   // Plain video stream renderer
+  void updateRemoteFrame(const uint8_t *image, int width, int height);
   RemoteFrameRenderer m_remoteFrameRenderer;
 
   bool sendingFrames = false;

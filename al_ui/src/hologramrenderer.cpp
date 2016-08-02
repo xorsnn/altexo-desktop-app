@@ -177,6 +177,9 @@ void HologramRenderer::render(int viewWidh, int viewHeight) {
   // unbind the shader
   shader.UnUse();
 
+  // TODO testing remote render
+  m_remoteFrameRenderer.render(viewWidh, viewHeight);
+
   glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
@@ -311,4 +314,9 @@ void HologramRenderer::filterMouseMoves(float dx, float dy) {
 
   mouseX = averageX / averageTotal;
   mouseY = averageY / averageTotal;
+}
+
+void HologramRenderer::updateRemoteFrame(const uint8_t *image, int width,
+                                         int height) {
+  m_remoteFrameRenderer.updateRemoteFrame(image, width, height);
 }
