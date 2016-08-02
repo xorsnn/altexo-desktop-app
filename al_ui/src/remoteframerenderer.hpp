@@ -72,13 +72,14 @@ private:
   GLuint renderTextureID;
 
   // screen resolution
-  const int WIDTH = 1280;
-  const int HEIGHT = 480;
   std::vector<GLubyte> m_outPixel;
   boost::signals2::signal<void(std::vector<GLubyte>, int, int)> newFrameSignal;
+  int m_width;
+  int m_height;
 
   boost::mutex m_remoteFrameMtx;
   bool m_newFrame;
+  bool m_updateSize;
   std::vector<uint8_t> m_remoteFrame;
 };
 

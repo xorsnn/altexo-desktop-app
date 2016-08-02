@@ -1,7 +1,8 @@
 #include "remoteframerenderer.hpp"
 
 RemoteFrameRenderer::RemoteFrameRenderer()
-    : m_outPixel(1280 * 480 * 3), m_newFrame(false) {}
+    : m_outPixel(1280 * 480 * 3), m_newFrame(false), m_width(0), m_height(0),
+      m_updateSize(false) {}
 
 int RemoteFrameRenderer::init() {
   // GL_CHECK_ERRORS
@@ -113,13 +114,16 @@ void RemoteFrameRenderer::render(int viewWidh, int viewHeight) {
   //   &(m_outPixel[0]));
   //   newFrameSignal(m_outPixel, 1280, 480);
   // }
-
-  // glActiveTexture(GL_TEXTURE3);
-  // glBindTexture(GL_TEXTURE_2D, sensorDepthTexID);
-  // glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, 1280, 480, 0, GL_RGB,
-  // GL_UNSIGNED_BYTE,
-  //              &(m_sensorDataFboRenderer.m_outPixel[0]));
-
+  if (m_updateSize) {
+  }
+  if (m_newFrame) {
+    m_remoteFrameMtx.lock();
+    glActiveTexture(GL_TEXTURE4);
+    glBindTexture(GL_TEXTURE_2D, sensorDepthTexID);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_BGRA,
+                 GL_UNSIGNED_BYTE, &(m_remoteFrame[0]));
+    m_remoteFrameMtx.unlock();
+  }
   // // ============ FBO ==============
   // // unbind the FBO
   // glBindFramebuffer(GL_FRAMEBUFFER, 0);
@@ -205,8 +209,11 @@ void RemoteFrameRenderer::render(int viewWidh, int viewHeight) {
 void RemoteFrameRenderer::updateRemoteFrame(const uint8_t *image, int width,
                                             int height) {
   boost::lock_guard<boost::mutex> guard(m_remoteFrameMtx);
-  if (m_remoteFrame.size() != width * height * 4) {
+  if (m_width != width || m_height != height) {
+    m_width = width;
+    m_height = height;
     m_remoteFrame.resize(width * height * 4);
+    m_updateSize = true;
   }
   std::copy(image, image + width * height * 4, m_remoteFrame.begin());
   m_newFrame = true;
