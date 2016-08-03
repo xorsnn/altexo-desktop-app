@@ -29,7 +29,11 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -m64 -pipe -fno-rtti -fPIC -D_GLIBCXX
 ##
 # USEFUL VARS
 #
-set(WEBRTCTRUNK "/home/xors/workspace/ALTEXO/webrtc/src")
+if (APPLE)
+  set(WEBRTCTRUNK "/Volumes/MAC/workspace/WEBRTC/webrtc/src")
+elseif(UNIX)
+  set(WEBRTCTRUNK "/home/xors/workspace/ALTEXO/webrtc/src")
+endif()
 set(WEBRTCBUILD "${WEBRTCTRUNK}/out/Release")
 
 ##
@@ -68,6 +72,7 @@ include_directories(../include/)
 #
 include(al-webrtc-deps.cmake)
 find_package( Boost )
+INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 
 TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC
   -Wl,--start-group
