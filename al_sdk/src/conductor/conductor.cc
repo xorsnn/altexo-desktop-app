@@ -515,18 +515,6 @@ cricket::VideoCapturer *Conductor::OpenVideoCaptureDevice() {
     cricket::WebRtcVideoDeviceCapturerFactory factory;
     cricket::VideoCapturer *capturer = nullptr;
 
-    if (m_debug) {
-      std::cout << "<><><><><><><><><><><><><><><><><><><><><><><><><>"
-                << std::endl;
-      std::cout << "<><><><><><><><><><><><><><><><><><><><><><><><><>"
-                << std::endl;
-      std::cout << m_alCallback->getVideoDeviceName() << std::endl;
-      std::cout << "<><><><><><><><><><><><><><><><><><><><><><><><><>"
-                << std::endl;
-      std::cout << "<><><><><><><><><><><><><><><><><><><><><><><><><>"
-                << std::endl;
-    }
-
     for (const auto &name : device_names) {
       if (m_alCallback->getVideoDeviceName() == "") {
         capturer = factory.Create(cricket::Device(name, 0));

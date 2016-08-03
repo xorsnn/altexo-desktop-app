@@ -86,7 +86,9 @@ void Manager::onWsMessageCb(std::vector<char> msg) {
       CONTACT ct;
       ct.name = item.second.get<std::string>("name");
       ct.id = item.second.get<std::string>("id");
-      contactList.push_back(ct);
+      if (ct.id != m_id) {
+        contactList.push_back(ct);
+      }
     }
   } else if (action == "message_from_peer") {
     onMessageFromPeer(pt);
