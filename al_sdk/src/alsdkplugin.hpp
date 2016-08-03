@@ -110,10 +110,17 @@ public:
   }
 
   void updateFrameCb(const uint8_t *image, int width, int height);
+  void updateLocalFrameCb(const uint8_t *image, int width, int height);
   void setDesiredVideDeviceName(AlTextMessage deviceName);
 
   //  TODO move to AlManager
-  std::string getVideoDeviceName() { return m_videoDeviceName; }
+  std::string getVideoDeviceName() {
+    if (m_debug) {
+      std::cout << "1111111111111111111111111111" << std::endl;
+      std::cout << m_videoDeviceName << std::endl;
+    }
+    return m_videoDeviceName;
+  }
 
   // getters
   bool ifNewMessage() {

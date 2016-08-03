@@ -89,9 +89,19 @@ void AlSdkPlugin::updateResolution(int width, int height) {
 }
 
 void AlSdkPlugin::setDesiredVideDeviceName(AlTextMessage deviceName) {
+  if (m_debug) {
+    std::cout << "222222222222222222222222222222222" << std::endl;
+    std::cout << deviceName.getText() << std::endl;
+  }
+
   m_videoDeviceName = deviceName.getText();
 }
 
 void AlSdkPlugin::updateFrameCb(const uint8_t *image, int width, int height) {
   m_sdkCb->updateFrameCb(image, width, height);
+}
+
+void AlSdkPlugin::updateLocalFrameCb(const uint8_t *image, int width,
+                                     int height) {
+  m_sdkCb->updateLocalFrameCb(image, width, height);
 }

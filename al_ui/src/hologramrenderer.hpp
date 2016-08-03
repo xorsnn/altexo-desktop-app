@@ -5,9 +5,9 @@
 #include "AL_CB/al_sensor_cb.hpp"
 #include "GLSLShader.hpp"
 #include "contact.hpp"
-#include "remoteframerenderer.hpp"
 #include "sensordatafborenderer.hpp"
 #include "targetcamera.h"
+#include "videostreamrenderer.hpp"
 #include <boost/signals2/signal.hpp>
 #include <glm/glm.hpp>
 #include <glm/gtc/matrix_transform.hpp>
@@ -42,7 +42,10 @@ public:
 
   // Plain video stream renderer
   void updateRemoteFrame(const uint8_t *image, int width, int height);
-  RemoteFrameRenderer m_remoteFrameRenderer;
+  void updateLocalFrame(const uint8_t *image, int width, int height);
+
+  VideoStreamRenderer m_remoteFrameRenderer;
+  VideoStreamRenderer m_localFrameRenderer;
 
   bool sendingFrames = false;
 

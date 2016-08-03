@@ -1,5 +1,5 @@
-#ifndef REMOTEFRAMERENDERER_H
-#define REMOTEFRAMERENDERER_H
+#ifndef VIDEOSTREAMRENDERER_H
+#define VIDEOSTREAMRENDERER_H
 
 #include "AL_API/sdk_api.hpp"
 #include "AL_CB/al_sensor_cb.hpp"
@@ -14,18 +14,18 @@
 #include <iostream>
 #include <vector>
 
-class RemoteFrameRenderer {
+class VideoStreamRenderer {
 public:
-  RemoteFrameRenderer();
-  ~RemoteFrameRenderer() {}
+  VideoStreamRenderer(float x1, float y1, float x2, float y2);
+  ~VideoStreamRenderer() {}
 
   int init();
   void render(int viewWidh, int viewHeight);
-  void updateRemoteFrame(const uint8_t *image, int width, int height);
+  void updateFrame(const uint8_t *image, int width, int height);
   // void initFBO();
   // void initFrameSending(AlSdkAPI *alSdkApi) {
   //   if (m_debug) {
-  //     std::cout << "RemoteFrameRenderer::initFrameSending" << std::endl;
+  //     std::cout << "VideoStreamRenderer::initFrameSending" << std::endl;
   //   }
   //   if (!sendingFrames) {
   //     newFrameSignal.connect(
@@ -40,7 +40,7 @@ public:
   bool sendingFrames = false;
 
 private:
-  // bool m_debug;
+  float x1, y1, x2, y2;
 
   // shader reference
   GLSLShader shader;
@@ -83,4 +83,4 @@ private:
   std::vector<uint8_t> m_remoteFrame;
 };
 
-#endif // REMOTEFRAMERENDERER_H
+#endif // VIDEOSTREAMRENDERER_H

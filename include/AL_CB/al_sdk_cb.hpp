@@ -13,6 +13,8 @@ public:
   virtual void
   onDevicesListChangedCb(std::vector<AlTextMessage> deviceNames) = 0;
   virtual void updateFrameCb(const uint8_t *image, int width, int height) = 0;
+  virtual void updateLocalFrameCb(const uint8_t *image, int width,
+                                  int height) = 0;
 };
 //]
 

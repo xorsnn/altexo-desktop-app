@@ -38,6 +38,8 @@ public:
   onDevicesListChangedCb(std::vector<std::string> device_names) = 0;
 
   virtual void updateFrameCb(const uint8_t *image, int width, int height) = 0;
+  virtual void updateLocalFrameCb(const uint8_t *image, int width,
+                                  int height) = 0;
   virtual std::vector<uint8_t> *getFrameRef() = 0;
 
   //    TODO move to AlManager

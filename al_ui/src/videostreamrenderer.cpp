@@ -1,10 +1,10 @@
-#include "remoteframerenderer.hpp"
+#include "videostreamrenderer.hpp"
 
-RemoteFrameRenderer::RemoteFrameRenderer()
+VideoStreamRenderer::VideoStreamRenderer(float x1, float y1, float x2, float y2)
     : m_outPixel(1280 * 480 * 3), m_newFrame(false), m_width(0), m_height(0),
-      m_updateSize(false) {}
+      m_updateSize(false), x1(x1), y1(y1), x2(x2), y2(y2) {}
 
-int RemoteFrameRenderer::init() {
+int VideoStreamRenderer::init() {
   // GL_CHECK_ERRORS
   // load the shader
   shader.LoadFromFile(GL_VERTEX_SHADER,
@@ -32,10 +32,10 @@ int RemoteFrameRenderer::init() {
   vertices[2].color = glm::vec3(0, 0, 1);
   vertices[3].color = glm::vec3(0, 1, 1);
 
-  vertices[0].position = glm::vec3(-0.5, -0.5, 0);
-  vertices[1].position = glm::vec3(0.5, -0.5, 0);
-  vertices[2].position = glm::vec3(0.5, 0.5, 0);
-  vertices[3].position = glm::vec3(-0.5, 0.5, 0);
+  vertices[0].position = glm::vec3(x1, y1, 0);
+  vertices[1].position = glm::vec3(x2, y1, 0);
+  vertices[2].position = glm::vec3(x2, y2, 0);
+  vertices[3].position = glm::vec3(x1, y2, 0);
 
   // setup triangle indices
   indices[0] = 0;
@@ -97,23 +97,7 @@ int RemoteFrameRenderer::init() {
   return 1;
 }
 
-void RemoteFrameRenderer::render(int viewWidh, int viewHeight) {
-  // // ============ FBO ==============
-  // // enable FBO
-  // glBindFramebuffer(GL_FRAMEBUFFER, fboID);
-  // // render to colour attachment 0
-  // glDrawBuffer(GL_COLOR_ATTACHMENT0);
-  // // clear the colour and depth buffers
-  // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  // // clear the colour and depth buffer
-  // // ============ ~FBO ==============
-
-  // // [AL-153] Getting pixels to bitmap
-  // if (sendingFrames) {
-  //   glReadPixels(0, 0, 1280, 480, GL_RGB, GL_UNSIGNED_BYTE,
-  //   &(m_outPixel[0]));
-  //   newFrameSignal(m_outPixel, 1280, 480);
-  // }
+void VideoStreamRenderer::render(int viewWidh, int viewHeight) {
   if (m_updateSize) {
   }
   if (m_newFrame) {
@@ -124,17 +108,6 @@ void RemoteFrameRenderer::render(int viewWidh, int viewHeight) {
                  GL_UNSIGNED_BYTE, &(m_remoteFrame[0]));
     m_remoteFrameMtx.unlock();
   }
-  // // ============ FBO ==============
-  // // unbind the FBO
-  // glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  // // restore the default back buffer
-  // glDrawBuffer(GL_BACK_LEFT);
-  // // bind the FBO output at the current texture
-  // glActiveTexture(GL_TEXTURE3);
-  // glBindTexture(GL_TEXTURE_2D, renderTextureID);
-  // // ============ ~FBO ==============
-
-  // glViewport(0, 0, viewWidh, viewHeight);
 
   glBindVertexArray(vaoID);
   glBindBuffer(GL_ARRAY_BUFFER, vboVerticesID);
@@ -159,55 +132,8 @@ void RemoteFrameRenderer::render(int viewWidh, int viewHeight) {
   glActiveTexture(GL_TEXTURE0);
 }
 
-// // initialize FBO
-// void RemoteFrameRenderer::initFBO() {
-//   // generate and bind fbo ID
-//   glGenFramebuffers(1, &fboID);
-//   glBindFramebuffer(GL_FRAMEBUFFER, fboID);
-//
-//   // generate and bind render buffer ID
-//   glGenRenderbuffers(1, &rbID);
-//   glBindRenderbuffer(GL_RENDERBUFFER, rbID);
-//
-//   // set the render buffer storage
-//   glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32, WIDTH,
-//   HEIGHT);
-//
-//   // generate the offscreen texture
-//   glGenTextures(1, &renderTextureID);
-//   glBindTexture(GL_TEXTURE_2D, renderTextureID);
-//
-//   // set texture parameters
-//   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_REPEAT);
-//   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_REPEAT);
-//   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_NEAREST);
-//   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_NEAREST);
-//   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, WIDTH, HEIGHT, 0, GL_BGRA,
-//                GL_UNSIGNED_BYTE, NULL);
-//
-//   // bind the renderTextureID as colour attachment of FBO
-//   glFramebufferTexture2D(GL_FRAMEBUFFER, GL_COLOR_ATTACHMENT0, GL_TEXTURE_2D,
-//                          renderTextureID, 0);
-//   // set the render buffer as the depth attachment of FBO
-//   glFramebufferRenderbuffer(GL_FRAMEBUFFER, GL_DEPTH_ATTACHMENT,
-//                             GL_RENDERBUFFER, rbID);
-//
-//   // check for frame buffer completeness status
-//   GLuint status = glCheckFramebufferStatus(GL_FRAMEBUFFER);
-//
-//   if (status == GL_FRAMEBUFFER_COMPLETE) {
-//     printf("FBO setup succeededa.\n");
-//   } else {
-//     printf("Error in FBO setup.\n");
-//   }
-//
-//   // unbind the texture and FBO
-//   glBindTexture(GL_TEXTURE_2D, 0);
-//   glBindFramebuffer(GL_FRAMEBUFFER, 0);
-// }
-
-void RemoteFrameRenderer::updateRemoteFrame(const uint8_t *image, int width,
-                                            int height) {
+void VideoStreamRenderer::updateFrame(const uint8_t *image, int width,
+                                      int height) {
   boost::lock_guard<boost::mutex> guard(m_remoteFrameMtx);
   if (m_width != width || m_height != height) {
     m_width = width;

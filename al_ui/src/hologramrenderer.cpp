@@ -2,7 +2,8 @@
 
 HologramRenderer::HologramRenderer()
     : WIDTH(0), HEIGHT(0), m_outPixel(0), pendingRenderTexResize(false),
-      m_debug(true) {}
+      m_debug(true), m_remoteFrameRenderer(-0.5, -0.5, 0, 0.5),
+      m_localFrameRenderer(0, -0.5, 0.5, 0.5) {}
 
 void HologramRenderer::updateResolution(int width, int height) {
   WIDTH = width;
@@ -96,6 +97,7 @@ int HologramRenderer::init() {
   m_sensorDataFboRenderer.init();
 
   m_remoteFrameRenderer.init();
+  m_localFrameRenderer.init();
 
   // setup the camera position and target
   cam.SetPosition(glm::vec3(1, 1, 1));
@@ -115,9 +117,9 @@ int HologramRenderer::init() {
   return 1;
 }
 
-void HologramRenderer::render(int viewWidh, int viewHeight) {
+void HologramRenderer::render(int viewWidth, int viewHeight) {
   // TODO: move to 'onResize' event
-  cam.SetupProjection(45, (GLfloat)viewWidh / viewHeight);
+  cam.SetupProjection(45, (GLfloat)viewWidth / viewHeight);
 
   if (pendingRenderTexResize) {
     pendingRenderTexResize = false;
@@ -153,7 +155,7 @@ void HologramRenderer::render(int viewWidh, int viewHeight) {
   glBindTexture(GL_TEXTURE_2D, renderTextureID);
   // ============ ~FBO ==============
 
-  glViewport(0, 0, viewWidh, viewHeight);
+  glViewport(0, 0, viewWidth, viewHeight);
 
   glBindVertexArray(vaoID);
   glBindBuffer(GL_ARRAY_BUFFER, vboVerticesID);
@@ -178,7 +180,8 @@ void HologramRenderer::render(int viewWidh, int viewHeight) {
   shader.UnUse();
 
   // TODO testing remote render
-  m_remoteFrameRenderer.render(viewWidh, viewHeight);
+  m_remoteFrameRenderer.render(viewWidth, viewHeight);
+  m_localFrameRenderer.render(viewWidth, viewHeight);
 
   glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -318,5 +321,10 @@ void HologramRenderer::filterMouseMoves(float dx, float dy) {
 
 void HologramRenderer::updateRemoteFrame(const uint8_t *image, int width,
                                          int height) {
-  m_remoteFrameRenderer.updateRemoteFrame(image, width, height);
+  m_remoteFrameRenderer.updateFrame(image, width, height);
+}
+
+void HologramRenderer::updateLocalFrame(const uint8_t *image, int width,
+                                        int height) {
+  m_localFrameRenderer.updateFrame(image, width, height);
 }

@@ -33,6 +33,7 @@ public:
   void onCandidate(std::vector<char> candidate);
   void onDevicesListChangedCb(std::vector<AlTextMessage> deviceNames);
   void updateFrameCb(const uint8_t *image, int width, int height); // REMOTE
+  void updateLocalFrameCb(const uint8_t *image, int width, int height); // LOCAL
 
   void initConnection(std::string peerId);
   void setConnectionMode(std::string mode);

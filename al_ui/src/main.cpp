@@ -130,7 +130,10 @@ int main(int, char **) {
       static int selected = 0;
       ImGui::BeginChild("left pane", ImVec2(-1, 0), true);
       for (int i = 0; i < manager.contactList.size(); i++) {
-        const char *label = manager.contactList[i].name.c_str();
+        std::string lb =
+            manager.contactList[i].name + "-" + manager.contactList[i].id;
+        // const char *label = manager.contactList[i].name.c_str();
+        const char *label = lb.c_str();
         if (ImGui::Selectable(label, selected == i)) {
           selected = i;
           manager.callToPeer(manager.contactList[i].id);

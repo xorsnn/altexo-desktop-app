@@ -134,6 +134,8 @@ void Manager::onMessageFromPeer(boost::property_tree::ptree msgPt) {
 
   boost::optional<bool> isCall = jsonMsg.get_optional<bool>("call");
 
+  boost::optional<std::string> mode = jsonMsg.get_optional<std::string>("mode");
+
   // this is the very first contact we will store peer id
   if (m_peerId == "-1") {
     m_peerId = senderIdStr;
@@ -154,6 +156,8 @@ void Manager::onMessageFromPeer(boost::property_tree::ptree msgPt) {
     std::string strJson = stream.str();
     m_wsClient->sendMessageToPeer(AlTextMessage(m_peerId),
                                   AlTextMessage(strJson));
+  } else if (mode) {
+    // TODO: handle this
   } else {
     alLog("================");
     alLog("sdp or candidate");
@@ -219,6 +223,10 @@ void Manager::updateFrameCb(const uint8_t *image, int width, int height) {
   m_holoRenderer->updateRemoteFrame(image, width, height);
 }
 
+void Manager::updateLocalFrameCb(const uint8_t *image, int width, int height) {
+  m_holoRenderer->updateLocalFrame(image, width, height);
+}
+
 void Manager::setDeviceName(AlTextMessage deviceName, int deviceType) {
   m_videoDeviceName = deviceName.getText();
   m_videoDeviceType = deviceType;
@@ -230,6 +238,7 @@ void Manager::_initVideoDevice() {
   switch (m_videoDeviceType) {
   case AlSdkAPI::DesiredVideoSource::CAMERA: {
     m_sdk->setDesiredDataSource(m_videoDeviceType);
+    m_sdk->setDesiredVideDeviceName(m_videoDeviceName);
     setConnectionMode("audio+video");
   } break;
   case AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS: {
