@@ -7,13 +7,17 @@ using namespace std;
 
 AlSdkPlugin::AlSdkPlugin()
     : m_debug(true), WIDTH(0), HEIGHT(0), m_videoDeviceName("") {
-  if (m_debug) {
-    std::cout << "AlSdkPlugin constructor" << std::endl;
-  }
   m_manager = new AlManager();
 }
 
 AlSdkPlugin::~AlSdkPlugin() {
+  m_internalThread->interrupt();
+  // TODO interrupt custom sockerserver
+  // if (m_internalThread->joinable()) {
+  // m_internalThread->join();
+  // }
+  delete m_internalThread;
+  m_internalThread = NULL;
   delete m_manager;
   m_manager = NULL;
 }
@@ -21,138 +25,38 @@ AlSdkPlugin::~AlSdkPlugin() {
 void AlSdkPlugin::init(AlSDKCb *alSdkCb) {
   m_sdkCb = alSdkCb;
   // TODO debug, checking init thread
-  // m_manager->InitializePeerConnection();
-  m_internalThread = boost::thread(&AlSdkPlugin::threadMain, this);
+  m_internalThread = new boost::thread(&AlSdkPlugin::threadMain, this);
+}
+
+void AlSdkPlugin::threadMain() {
+  m_manager->init(this);
+  m_manager->run();
 }
 
 void AlSdkPlugin::initializePeerConnection() {
   boost::lock_guard<boost::mutex> guard(m_mtx);
-  if (m_debug) {
-    std::cout << "AlSdkPlugin::initializePeerConnection" << std::endl;
-  }
   std::pair<int, std::vector<char>> msg(AlCallback::SdkMessageType::INIT_SM,
                                         std::vector<char>());
   m_messageQueue.push(msg);
 }
 
-void AlSdkPlugin::threadMain() {
-  if (m_debug) {
-    std::cout << "AlSdkPlugin::threadMain" << std::endl;
-  }
-  m_manager->init(this);
-  m_manager->run();
-}
-
-// AlWsCb *AlSdkPlugin::getWsCb() { return this; }
-
-// void AlSdkPlugin::run() {
-//   // m_manager->run();
-// }
-//
 // bool AlSdkPlugin::hasConnections() { return m_manager->hasConnections(); }
-//
-// void AlSdkPlugin::InitializePeerConnection() {
-//   m_manager->InitializePeerConnection();
-// }
-//
 // void AlSdkPlugin::DeletePeerConnection() { m_manager->DeletePeerConnection();
 // }
-//
-// void AlSdkPlugin::OnMessageFromPeer(std::string peerId,
-//                                     const std::string &message) {
-//   m_manager->OnMessageFromPeer(peerId, message);
-// }
-
-// void AlSdkPlugin::onMessageFromPeer(std::vector<char> peerId,
-//                                     std::vector<char> message) {
-//   std::string peerIdStr(peerId.begin(), peerId.end());
-//   std::string msgStr(message.begin(), message.end());
-//   std::cout << "===========================" << std::endl;
-//   std::cout << msgStr << std::endl;
-//   std::cout << "===========================" << std::endl;
-//   if (m_peerId == "-1") {
-//     m_peerId = peerIdStr;
-//     if (m_videoDeviceName != "") {
-//       //
-//       m_managerInterface->setDesiredDataSource(AlManagerInterface::CAMERA);
-//     } else {
-//       // **
-//       // * INITIATE MODE
-//       // *
-//       std::cout << "intiate" << std::endl;
-//
-//       std::vector<char> peerIdVec(m_peerId.begin(), m_peerId.end());
-//
-//       std::string mode = "hologram";
-//       std::vector<char> modeVec(mode.begin(), mode.end());
-//       m_sdkCb->initConnection(peerIdVec, modeVec);
-//       // Q_EMIT requestNewFrameSignal();
-//       // // TODO: take a look later
-//       // //            QTimer *timer = new QTimer(this);
-//       // //            connect(timer, SIGNAL(timeout()), this,
-//       // //            SLOT(timeoutSlot()));
-//       // //            timer->start(1000);
-//     }
-//   }
-
-// boost::property_tree::ptree pt;
-// std::stringstream ss(msgStr);
-// boost::property_tree::read_json(ss, pt);
-//
-// boost::optional<std::string> sdp =
-//     pt.get_optional<std::string>("data.message.sdp");
-// if (sdp) {
-//   std::cout << "sdb received" << std::endl;
-//   //   m_managerInterface->OnMessageFromPeer(peer_id, message);
-//   //   m_remoteSDP = QString::fromStdString(message);
-// } else {
-//   std::cout << "ice candidate received" << std::endl;
-//   //   m_remoteCandidates++;
-//   // qDebug() << "REMOTE CANDIDATES: ";
-//   //   qDebug() << m_remoteCandidates;
-//   //   curMsg[QString::fromStdString(peer_id)] =
-//   //   QString::fromStdString(message);
-//   //   m_messageQueue.enqueue(curMsg);
-// }
-
-// QMap<QString, QString> curMsg;
-// // defining type
-// QJsonDocument doc =
-//     QJsonDocument::fromJson(QString::fromStdString(message).toUtf8());
-// QJsonObject jsonObj = doc.object();
-// qDebug() << jsonObj.contains("sdp");
-//
-// if (jsonObj.contains("sdp")) {
-// } else {
-// }
-// if (!this->m_processingMsg) {
-//   if (m_remoteSDP != "" && m_localSDP != "") {
-//     DequeueMessagesFromPeerSlot();
-//   }
-// }
-// }
-
 // bool AlSdkPlugin::isClientConnected() {
 //   return m_manager->m_client.is_connected();
 // }
-//
 // void AlSdkPlugin::clientConnect(const std::string &server, int port,
 //                                 const std::string &client_name) {
 //   m_manager->m_client.Connect(server, port, client_name);
 // }
-//
 // void AlSdkPlugin::clientSignOut() { m_manager->m_client.SignOut(); }
-//
+
 void AlSdkPlugin::setDesiredDataSource(int dataSource) {
   m_manager->setDesiredDataSource(dataSource);
 }
 
 void AlSdkPlugin::setRemoteSdp(std::vector<char> sdp) {
-  if (m_debug) {
-    std::cout << "++++++++++++++++++++++++++++++" << std::endl;
-    std::cout << AlCallback::SdkMessageType::CANDIDATE_SM << std::endl;
-    std::cout << sdp.size() << std::endl;
-  }
   boost::lock_guard<boost::mutex> guard(m_mtx);
   std::pair<int, std::vector<char>> msg(AlCallback::SdkMessageType::SDP_SM,
                                         sdp);
@@ -176,11 +80,6 @@ void AlSdkPlugin::setImageData(std::vector<unsigned char> imageBytes, int width,
 }
 
 void AlSdkPlugin::updateResolution(int width, int height) {
-  if (m_debug) {
-    std::cout << "AlSdkPlugin::updateResolution" << std::endl;
-    std::cout << width << std::endl;
-    std::cout << height << std::endl;
-  }
   boost::lock_guard<boost::mutex> guard(m_mtx);
   WIDTH = width;
   HEIGHT = height;
@@ -190,5 +89,19 @@ void AlSdkPlugin::updateResolution(int width, int height) {
 }
 
 void AlSdkPlugin::setDesiredVideDeviceName(AlTextMessage deviceName) {
+  if (m_debug) {
+    std::cout << "222222222222222222222222222222222" << std::endl;
+    std::cout << deviceName.getText() << std::endl;
+  }
+
   m_videoDeviceName = deviceName.getText();
+}
+
+void AlSdkPlugin::updateFrameCb(const uint8_t *image, int width, int height) {
+  m_sdkCb->updateFrameCb(image, width, height);
+}
+
+void AlSdkPlugin::updateLocalFrameCb(const uint8_t *image, int width,
+                                     int height) {
+  m_sdkCb->updateLocalFrameCb(image, width, height);
 }

@@ -2,6 +2,7 @@
 // If you are new to ImGui, see examples/README.txt and documentation at the top
 // of imgui.cpp.
 
+// #include "allog.hpp"
 #include "hologramrenderer.hpp"
 #include "imgui/imgui.h"
 #include "imgui_impl_sdl.h"
@@ -129,10 +130,13 @@ int main(int, char **) {
       static int selected = 0;
       ImGui::BeginChild("left pane", ImVec2(-1, 0), true);
       for (int i = 0; i < manager.contactList.size(); i++) {
-        const char *label = manager.contactList[i].name.c_str();
+        std::string lb =
+            manager.contactList[i].name + "-" + manager.contactList[i].id;
+        // const char *label = manager.contactList[i].name.c_str();
+        const char *label = lb.c_str();
         if (ImGui::Selectable(label, selected == i)) {
           selected = i;
-          std::cout << selected << std::endl;
+          manager.callToPeer(manager.contactList[i].id);
         }
       }
       ImGui::EndChild();

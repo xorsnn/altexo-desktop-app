@@ -1,26 +1,48 @@
 #include "alkinectplugin.hpp"
 #include <iostream>
 
-AlKinectPlugin::AlKinectPlugin() {
-  m_kinectInterface = NULL;
-  // TODO: seems like thread is not a cycle
-  m_internalThread = boost::thread(&AlKinectPlugin::threadMain, this);
+AlKinectPlugin::AlKinectPlugin()
+    : m_device(NULL), m_freenect(NULL), m_internalThread(NULL), m_debug(true),
+      m_initFinished(false) {}
+
+AlKinectPlugin::~AlKinectPlugin() {
+  if (m_internalThread->joinable()) {
+    // TODO: may be join a little bit earlyer
+    m_internalThread->join();
+  }
+  delete m_internalThread;
+  m_internalThread = NULL;
 }
 
-AlKinectPlugin::~AlKinectPlugin() {}
+void AlKinectPlugin::init(AlSensorCb *alSensorCb) {
+  m_sensorCb = alSensorCb;
+  m_newFrameSignal.connect(
+      boost::bind(&AlSensorCb::newFrame, m_sensorCb, _1, _2));
+  // init in another thread no to delay main prograpm execution
+  m_internalThread = new boost::thread(&AlKinectPlugin::threadMain, this);
+}
 
-void AlKinectPlugin::init(AlSensorCb *alSensorCb) { m_sensorCb = alSensorCb; }
-
-// TODO: seems like it makes no to run in a thread not a loop
 void AlKinectPlugin::threadMain() {
-  m_kinectInterface = new ALKinectInterface();
-  m_kinectInterface->init(m_sensorCb);
-  m_needNewFrameSignal.connect(
-      boost::bind(&ALKinectInterface::needDataSlot, m_kinectInterface));
+  m_freenect = new Freenect::Freenect();
+  this->m_device = &(m_freenect->createDevice<ALFreenectDevice>(0));
+  this->start();
+  m_initFinished = true;
 }
 
 void AlKinectPlugin::requestNewFrame() {
-  if (m_sensorCb) {
-    m_needNewFrameSignal();
+  if (m_sensorCb && m_initFinished) {
+    if (this->m_device->m_newDepthFrame && this->m_device->m_newDepthFrame) {
+      m_newFrameSignal(this->m_device->getRGB(), this->m_device->getDepth());
+    }
   }
+}
+
+void AlKinectPlugin::start() {
+  this->m_device->startVideo();
+  this->m_device->startDepth();
+}
+
+void AlKinectPlugin::stop() {
+  this->m_device->stopVideo();
+  this->m_device->stopDepth();
 }

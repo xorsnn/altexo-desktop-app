@@ -30,6 +30,7 @@
 #include "webrtc/base/logging.h"
 
 #include "alcallback.h"
+#include "allocalvideorenderer.h"
 #include "alvideorenderer.h"
 #include "conductor/aldatamanager.h"
 
@@ -194,6 +195,11 @@ protected:
   std::queue<std::map<std::string, std::string>> m_messageQueue;
   bool m_processingMsg;
   bool m_isAcceptingConnection;
+
+  // local renderer
+  google_breakpad::scoped_ptr<AlLocalVideoRenderer> m_localRenderer;
+  // remote renderer
+  google_breakpad::scoped_ptr<AlVideoRenderer> m_remoteRenderer;
 
 public:
   rtc::scoped_refptr<webrtc::PeerConnectionInterface> m_peerConnection;

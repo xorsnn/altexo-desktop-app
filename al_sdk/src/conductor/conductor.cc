@@ -203,8 +203,10 @@ void Conductor::OnAddStream(webrtc::MediaStreamInterface *stream) {
     // Video track
 
     //        this->m_alCallback->startRemoteRendererCb(track);
-    std::cout << "============qwe=============" << std::endl;
-    this->m_dataManager->startRemoteRenderer(track, m_alCallback);
+    // std::cout << "============qwe=============" << std::endl;
+    m_remoteRenderer.reset(new AlVideoRenderer(1, track, m_alCallback));
+    // TODO: remove
+    // this->m_dataManager->startRemoteRenderer(track, m_alCallback);
 
     //        this->SetRemoteMedia(track);
   }
@@ -549,8 +551,9 @@ void Conductor::AddStreams() {
       peer_connection_factory_->CreateVideoTrack(
           kVideoLabel, peer_connection_factory_->CreateVideoSource(
                            OpenVideoCaptureDevice(), NULL)));
-  // TODO local renderer is not nesessary
-  //    m_alCallback->startLocalRendererCb(video_track);
+
+  // Starting local renderer
+  m_localRenderer.reset(new AlLocalVideoRenderer(1, video_track, m_alCallback));
 
   rtc::scoped_refptr<webrtc::MediaStreamInterface> stream =
       peer_connection_factory_->CreateLocalMediaStream(kStreamLabel);
@@ -658,7 +661,9 @@ void Conductor::UIThreadCallback(int msg_id, void *data) {
     if (!tracks.empty()) {
       webrtc::VideoTrackInterface *track = tracks[0];
       //            m_alCallback->startRemoteRendererCb(track);
-      m_dataManager->startRemoteRenderer(track, m_alCallback);
+      m_remoteRenderer.reset(new AlVideoRenderer(1, track, m_alCallback));
+      // TODO: remove
+      // m_dataManager->startRemoteRenderer(track, m_alCallback);
     }
     stream->Release();
     break;

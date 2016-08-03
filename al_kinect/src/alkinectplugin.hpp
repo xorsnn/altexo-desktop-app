@@ -3,7 +3,7 @@
 #define ALKINECTPLUGIN_H
 
 #include "AL_API/sensor_api.hpp"
-#include "alkinectinterface.h"
+#include "alfreenectdevice.h"
 #include <boost/config.hpp>
 #include <boost/signals2/signal.hpp>
 #include <boost/thread.hpp>
@@ -16,16 +16,27 @@ public:
   AlKinectPlugin();
   ~AlKinectPlugin();
 
+  void threadMain();
+
   void init(AlSensorCb *alSensorCb);
   void requestNewFrame();
 
-private:
-  void threadMain();
-  ALKinectInterface *m_kinectInterface;
-  boost::thread m_internalThread;
-  AlSensorCb *m_sensorCb;
+  void start();
+  void stop();
 
-  boost::signals2::signal<void()> m_needNewFrameSignal;
+private:
+  ALFreenectDevice *m_device;
+  Freenect::Freenect *m_freenect;
+
+  boost::thread *m_internalThread;
+
+  AlSensorCb *m_sensorCb;
+  boost::signals2::signal<void(std::vector<uint8_t> rgbFrame,
+                               std::vector<uint16_t> depthFrame)>
+      m_newFrameSignal;
+
+  bool m_initFinished;
+  bool m_debug;
 };
 
 extern "C" BOOST_SYMBOL_EXPORT AlKinectPlugin plugin;

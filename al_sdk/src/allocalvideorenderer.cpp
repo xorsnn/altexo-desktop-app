@@ -1,17 +1,19 @@
-#include "alvideorenderer.h"
+#include "allocalvideorenderer.h"
 #include <iostream>
 
-AlVideoRenderer::AlVideoRenderer(const int nameReceiver,
-                                 webrtc::VideoTrackInterface *track_to_render,
-                                 AlCallback *alCallback)
+AlLocalVideoRenderer::AlLocalVideoRenderer(
+    const int nameReceiver, webrtc::VideoTrackInterface *track_to_render,
+    AlCallback *alCallback)
     : m_width(0), m_height(0), m_rendered_track(track_to_render),
       m_nameReceiver(nameReceiver), m_alCallback(alCallback) {
   m_rendered_track->AddOrUpdateSink(this, rtc::VideoSinkWants());
 }
 
-AlVideoRenderer::~AlVideoRenderer() { m_rendered_track->RemoveSink(this); }
+AlLocalVideoRenderer::~AlLocalVideoRenderer() {
+  m_rendered_track->RemoveSink(this);
+}
 
-void AlVideoRenderer::SetSize(int width, int height) {
+void AlLocalVideoRenderer::SetSize(int width, int height) {
   if (m_width == width && m_height == height) {
     return;
   }
@@ -20,14 +22,14 @@ void AlVideoRenderer::SetSize(int width, int height) {
   m_image.reset(new uint8_t[width * height * 4]);
 }
 
-void AlVideoRenderer::OnFrame(const cricket::VideoFrame &video_frame) {
+void AlLocalVideoRenderer::OnFrame(const cricket::VideoFrame &video_frame) {
   const cricket::VideoFrame *frame = video_frame.GetCopyWithRotationApplied();
   SetSize(frame->width(), frame->height());
   int size = m_width * m_height * 4;
   //  // TODO(henrike): Convert directly to RGBA
   frame->ConvertToRgbBuffer(cricket::FOURCC_ARGB, m_image.get(), size,
                             m_width * 4);
-  m_alCallback->updateFrameCb(image(), width(), height());
+  m_alCallback->updateLocalFrameCb(image(), width(), height());
   //  // Convert the B,G,R,A frame to R,G,B,A, which is accepted by GTK.
   //  // The 'A' is just padding for GTK, so we can use it as temp.
   //  uint8_t* pix = image_.get();

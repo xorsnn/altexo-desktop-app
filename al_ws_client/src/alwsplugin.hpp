@@ -4,6 +4,7 @@
 #include "AL_API/ws_client_api.hpp"
 #include "AL_CB/al_ws_cb.hpp"
 #include "alconnclient.hpp"
+#include "altextmessage.hpp"
 #include <boost/config.hpp>
 #include <boost/signals2/signal.hpp>
 #include <string>
@@ -17,7 +18,7 @@ public:
 
   // api
   void init(AlWsCb *alWsCb);
-  void sendMessageToPeer(std::vector<char> peerId, std::vector<char> msg);
+  void sendMessageToPeer(AlTextMessage peerId, AlTextMessage msg);
 
   void threadMain();
 

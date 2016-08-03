@@ -2,7 +2,8 @@
 
 HologramRenderer::HologramRenderer()
     : WIDTH(0), HEIGHT(0), m_outPixel(0), pendingRenderTexResize(false),
-      m_debug(true) {}
+      m_debug(true), m_remoteFrameRenderer(-0.5, -0.5, 0, 0.5),
+      m_localFrameRenderer(0, -0.5, 0.5, 0.5) {}
 
 void HologramRenderer::updateResolution(int width, int height) {
   WIDTH = width;
@@ -95,6 +96,9 @@ int HologramRenderer::init() {
 
   m_sensorDataFboRenderer.init();
 
+  m_remoteFrameRenderer.init();
+  m_localFrameRenderer.init();
+
   // setup the camera position and target
   cam.SetPosition(glm::vec3(1, 1, 1));
   cam.SetTarget(glm::vec3(0, 0, 0));
@@ -113,9 +117,9 @@ int HologramRenderer::init() {
   return 1;
 }
 
-void HologramRenderer::render(int viewWidh, int viewHeight) {
+void HologramRenderer::render(int viewWidth, int viewHeight) {
   // TODO: move to 'onResize' event
-  cam.SetupProjection(45, (GLfloat)viewWidh / viewHeight);
+  cam.SetupProjection(45, (GLfloat)viewWidth / viewHeight);
 
   if (pendingRenderTexResize) {
     pendingRenderTexResize = false;
@@ -151,7 +155,7 @@ void HologramRenderer::render(int viewWidh, int viewHeight) {
   glBindTexture(GL_TEXTURE_2D, renderTextureID);
   // ============ ~FBO ==============
 
-  glViewport(0, 0, viewWidh, viewHeight);
+  glViewport(0, 0, viewWidth, viewHeight);
 
   glBindVertexArray(vaoID);
   glBindBuffer(GL_ARRAY_BUFFER, vboVerticesID);
@@ -163,14 +167,8 @@ void HologramRenderer::render(int viewWidh, int viewHeight) {
   // set the camera transformation
   glm::mat4 MV = cam.GetViewMatrix();
   glm::mat4 P = cam.GetProjectionMatrix();
-
   glm::mat4 MVP = P * MV;
-  // if (m_debug) {
-  //   std::cout << MV[0][0] << std::endl;
-  // }
-
   // pass the shader uniform
-  // glUniformMatrix4fv(shader("MVP"), 1, GL_FALSE, glm::value_ptr(P * MV));
   glUniformMatrix4fv(shader("MVP"), 1, GL_FALSE, glm::value_ptr(MVP));
 
   // drwa triangle
@@ -180,6 +178,10 @@ void HologramRenderer::render(int viewWidh, int viewHeight) {
   glDrawArrays(GL_POINTS, 0, 320 * 240);
   // unbind the shader
   shader.UnUse();
+
+  // TODO testing remote render
+  m_remoteFrameRenderer.render(viewWidth, viewHeight);
+  m_localFrameRenderer.render(viewWidth, viewHeight);
 
   glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -243,4 +245,86 @@ void HologramRenderer::resizeRenderTex() {
   glBindTexture(GL_TEXTURE_2D, renderTextureID);
   glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA8, WIDTH * 2, HEIGHT, 0, GL_BGRA,
                GL_UNSIGNED_BYTE, NULL);
+}
+
+void HologramRenderer::initFrameSending(AlSdkAPI *alSdkApi) {
+  if (m_debug) {
+    std::cout << "HologramRenderer::initFrameSending" << std::endl;
+  }
+  if (!sendingFrames) {
+    newFrameSignal.connect(
+        boost::bind(&AlSdkAPI::setImageData, alSdkApi, _1, _2, _3));
+  }
+  sendingFrames = true;
+}
+
+void HologramRenderer::OnStartMouseMove(int initX, int initY) {
+  oldX = initX;
+  oldY = initY;
+}
+
+void HologramRenderer::OnMouseMove(int x, int y) {
+  if (state == 0) {
+    dist = (y - oldY) / 5.0f;
+    cam.Zoom(dist);
+  } else if (state == 2) {
+    float dy = float(y - oldY) / 100.0f;
+    float dx = float(oldX - x) / 100.0f;
+    if (useFiltering) {
+      filterMouseMoves(dx, dy);
+    } else {
+      mouseX = dx;
+      mouseY = dy;
+    }
+    cam.Pan(mouseX, mouseY);
+  } else {
+    rY += (y - oldY) / 5.0f;
+    rX += (oldX - x) / 5.0f;
+    if (useFiltering) {
+      filterMouseMoves(rX, rY);
+    } else {
+      mouseX = rX;
+      mouseY = rY;
+    }
+    cam.Rotate(mouseX, mouseY, 0);
+  }
+  oldX = x;
+  oldY = y;
+}
+
+void HologramRenderer::filterMouseMoves(float dx, float dy) {
+
+  for (int i = MOUSE_HISTORY_BUFFER_SIZE - 1; i > 0; --i) {
+    mouseHistory[i] = mouseHistory[i - 1];
+  }
+
+  // Store current mouse entry at front of array.
+  mouseHistory[0] = glm::vec2(dx, dy);
+
+  float averageX = 0.0f;
+  float averageY = 0.0f;
+  float averageTotal = 0.0f;
+  float currentWeight = 1.0f;
+
+  // Filter the mouse.
+  for (int i = 0; i < MOUSE_HISTORY_BUFFER_SIZE; ++i) {
+    glm::vec2 tmp = mouseHistory[i];
+    averageX += tmp.x * currentWeight;
+    averageY += tmp.y * currentWeight;
+    averageTotal += 1.0f * currentWeight;
+    currentWeight *= MOUSE_FILTER_WEIGHT;
+  }
+
+  mouseX = averageX / averageTotal;
+  mouseY = averageY / averageTotal;
+}
+
+void HologramRenderer::updateRemoteFrame(const uint8_t *image, int width,
+                                         int height) {
+  m_remoteFrameRenderer.updateFrame(image, width, height);
+}
+
+void HologramRenderer::updateLocalFrame(const uint8_t *image, int width,
+                                        int height) {
+  m_localFrameRenderer.updateFrame(image, width, height);
 }

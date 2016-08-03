@@ -1,5 +1,5 @@
-#ifndef ALVIDEORENDERER_H
-#define ALVIDEORENDERER_H
+#ifndef ALLOCALVIDEORENDERER_H
+#define ALLOCALVIDEORENDERER_H
 
 #include "chromium/src/breakpad/src/common/scoped_ptr.h"
 #include "webrtc/api/mediastreaminterface.h"
@@ -7,12 +7,13 @@
 
 #include "alcallback.h"
 
-class AlVideoRenderer : public rtc::VideoSinkInterface<cricket::VideoFrame> {
+class AlLocalVideoRenderer
+    : public rtc::VideoSinkInterface<cricket::VideoFrame> {
 public:
-  AlVideoRenderer(const int target,
-                  webrtc::VideoTrackInterface *track_to_render,
-                  AlCallback *alCallback);
-  virtual ~AlVideoRenderer();
+  AlLocalVideoRenderer(const int target,
+                       webrtc::VideoTrackInterface *track_to_render,
+                       AlCallback *alCallback);
+  virtual ~AlLocalVideoRenderer();
 
   // VideoSinkInterface implementation
   void OnFrame(const cricket::VideoFrame &frame) override;
@@ -30,4 +31,4 @@ protected:
   AlCallback *m_alCallback;
 };
 
-#endif // ALVIDEORENDERER_H
+#endif // ALLOCALVIDEORENDERER_H
