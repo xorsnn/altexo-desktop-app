@@ -1,7 +1,7 @@
 #ifndef ALVIDEOCAPTURER_H
 #define ALVIDEOCAPTURER_H
-#include "webrtc/api/mediastreaminterface.h"
-#include "webrtc/api/peerconnectioninterface.h"
+
+#include "webrtc/media/base/videocapturer.h"
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>
 
@@ -25,6 +25,9 @@ public:
   void setImageData(uint8_t *pImageBytes, size_t len, int width, int height);
   void setImageData(std::vector<unsigned char> imageBytes, int width,
                     int height);
+
+  // bool apply_rotation() { return apply_rotation_; }
+  // virtual bool GetPreferredFourccs(std::vector<uint32_t> *fourccs) = 0;
 
 private:
   uint64_t m_prevTimestamp;
