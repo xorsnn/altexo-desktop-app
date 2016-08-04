@@ -19,9 +19,22 @@ public:
   VideoStreamRenderer(float x1, float y1, float x2, float y2);
   ~VideoStreamRenderer() {}
 
+  struct Borders {
+    float x1;
+    float x2;
+    float y1;
+    float y2;
+  };
+
+  static Borders absoluteToRelative(Borders absoluteBorders, int winWidth,
+                                    int winHeight);
+  static Borders relativeToAbsolute(Borders relativeBorders, int winWidth,
+                                    int winHeight);
+
   int init();
   void render();
-  void setPosition(float x1, float y1, float x2, float y2);
+  void setPosition(float x1, float y1, float x2, float y2, int winWidth,
+                   int winHeight);
   void updateFrame(const uint8_t *image, int width, int height);
   // void initFBO();
 
@@ -29,6 +42,7 @@ private:
   void _updateVertices();
 
   float m_x1, m_y1, m_x2, m_y2;
+  float m_winWidth, m_winHeight;
 
   // shader reference
   GLSLShader shader;
@@ -54,11 +68,6 @@ private:
   glm::mat4 P = glm::mat4(1);
   glm::mat4 MV = glm::mat4(1);
 
-  // FBO and render buffer object ID
-  GLuint fboID, rbID;
-  // offscreen render texture ID
-  GLuint renderTextureID;
-
   // screen resolution
   std::vector<GLubyte> m_outPixel;
   boost::signals2::signal<void(std::vector<GLubyte>, int, int)> newFrameSignal;
@@ -69,8 +78,6 @@ private:
   bool m_newFrame;
   bool m_updateSize;
   std::vector<uint8_t> m_remoteFrame;
-
-  bool m_winResized;
 };
 
 #endif // VIDEOSTREAMRENDERER_H

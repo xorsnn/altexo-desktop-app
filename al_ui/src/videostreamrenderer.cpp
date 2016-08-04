@@ -1,9 +1,31 @@
 #include "videostreamrenderer.hpp"
+#include <algorithm>
 
 VideoStreamRenderer::VideoStreamRenderer(float x1, float y1, float x2, float y2)
     : m_outPixel(1280 * 480 * 3), m_newFrame(false), m_width(0), m_height(0),
-      m_updateSize(false), m_x1(x1), m_y1(y1), m_x2(x2), m_y2(y2),
-      m_winResized(false) {}
+      m_updateSize(false), m_x1(x1), m_y1(y1), m_x2(x2), m_y2(y2) {}
+
+VideoStreamRenderer::Borders
+VideoStreamRenderer::absoluteToRelative(Borders absoluteBorders, int winWidth,
+                                        int winHeight) {
+  Borders result;
+  result.x2 = ((absoluteBorders.x2 / winWidth) - 0.5) * 2;
+  result.x1 = ((absoluteBorders.x1 / winWidth) - 0.5) * 2;
+  result.y1 = ((absoluteBorders.y1 / winHeight) - 0.5) * 2;
+  result.y2 = ((absoluteBorders.y2 / winHeight) - 0.5) * 2;
+  return result;
+}
+
+VideoStreamRenderer::Borders
+VideoStreamRenderer::relativeToAbsolute(Borders relativeBorders, int winWidth,
+                                        int winHeight) {
+  Borders result;
+  result.x2 = (relativeBorders.x2 / 2 + 0.5) * winWidth;
+  result.x1 = (relativeBorders.x1 / 2 + 0.5) * winWidth;
+  result.y1 = (relativeBorders.y1 / 2 + 0.5) * winHeight;
+  result.y2 = (relativeBorders.y2 / 2 + 0.5) * winHeight;
+  return result;
+}
 
 int VideoStreamRenderer::init() {
   // GL_CHECK_ERRORS
@@ -70,10 +92,11 @@ int VideoStreamRenderer::init() {
 }
 
 void VideoStreamRenderer::render() {
-  if (m_winResized) {
-    m_winResized = false;
+  if (m_updateSize) {
+    m_updateSize = false;
     _updateVertices();
   }
+
   if (m_newFrame) {
     m_remoteFrameMtx.lock();
     glActiveTexture(GL_TEXTURE4);
@@ -119,19 +142,56 @@ void VideoStreamRenderer::updateFrame(const uint8_t *image, int width,
   m_newFrame = true;
 }
 
-void VideoStreamRenderer::setPosition(float x1, float y1, float x2, float y2) {
+void VideoStreamRenderer::setPosition(float x1, float y1, float x2, float y2,
+                                      int winWidth, int winHeight) {
   m_x1 = x1;
   m_y1 = y1;
   m_x2 = x2;
   m_y2 = y2;
-  m_winResized = true;
+  m_winWidth = winWidth;
+  m_winHeight = winHeight;
+  m_updateSize = true;
 }
 
 void VideoStreamRenderer::_updateVertices() {
-  vertices[0].position = glm::vec2(m_x1, m_y1);
-  vertices[1].position = glm::vec2(m_x2, m_y1);
-  vertices[2].position = glm::vec2(m_x2, m_y2);
-  vertices[3].position = glm::vec2(m_x1, m_y2);
+  // center frame stream to rendering curface
+  VideoStreamRenderer::Borders relativeBorders;
+  relativeBorders.x1 = m_x1;
+  relativeBorders.x2 = m_x2;
+  relativeBorders.y1 = m_y1;
+  relativeBorders.y2 = m_y2;
+
+  VideoStreamRenderer::Borders absoluteBorders =
+      relativeToAbsolute(relativeBorders, m_winWidth, m_winHeight);
+
+  bool alignVertical = false;
+  if (float(m_width) / m_height >
+      float(absoluteBorders.x2 - absoluteBorders.x1) /
+          (absoluteBorders.y2 - absoluteBorders.y1)) {
+    alignVertical = true;
+  }
+
+  if (alignVertical) {
+    float delta =
+        (absoluteBorders.y2 - absoluteBorders.y1) -
+        (float(m_height) / m_width) * (absoluteBorders.x2 - absoluteBorders.x1);
+    absoluteBorders.y2 -= delta / 2;
+    absoluteBorders.y1 += delta / 2;
+  } else {
+    float delta =
+        (absoluteBorders.x2 - absoluteBorders.x1) -
+        (float(m_width) / m_height) * (absoluteBorders.y2 - absoluteBorders.y1);
+    absoluteBorders.x2 -= delta / 2;
+    absoluteBorders.x1 += delta / 2;
+  }
+
+  relativeBorders = VideoStreamRenderer::absoluteToRelative(
+      absoluteBorders, m_winWidth, m_winHeight);
+
+  vertices[0].position = glm::vec2(relativeBorders.x1, relativeBorders.y1);
+  vertices[1].position = glm::vec2(relativeBorders.x2, relativeBorders.y1);
+  vertices[2].position = glm::vec2(relativeBorders.x2, relativeBorders.y2);
+  vertices[3].position = glm::vec2(relativeBorders.x1, relativeBorders.y2);
 
   GLsizei stride = sizeof(Vertex);
 

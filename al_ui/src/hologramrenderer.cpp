@@ -342,13 +342,21 @@ void HologramRenderer::onWinResize(int winWidth, int winHeight) {
 
 void HologramRenderer::_updateRenderersPos() {
 
-  m_remoteFrameRenderer.setPosition(-0.5, -0.5, 0, 0.5);
+  m_remoteFrameRenderer.setPosition(-0.8, -0.8, 0.8, 0.8, m_winWidth,
+                                    m_winHeight);
   // 50px from left and 50px from bottom
   // 200 px for reqtangle
   int size = 200;
-  float x2 = ((float(m_winWidth - 50) / m_winWidth) - 0.5) * 2;
-  float x1 = ((float(m_winWidth - 50 - size) / m_winWidth) - 0.5) * 2;
-  float y1 = ((1 - float(m_winHeight - 50) / m_winHeight) - 0.5) * 2;
-  float y2 = ((1 - float(m_winHeight - 50 - size) / m_winHeight) - 0.5) * 2;
-  m_localFrameRenderer.setPosition(x1, y1, x2, y2);
+  VideoStreamRenderer::Borders absoluteBorders;
+  absoluteBorders.x2 = float(m_winWidth - 50);
+  absoluteBorders.x1 = float(m_winWidth - 50 - size);
+  absoluteBorders.y1 = m_winHeight - float(m_winHeight - 50);
+  absoluteBorders.y2 = m_winHeight - float(m_winHeight - 50 - size);
+  VideoStreamRenderer::Borders relativeBorders =
+      VideoStreamRenderer::absoluteToRelative(absoluteBorders, m_winWidth,
+                                              m_winHeight);
+
+  m_localFrameRenderer.setPosition(relativeBorders.x1, relativeBorders.y1,
+                                   relativeBorders.x2, relativeBorders.y2,
+                                   m_winWidth, m_winHeight);
 }
