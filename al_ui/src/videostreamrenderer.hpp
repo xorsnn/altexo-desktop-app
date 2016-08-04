@@ -20,12 +20,15 @@ public:
   ~VideoStreamRenderer() {}
 
   int init();
-  void render(int viewWidh, int viewHeight);
+  void render();
+  void setPosition(float x1, float y1, float x2, float y2);
   void updateFrame(const uint8_t *image, int width, int height);
   // void initFBO();
 
 private:
-  float x1, y1, x2, y2;
+  void _updateVertices();
+
+  float m_x1, m_y1, m_x2, m_y2;
 
   // shader reference
   GLSLShader shader;
@@ -66,6 +69,8 @@ private:
   bool m_newFrame;
   bool m_updateSize;
   std::vector<uint8_t> m_remoteFrame;
+
+  bool m_winResized;
 };
 
 #endif // VIDEOSTREAMRENDERER_H

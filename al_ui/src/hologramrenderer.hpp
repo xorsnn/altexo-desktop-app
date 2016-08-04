@@ -52,6 +52,8 @@ public:
   bool sendingFrames = false;
 
 private:
+  void _updateRenderersPos();
+
   bool m_debug;
 
   // mouse history buffer
