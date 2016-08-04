@@ -20,27 +20,15 @@ public:
   ~VideoStreamRenderer() {}
 
   int init();
-  void render(int viewWidh, int viewHeight);
+  void render();
+  void setPosition(float x1, float y1, float x2, float y2);
   void updateFrame(const uint8_t *image, int width, int height);
   // void initFBO();
-  // void initFrameSending(AlSdkAPI *alSdkApi) {
-  //   if (m_debug) {
-  //     std::cout << "VideoStreamRenderer::initFrameSending" << std::endl;
-  //   }
-  //   if (!sendingFrames) {
-  //     newFrameSignal.connect(
-  //         boost::bind(&AlSdkAPI::setImageData, alSdkApi, _1, _2, _3));
-  //   }
-  //   sendingFrames = true;
-  // }
-
-  // Sensor data capturer
-  // SensorDataFboRenderer m_sensorDataFboRenderer;
-
-  bool sendingFrames = false;
 
 private:
-  float x1, y1, x2, y2;
+  void _updateVertices();
+
+  float m_x1, m_y1, m_x2, m_y2;
 
   // shader reference
   GLSLShader shader;
@@ -54,8 +42,8 @@ private:
 
   // out vertex struct for interleaved attributes
   struct Vertex {
-    glm::vec3 position;
-    glm::vec3 color;
+    glm::vec2 position;
+    glm::vec2 texCoord;
   };
 
   // triangle vertices and indices
@@ -81,6 +69,8 @@ private:
   bool m_newFrame;
   bool m_updateSize;
   std::vector<uint8_t> m_remoteFrame;
+
+  bool m_winResized;
 };
 
 #endif // VIDEOSTREAMRENDERER_H

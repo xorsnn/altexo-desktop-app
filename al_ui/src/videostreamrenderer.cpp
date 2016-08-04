@@ -2,7 +2,8 @@
 
 VideoStreamRenderer::VideoStreamRenderer(float x1, float y1, float x2, float y2)
     : m_outPixel(1280 * 480 * 3), m_newFrame(false), m_width(0), m_height(0),
-      m_updateSize(false), x1(x1), y1(y1), x2(x2), y2(y2) {}
+      m_updateSize(false), m_x1(x1), m_y1(y1), m_x2(x2), m_y2(y2),
+      m_winResized(false) {}
 
 int VideoStreamRenderer::init() {
   // GL_CHECK_ERRORS
@@ -16,6 +17,7 @@ int VideoStreamRenderer::init() {
   shader.Use();
   // add attributes and uniforms
   shader.AddAttribute("vVertex");
+  shader.AddAttribute("vTexCoord");
   shader.AddUniform("MVP");
   shader.AddUniform("textureMap");
   // pass values of constant uniforms at initialization
@@ -27,15 +29,10 @@ int VideoStreamRenderer::init() {
 
   // setup triangle geometry
   // setup triangle vertices
-  vertices[0].color = glm::vec3(1, 0, 0);
-  vertices[1].color = glm::vec3(0, 1, 0);
-  vertices[2].color = glm::vec3(0, 0, 1);
-  vertices[3].color = glm::vec3(0, 1, 1);
-
-  vertices[0].position = glm::vec3(x1, y1, 0);
-  vertices[1].position = glm::vec3(x2, y1, 0);
-  vertices[2].position = glm::vec3(x2, y2, 0);
-  vertices[3].position = glm::vec3(x1, y2, 0);
+  vertices[0].texCoord = glm::vec2(0, 0);
+  vertices[1].texCoord = glm::vec2(1, 0);
+  vertices[2].texCoord = glm::vec2(1, 1);
+  vertices[3].texCoord = glm::vec2(0, 1);
 
   // setup triangle indices
   indices[0] = 0;
@@ -51,33 +48,10 @@ int VideoStreamRenderer::init() {
   glGenVertexArrays(1, &vaoID);
   glGenBuffers(1, &vboVerticesID);
   glGenBuffers(1, &vboIndicesID);
-  GLsizei stride = sizeof(Vertex);
 
-  glBindVertexArray(vaoID);
+  _updateVertices();
 
-  glBindBuffer(GL_ARRAY_BUFFER, vboVerticesID);
-  // pass triangle verteices to buffer object
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices[0], GL_STATIC_DRAW);
   // GL_CHECK_ERRORS
-  // enable vertex attribute array for position
-  glEnableVertexAttribArray(shader["vVertex"]);
-  glVertexAttribPointer(shader["vVertex"], 3, GL_FLOAT, GL_FALSE, stride, 0);
-  // GL_CHECK_ERRORS
-  // enable vertex attribute array for colour
-  // glEnableVertexAttribArray(shader["vColor"]);
-  // glVertexAttribPointer(shader["vColor"], 3, GL_FLOAT, GL_FALSE, stride,
-  //                       (const GLvoid *)offsetof(Vertex, color));
-  // GL_CHECK_ERRORS
-  // pass indices to element array buffer
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIndicesID);
-  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices[0],
-               GL_STATIC_DRAW);
-  // GL_CHECK_ERRORS
-
-  // unbinding
-  glBindVertexArray(0);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
   // some tex ==============
   glGenTextures(1, &sensorDepthTexID);
@@ -90,15 +64,15 @@ int VideoStreamRenderer::init() {
   glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
   glBindTexture(GL_TEXTURE_2D, 0);
   // =====================
-  // initFBO();
 
-  // m_sensorDataFboRenderer.init();
   cout << "Initialization successfull" << endl;
   return 1;
 }
 
-void VideoStreamRenderer::render(int viewWidh, int viewHeight) {
-  if (m_updateSize) {
+void VideoStreamRenderer::render() {
+  if (m_winResized) {
+    m_winResized = false;
+    _updateVertices();
   }
   if (m_newFrame) {
     m_remoteFrameMtx.lock();
@@ -143,4 +117,45 @@ void VideoStreamRenderer::updateFrame(const uint8_t *image, int width,
   }
   std::copy(image, image + width * height * 4, m_remoteFrame.begin());
   m_newFrame = true;
+}
+
+void VideoStreamRenderer::setPosition(float x1, float y1, float x2, float y2) {
+  m_x1 = x1;
+  m_y1 = y1;
+  m_x2 = x2;
+  m_y2 = y2;
+  m_winResized = true;
+}
+
+void VideoStreamRenderer::_updateVertices() {
+  vertices[0].position = glm::vec2(m_x1, m_y1);
+  vertices[1].position = glm::vec2(m_x2, m_y1);
+  vertices[2].position = glm::vec2(m_x2, m_y2);
+  vertices[3].position = glm::vec2(m_x1, m_y2);
+
+  GLsizei stride = sizeof(Vertex);
+
+  glBindVertexArray(vaoID);
+
+  glBindBuffer(GL_ARRAY_BUFFER, vboVerticesID);
+  // pass triangle verteices to buffer object
+  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices[0], GL_STATIC_DRAW);
+  // GL_CHECK_ERRORS
+  // enable vertex attribute array for position
+  glEnableVertexAttribArray(shader["vVertex"]);
+  glVertexAttribPointer(shader["vVertex"], 2, GL_FLOAT, GL_FALSE, stride, 0);
+  // GL_CHECK_ERRORS
+  // enable vertex attribute array for tex coord
+  glEnableVertexAttribArray(shader["vTexCoord"]);
+  glVertexAttribPointer(shader["vTexCoord"], 2, GL_FLOAT, GL_FALSE, stride,
+                        (const GLvoid *)offsetof(Vertex, texCoord));
+  // GL_CHECK_ERRORS
+  // pass indices to element array buffer
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIndicesID);
+  glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices[0],
+               GL_STATIC_DRAW);
+  // unbinding
+  glBindVertexArray(0);
+  glBindBuffer(GL_ARRAY_BUFFER, 0);
+  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 }
