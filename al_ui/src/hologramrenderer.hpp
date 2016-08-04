@@ -20,12 +20,12 @@ const float MOUSE_FILTER_WEIGHT = 0.75f;
 
 class HologramRenderer {
 public:
-  HologramRenderer();
+  HologramRenderer(int winWidth, int winHeight);
   ~HologramRenderer() {}
 
   void updateResolution(int width, int height);
   int init();
-  void render(int viewWidh, int viewHeight);
+  void render();
   void initFBO();
   void resizeRenderTex();
   void initFrameSending(AlSdkAPI *alSdkApi);
@@ -36,6 +36,8 @@ public:
 
   // mouse move filtering function
   void filterMouseMoves(float dx, float dy);
+
+  void onWinResize(int winWidth, int winHeight);
 
   // Sensor data capturer
   SensorDataFboRenderer m_sensorDataFboRenderer;
@@ -89,6 +91,9 @@ private:
   // rendering data resolution
   int WIDTH;
   int HEIGHT;
+
+  int m_winWidth;
+  int m_winHeight;
 
   std::vector<GLubyte> m_outPixel;
   boost::signals2::signal<void(std::vector<GLubyte>, int, int)> newFrameSignal;

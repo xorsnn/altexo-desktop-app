@@ -17,6 +17,10 @@
 #define IM_ARRAYSIZE(_ARR) ((int)(sizeof(_ARR) / sizeof(*_ARR)))
 
 int main(int, char **) {
+  // TODO move it to stored settings
+  int winWidth = 1280;
+  int winHeight = 720;
+
   // Setup SDL
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
     printf("Error: %s\n", SDL_GetError());
@@ -35,7 +39,7 @@ int main(int, char **) {
   SDL_GetCurrentDisplayMode(0, &current);
   SDL_Window *window = SDL_CreateWindow(
       "Altexo holographic chat", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
-      1280, 720, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
+      winWidth, winHeight, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
   SDL_GLContext glcontext = SDL_GL_CreateContext(window);
 
   // Opengl
@@ -63,7 +67,7 @@ int main(int, char **) {
   ImGui_ImplSdl_Init(window);
 
   // local init
-  HologramRenderer hologramRenderer;
+  HologramRenderer hologramRenderer(winWidth, winHeight);
   hologramRenderer.init();
   Manager manager;
   manager.initHoloRenderer(&hologramRenderer);
@@ -110,6 +114,14 @@ int main(int, char **) {
       } break;
       case SDL_MOUSEBUTTONUP: {
         mouseDown = false;
+      } break;
+      case SDL_WINDOWEVENT: {
+        switch (event.window.event) {
+        case SDL_WINDOWEVENT_RESIZED: {
+          hologramRenderer.onWinResize((int)ImGui::GetIO().DisplaySize.x,
+                                       (int)ImGui::GetIO().DisplaySize.y);
+        } break;
+        default: { } break; }
       } break;
       case SDL_QUIT: {
         done = true;
@@ -189,8 +201,7 @@ int main(int, char **) {
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    hologramRenderer.render((int)ImGui::GetIO().DisplaySize.x,
-                            (int)ImGui::GetIO().DisplaySize.y);
+    hologramRenderer.render();
 
     // has to be called once
     if (!hologramRenderer.sendingFrames && manager.connectionInitialized &&
