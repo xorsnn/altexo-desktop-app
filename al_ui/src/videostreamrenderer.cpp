@@ -16,6 +16,7 @@ int VideoStreamRenderer::init() {
   shader.Use();
   // add attributes and uniforms
   shader.AddAttribute("vVertex");
+  shader.AddAttribute("vTexCoord");
   shader.AddUniform("MVP");
   shader.AddUniform("textureMap");
   // pass values of constant uniforms at initialization
@@ -27,15 +28,15 @@ int VideoStreamRenderer::init() {
 
   // setup triangle geometry
   // setup triangle vertices
-  vertices[0].color = glm::vec3(1, 0, 0);
-  vertices[1].color = glm::vec3(0, 1, 0);
-  vertices[2].color = glm::vec3(0, 0, 1);
-  vertices[3].color = glm::vec3(0, 1, 1);
+  vertices[0].texCoord = glm::vec2(0, 0);
+  vertices[1].texCoord = glm::vec2(1, 0);
+  vertices[2].texCoord = glm::vec2(1, 1);
+  vertices[3].texCoord = glm::vec2(0, 1);
 
-  vertices[0].position = glm::vec3(x1, y1, 0);
-  vertices[1].position = glm::vec3(x2, y1, 0);
-  vertices[2].position = glm::vec3(x2, y2, 0);
-  vertices[3].position = glm::vec3(x1, y2, 0);
+  vertices[0].position = glm::vec2(x1, y1);
+  vertices[1].position = glm::vec2(x2, y1);
+  vertices[2].position = glm::vec2(x2, y2);
+  vertices[3].position = glm::vec2(x1, y2);
 
   // setup triangle indices
   indices[0] = 0;
@@ -61,12 +62,12 @@ int VideoStreamRenderer::init() {
   // GL_CHECK_ERRORS
   // enable vertex attribute array for position
   glEnableVertexAttribArray(shader["vVertex"]);
-  glVertexAttribPointer(shader["vVertex"], 3, GL_FLOAT, GL_FALSE, stride, 0);
+  glVertexAttribPointer(shader["vVertex"], 2, GL_FLOAT, GL_FALSE, stride, 0);
   // GL_CHECK_ERRORS
-  // enable vertex attribute array for colour
-  // glEnableVertexAttribArray(shader["vColor"]);
-  // glVertexAttribPointer(shader["vColor"], 3, GL_FLOAT, GL_FALSE, stride,
-  //                       (const GLvoid *)offsetof(Vertex, color));
+  // enable vertex attribute array for tex coord
+  glEnableVertexAttribArray(shader["vTexCoord"]);
+  glVertexAttribPointer(shader["vTexCoord"], 2, GL_FLOAT, GL_FALSE, stride,
+                        (const GLvoid *)offsetof(Vertex, texCoord));
   // GL_CHECK_ERRORS
   // pass indices to element array buffer
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIndicesID);

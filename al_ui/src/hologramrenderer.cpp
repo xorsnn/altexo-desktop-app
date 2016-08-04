@@ -3,7 +3,7 @@
 HologramRenderer::HologramRenderer()
     : WIDTH(0), HEIGHT(0), m_outPixel(0), pendingRenderTexResize(false),
       m_debug(true), m_remoteFrameRenderer(-0.5, -0.5, 0, 0.5),
-      m_localFrameRenderer(0, -0.5, 0.5, 0.5) {}
+      m_localFrameRenderer(0.7, -0.9, 0.9, -0.7) {}
 
 void HologramRenderer::updateResolution(int width, int height) {
   WIDTH = width;

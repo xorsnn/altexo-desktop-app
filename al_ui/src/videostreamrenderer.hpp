@@ -23,21 +23,6 @@ public:
   void render(int viewWidh, int viewHeight);
   void updateFrame(const uint8_t *image, int width, int height);
   // void initFBO();
-  // void initFrameSending(AlSdkAPI *alSdkApi) {
-  //   if (m_debug) {
-  //     std::cout << "VideoStreamRenderer::initFrameSending" << std::endl;
-  //   }
-  //   if (!sendingFrames) {
-  //     newFrameSignal.connect(
-  //         boost::bind(&AlSdkAPI::setImageData, alSdkApi, _1, _2, _3));
-  //   }
-  //   sendingFrames = true;
-  // }
-
-  // Sensor data capturer
-  // SensorDataFboRenderer m_sensorDataFboRenderer;
-
-  bool sendingFrames = false;
 
 private:
   float x1, y1, x2, y2;
@@ -54,8 +39,8 @@ private:
 
   // out vertex struct for interleaved attributes
   struct Vertex {
-    glm::vec3 position;
-    glm::vec3 color;
+    glm::vec2 position;
+    glm::vec2 texCoord;
   };
 
   // triangle vertices and indices
