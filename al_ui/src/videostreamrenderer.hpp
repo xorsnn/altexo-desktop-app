@@ -19,28 +19,30 @@ public:
   VideoStreamRenderer(float x1, float y1, float x2, float y2);
   ~VideoStreamRenderer() {}
 
+  struct Borders {
+    float x1;
+    float x2;
+    float y1;
+    float y2;
+  };
+
+  static Borders absoluteToRelative(Borders absoluteBorders, int winWidth,
+                                    int winHeight);
+  static Borders relativeToAbsolute(Borders relativeBorders, int winWidth,
+                                    int winHeight);
+
   int init();
-  void render(int viewWidh, int viewHeight);
+  void render();
+  void setPosition(float x1, float y1, float x2, float y2, int winWidth,
+                   int winHeight);
   void updateFrame(const uint8_t *image, int width, int height);
   // void initFBO();
-  // void initFrameSending(AlSdkAPI *alSdkApi) {
-  //   if (m_debug) {
-  //     std::cout << "VideoStreamRenderer::initFrameSending" << std::endl;
-  //   }
-  //   if (!sendingFrames) {
-  //     newFrameSignal.connect(
-  //         boost::bind(&AlSdkAPI::setImageData, alSdkApi, _1, _2, _3));
-  //   }
-  //   sendingFrames = true;
-  // }
-
-  // Sensor data capturer
-  // SensorDataFboRenderer m_sensorDataFboRenderer;
-
-  bool sendingFrames = false;
 
 private:
-  float x1, y1, x2, y2;
+  void _updateVertices();
+
+  float m_x1, m_y1, m_x2, m_y2;
+  float m_winWidth, m_winHeight;
 
   // shader reference
   GLSLShader shader;
@@ -54,8 +56,8 @@ private:
 
   // out vertex struct for interleaved attributes
   struct Vertex {
-    glm::vec3 position;
-    glm::vec3 color;
+    glm::vec2 position;
+    glm::vec2 texCoord;
   };
 
   // triangle vertices and indices
@@ -65,11 +67,6 @@ private:
   // projection and modelview matrices
   glm::mat4 P = glm::mat4(1);
   glm::mat4 MV = glm::mat4(1);
-
-  // FBO and render buffer object ID
-  GLuint fboID, rbID;
-  // offscreen render texture ID
-  GLuint renderTextureID;
 
   // screen resolution
   std::vector<GLubyte> m_outPixel;

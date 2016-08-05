@@ -1,9 +1,13 @@
 #include "hologramrenderer.hpp"
 
-HologramRenderer::HologramRenderer()
+HologramRenderer::HologramRenderer(int winWidth, int winHeight)
     : WIDTH(0), HEIGHT(0), m_outPixel(0), pendingRenderTexResize(false),
-      m_debug(true), m_remoteFrameRenderer(-0.5, -0.5, 0, 0.5),
-      m_localFrameRenderer(0, -0.5, 0.5, 0.5) {}
+      m_debug(true), m_remoteFrameRenderer(-0.5, -0.5, -0.5, -0.5),
+      m_localFrameRenderer(-0.5, -0.5, -0.5, -0.5), m_winWidth(winWidth),
+      m_winHeight(winHeight) {
+
+  _updateRenderersPos();
+}
 
 void HologramRenderer::updateResolution(int width, int height) {
   WIDTH = width;
@@ -117,9 +121,9 @@ int HologramRenderer::init() {
   return 1;
 }
 
-void HologramRenderer::render(int viewWidth, int viewHeight) {
+void HologramRenderer::render() {
   // TODO: move to 'onResize' event
-  cam.SetupProjection(45, (GLfloat)viewWidth / viewHeight);
+  cam.SetupProjection(45, (GLfloat)m_winWidth / m_winHeight);
 
   if (pendingRenderTexResize) {
     pendingRenderTexResize = false;
@@ -155,7 +159,7 @@ void HologramRenderer::render(int viewWidth, int viewHeight) {
   glBindTexture(GL_TEXTURE_2D, renderTextureID);
   // ============ ~FBO ==============
 
-  glViewport(0, 0, viewWidth, viewHeight);
+  glViewport(0, 0, m_winWidth, m_winHeight);
 
   glBindVertexArray(vaoID);
   glBindBuffer(GL_ARRAY_BUFFER, vboVerticesID);
@@ -180,8 +184,8 @@ void HologramRenderer::render(int viewWidth, int viewHeight) {
   shader.UnUse();
 
   // TODO testing remote render
-  m_remoteFrameRenderer.render(viewWidth, viewHeight);
-  m_localFrameRenderer.render(viewWidth, viewHeight);
+  m_remoteFrameRenderer.render();
+  m_localFrameRenderer.render();
 
   glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -278,6 +282,7 @@ void HologramRenderer::OnMouseMove(int x, int y) {
     }
     cam.Pan(mouseX, mouseY);
   } else {
+    // seems like when state == 1 it means left button
     rY += (y - oldY) / 5.0f;
     rX += (oldX - x) / 5.0f;
     if (useFiltering) {
@@ -327,4 +332,31 @@ void HologramRenderer::updateRemoteFrame(const uint8_t *image, int width,
 void HologramRenderer::updateLocalFrame(const uint8_t *image, int width,
                                         int height) {
   m_localFrameRenderer.updateFrame(image, width, height);
+}
+
+void HologramRenderer::onWinResize(int winWidth, int winHeight) {
+  m_winWidth = winWidth;
+  m_winHeight = winHeight;
+  _updateRenderersPos();
+}
+
+void HologramRenderer::_updateRenderersPos() {
+
+  m_remoteFrameRenderer.setPosition(-0.8, -0.8, 0.8, 0.8, m_winWidth,
+                                    m_winHeight);
+  // 50px from left and 50px from bottom
+  // 200 px for reqtangle
+  int size = 200;
+  VideoStreamRenderer::Borders absoluteBorders;
+  absoluteBorders.x2 = float(m_winWidth - 50);
+  absoluteBorders.x1 = float(m_winWidth - 50 - size);
+  absoluteBorders.y1 = m_winHeight - float(m_winHeight - 50);
+  absoluteBorders.y2 = m_winHeight - float(m_winHeight - 50 - size);
+  VideoStreamRenderer::Borders relativeBorders =
+      VideoStreamRenderer::absoluteToRelative(absoluteBorders, m_winWidth,
+                                              m_winHeight);
+
+  m_localFrameRenderer.setPosition(relativeBorders.x1, relativeBorders.y1,
+                                   relativeBorders.x2, relativeBorders.y2,
+                                   m_winWidth, m_winHeight);
 }
