@@ -37,8 +37,7 @@ private:
 
   // out vertex struct for interleaved attributes
   struct Vertex {
-    glm::vec3 position;
-    glm::vec3 color;
+    glm::vec2 position;
   };
 
   // triangle vertices and indices

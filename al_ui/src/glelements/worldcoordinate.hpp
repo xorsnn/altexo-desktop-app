@@ -17,7 +17,7 @@ public:
 private:
   struct Vertex {
     glm::vec2 position;
-    glm::vec2 coord;
+    // glm::vec2 texCoord;
   };
 };
 
