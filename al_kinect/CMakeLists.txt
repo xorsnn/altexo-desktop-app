@@ -27,19 +27,37 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
 endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 
-find_package(Boost)
+find_package( Boost COMPONENTS system filesystem thread REQUIRED )
+# find_package(libfreenect REQUIRED)
+
 include(./cmake/Findlibusb-1.0.cmake)
 
 include_directories(include)
 include_directories(../include)
 include_directories(../vendor/Boost.DLL/include/)
-include_directories(/usr/include/libfreenect/)
+INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
+# include_directories(/usr/include/libfreenect/)
+# include_directories(${LIBFREENECT_INCLUDE_DIR})
+# message("--------------")
+# message(${LIBFREENECT_INCLUDE_DIR})
+# message("--------------")
+if (APPLE)
+  include_directories(/usr/local/Cellar/libfreenect/0.5.1/include/libfreenect/)
+  link_directories(/usr/local/Cellar/libfreenect/0.5.1/lib)
+elseif(UNIX)
+  include_directories(/usr/include/libfreenect/)
+endif()
+
 include_directories(${LIBUSB_1_INCLUDE_DIRS})
 
 # add_executable(${PROJECT_NAME} ${SRC_LIST})
 add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
 
 target_link_libraries(${PROJECT_NAME} ${LIBUSB_1_LIBRARIES}
-  boost_system boost_filesystem boost_thread -lfreenect -ldl)
+  ${Boost_FILESYSTEM_LIBRARY}
+  ${Boost_SYSTEM_LIBRARY}
+  ${Boost_THREAD_LIBRARY}
+  # ${FREENECT_LIBRARIES}
+  -lfreenect -ldl)
 
 # install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${BIN_DIR})

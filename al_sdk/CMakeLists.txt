@@ -15,16 +15,18 @@ INCLUDE_DIRECTORIES(./src/)
 ##
 # Compiler flags
 #
-set(CMAKE_C_COMPILER "/usr/bin/clang")
-set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+if(UNIX)
+  set(CMAKE_C_COMPILER "/usr/bin/clang")
+  set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+endif()
 
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -m64 -pipe -fno-rtti -fPIC -D_GLIBCXX_USE_CXX11_ABI=0 -O0 -std=c++11 -Wall -W -D_REENTRANT")
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -m64 -pipe -fPIC -D_GLIBCXX_USE_CXX11_ABI=0 -O0 -std=c++11 -Wall -W -D_REENTRANT")
-
-# set(Boost_USE_STATIC_LIBS ON)
-# set(Boost_USE_MULTITHREADED ON)
-# set(CMAKE_BUILD_TYPE Release)
-# set(CMAKE_POSITION_INDEPENDENT_CODE TRUE)
+if (APPLE)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g  -pipe -fno-rtti -fPIC -D_GLIBCXX_USE_CXX11_ABI=0 -O0 -std=c++11 -Wall -W -D_REENTRANT")
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
+  set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
+elseif(UNIX)
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g -m64 -pipe -fno-rtti -fPIC -D_GLIBCXX_USE_CXX11_ABI=0 -O0 -std=c++11 -Wall -W -D_REENTRANT")
+endif()
 
 ##
 # USEFUL VARS
@@ -40,7 +42,9 @@ set(WEBRTCBUILD "${WEBRTCTRUNK}/out/Release")
 # DEFINES
 #
 add_definitions(-DUNIX)
-add_definitions(-DLINUX)
+if(UNIX)
+  add_definitions(-DLINUX)
+endif()
 add_definitions(-DWEBRTC_POSIX)
 add_definitions(-DPOSIX)
 
@@ -50,8 +54,16 @@ add_definitions(-DPOSIX)
 add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
 # add_executable(${PROJECT_NAME} ${SRC_LIST})
 
-# compile and link for 64 bit mode
-set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-m64" LINK_FLAGS "-m64")
+if (APPLE)
+  set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++11")
+  set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
+  set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "com.apple.compilers.llvm.clang.1_0")
+  set(CMAKE_MACOSX_RPATH 1)
+  set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-m64" LINK_FLAGS "-m64")
+elseif(UNIX)
+  # compile and link for 64 bit mode
+  set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-m64" LINK_FLAGS "-m64")
+endif()
 set(CMAKE_AUTOMOC ON)
 
 ##
@@ -70,15 +82,43 @@ include_directories(../include/)
 ##
 # LIBRARIES
 #
-include(al-webrtc-deps.cmake)
-find_package( Boost )
+if (APPLE)
+  include(al-webrtc-deps-mac.cmake)
+elseif(UNIX)
+  include(al-webrtc-deps.cmake)
+endif()
+
+find_package( Boost COMPONENTS system filesystem thread REQUIRED )
+
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 
-TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC
-  -Wl,--start-group
-  ${WEBRTC_LIBS}
-  -Wl,--end-group
-  -lpthread
-  -lX11 -lXfixes -lXi -lXcomposite -lXext -lXrender -ldl -lrt -lexpat -lXrandr -lm -ldl
-  boost_thread boost_system
-)
+if (APPLE)
+  TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC
+    ${WEBRTC_LIBS}
+    -lpthread
+    # -lX11
+    # -lXfixes
+    # -lXi
+    # -lXcomposite
+    # -lXext
+    # -lXrender
+    -ldl
+    # -lrt
+    -lexpat
+    # -lXrandr
+    -lm -ldl
+    # boost_thread boost_system
+    ${Boost_FILESYSTEM_LIBRARY}
+    ${Boost_SYSTEM_LIBRARY}
+    ${Boost_THREAD_LIBRARY}
+  )
+elseif(UNIX)
+  TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC
+    -Wl,--start-group
+    ${WEBRTC_LIBS}
+    -Wl,--end-group
+    -lpthread
+    -lX11 -lXfixes -lXi -lXcomposite -lXext -lXrender -ldl -lrt -lexpat -lXrandr -lm -ldl
+    boost_thread boost_system
+  )
+endif()

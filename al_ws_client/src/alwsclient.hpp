@@ -47,7 +47,7 @@ private:
 
   unsigned int rl_dumb = 0;
   struct lws_context_creation_info info;
-  struct lws_client_connect_info i;
+  struct lws_client_connect_info m_i;
   struct lws_context *context;
   const char *prot, *p;
   char path[300];

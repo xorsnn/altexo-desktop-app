@@ -23,7 +23,7 @@ AlConnClient::AlConnClient(AlWsCb *alWsCb) {
   // login("Galya", "ujnm567");
 }
 
-AlConnClient::~AlConnClient() {}
+AlConnClient::~AlConnClient() { std::cout << "destructor" << std::endl; }
 
 void AlConnClient::login(std::string login, std::string password) {
   auto future_text = cpr::PostCallback(

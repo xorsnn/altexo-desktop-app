@@ -33,24 +33,34 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 
 
 set(LWS_OPENSSL_SUPPORT 1)
+# set(ENABLE_CXX_EXCEPTIONS 0)
 
 include_directories(include)
 include_directories(/usr/include)
 
 # TODO: environment dependent
-set(LIB_CPR_PATH "/home/xors/workspace/ALTEXO/cpr")
+if (APPLE)
+  set(LIB_CPR_PATH "/Volumes/MAC/workspace/cpr")
+  set(OPENSSL_LIBRARIES "/usr/local/Cellar/openssl/1.0.2h_1/lib")
+  set(OPENSSL_ROOT_DIR "/usr/local/Cellar/openssl/1.0.2h_1/")
+  include_directories("/usr/local/Cellar/openssl/1.0.2h_1/include/")
+elseif(UNIX)
+  set(LIB_CPR_PATH "/home/xors/workspace/ALTEXO/cpr")
+endif()
 
 include_directories("${LIB_CPR_PATH}/include")
 include_directories(../include/)
 
-find_package(Boost)
+find_package( Boost COMPONENTS system thread REQUIRED )
+INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 
 # add_executable(${PROJECT_NAME} ${SRC_LIST})
 add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
 
 target_link_libraries(${PROJECT_NAME}
   ${LIB_CPR_PATH}/build/lib/libcpr.a
-  boost_system -lpthread -lssl -lcrypto -lcurl -lwebsockets
-  boost_thread
+  -lpthread -lssl -lcrypto -lcurl -lwebsockets
+  ${Boost_SYSTEM_LIBRARY}
+  ${Boost_THREAD_LIBRARY}
 )
 # install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${BIN_DIR})

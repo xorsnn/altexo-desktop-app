@@ -6,7 +6,7 @@
 
 class AlWsCb {
 public:
-  virtual ~AlWsCb() {}
+  // virtual ~AlWsCb() {}
 
   // TODO: for some reason std::string doesn't work
   virtual void onMessageCb(std::vector<char> peerId, std::vector<char> msg) = 0;
