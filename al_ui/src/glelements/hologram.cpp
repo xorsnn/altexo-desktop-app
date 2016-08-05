@@ -5,23 +5,7 @@ Hologram::Hologram() {}
 Hologram::~Hologram() {}
 
 void Hologram::init() {
-  // load the shader
-  shader.LoadFromFile(GL_VERTEX_SHADER,
-                      "../al_ui/shaders/hologramRenderer.vert");
-  shader.LoadFromFile(GL_FRAGMENT_SHADER, "../al_ui/shaders/shader.frag");
-  // compile and link shader
-  shader.CreateAndLinkProgram();
-  shader.Use();
-  // add attributes and uniforms
-  shader.AddAttribute("vVertex");
-  shader.AddAttribute("vTexCoord");
-  shader.AddUniform("MVP");
-  shader.AddUniform("textureMap");
-  // pass values of constant uniforms at initialization
-  glUniform1i(shader("textureMap"), 3);
-  // pass values of constant uniforms at initialization
-  shader.UnUse();
-
+  _initShaders();
   int wAmount = 320;
   int hAmount = 240;
   int normConst = wAmount;
@@ -76,7 +60,7 @@ void Hologram::init() {
   // =====================
 }
 
-void Hologram::render(glm::mat4 MVP) {
+void Hologram::render(glm::mat4 *MVP) {
   glBindVertexArray(vaoID);
   glBindBuffer(GL_ARRAY_BUFFER, vboVerticesID);
 
@@ -84,11 +68,30 @@ void Hologram::render(glm::mat4 MVP) {
   shader.Use();
 
   // pass the shader uniform
-  glUniformMatrix4fv(shader("MVP"), 1, GL_FALSE, glm::value_ptr(MVP));
+  glUniformMatrix4fv(shader("MVP"), 1, GL_FALSE, glm::value_ptr(*MVP));
 
   // drwa triangle
   glEnable(GL_PROGRAM_POINT_SIZE);
   glDrawArrays(GL_POINTS, 0, 320 * 240);
   // unbind the shader
+  shader.UnUse();
+}
+
+void Hologram::_initShaders() {
+  // load the shader
+  shader.LoadFromFile(GL_VERTEX_SHADER,
+                      "../al_ui/shaders/hologramRenderer.vert");
+  shader.LoadFromFile(GL_FRAGMENT_SHADER, "../al_ui/shaders/shader.frag");
+  // compile and link shader
+  shader.CreateAndLinkProgram();
+  shader.Use();
+  // add attributes and uniforms
+  shader.AddAttribute("vVertex");
+  shader.AddAttribute("vTexCoord");
+  shader.AddUniform("MVP");
+  shader.AddUniform("textureMap");
+  // pass values of constant uniforms at initialization
+  glUniform1i(shader("textureMap"), 3);
+  // pass values of constant uniforms at initialization
   shader.UnUse();
 }

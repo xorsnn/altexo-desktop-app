@@ -9,7 +9,10 @@ class GlElement {
 public:
   virtual ~GlElement() {}
   virtual void init() = 0;
-  virtual void render(glm::mat4 MPV) = 0;
+  virtual void render(glm::mat4 *MPV) = 0;
+
+protected:
+  virtual void _initShaders() = 0;
 };
 
 #endif // GLELEMENT_H

@@ -1,5 +1,6 @@
 -I/usr/include/SDL2/
 -I/usr/include/
 -I./include/
+-I./src/
 -I../include/
 -I../vendor/Boost.DLL/include/

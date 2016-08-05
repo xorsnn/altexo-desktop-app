@@ -12,13 +12,25 @@ public:
   WorldCoordinate();
   ~WorldCoordinate();
   void init();
-  void render(glm::mat4 MPV);
+  void render(glm::mat4 *MPV);
+
+protected:
+  void _initShaders();
 
 private:
+  // shader reference
+  GLSLShader shader;
+
   struct Vertex {
-    glm::vec2 position;
-    // glm::vec2 texCoord;
+    glm::vec3 position;
   };
+
+  Vertex m_vertices[2];
+  GLushort m_indices[2];
+
+  GLuint vaoID;
+  GLuint vboVerticesID;
+  GLuint vboIndicesID;
 };
 
 #endif // WORLDCOORDINATE_H

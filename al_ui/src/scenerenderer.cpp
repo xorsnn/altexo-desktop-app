@@ -19,14 +19,12 @@ void SceneRenderer::updateResolution(int width, int height) {
 int SceneRenderer::init() {
   m_newFrame = false;
   // GL_CHECK_ERRORS
-  // GL_CHECK_ERRORS
 
   m_hologram.init();
 
   initFBO();
 
   m_sensorDataFboRenderer.init();
-
   m_remoteFrameRenderer.init();
   m_localFrameRenderer.init();
 
@@ -93,9 +91,8 @@ void SceneRenderer::render() {
 
   glViewport(0, 0, m_winWidth, m_winHeight);
 
-  m_hologram.render(MVP);
-
-  // TODO testing remote render
+  // Elements rendering
+  m_hologram.render(&MVP);
   m_remoteFrameRenderer.render();
   m_localFrameRenderer.render();
 

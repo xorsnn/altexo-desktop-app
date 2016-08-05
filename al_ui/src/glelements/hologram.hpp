@@ -12,7 +12,10 @@ public:
   Hologram();
   ~Hologram();
   void init();
-  void render(glm::mat4 MPV);
+  void render(glm::mat4 *MPV);
+
+protected:
+  void _initShaders();
 
 private:
   // shader reference
