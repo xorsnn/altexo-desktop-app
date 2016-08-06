@@ -75,7 +75,8 @@ void WorldCoordinate::render(glm::mat4 *MVP) {
 
   // draw triangle
   // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
-  glDrawElements(GL_LINE_STRIP, 6, GL_UNSIGNED_SHORT, 0);
+  // glDrawElements(GL_LINE_STRIP, 6, GL_UNSIGNED_SHORT, 0);
+  glDrawElements(GL_LINES, 6, GL_UNSIGNED_SHORT, 0);
   // unbind the shader
   shader.UnUse();
 
