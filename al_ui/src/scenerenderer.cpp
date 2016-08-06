@@ -27,6 +27,7 @@ int SceneRenderer::init() {
   m_sensorDataFboRenderer.init();
   m_remoteFrameRenderer.init();
   m_localFrameRenderer.init();
+  m_worldCoordinate.init();
 
   // setup the camera position and target
   // cam.SetPosition(glm::vec3(1, 1, 1));
@@ -95,6 +96,7 @@ void SceneRenderer::render() {
   m_hologram.render(&MVP);
   m_remoteFrameRenderer.render();
   m_localFrameRenderer.render();
+  m_worldCoordinate.render(&MVP);
 
   glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);

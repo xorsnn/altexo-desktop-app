@@ -23,10 +23,11 @@ private:
 
   struct Vertex {
     glm::vec3 position;
+    glm::vec3 color;
   };
 
-  Vertex m_vertices[2];
-  GLushort m_indices[2];
+  Vertex m_vertices[6];
+  GLushort m_indices[6];
 
   GLuint vaoID;
   GLuint vboVerticesID;

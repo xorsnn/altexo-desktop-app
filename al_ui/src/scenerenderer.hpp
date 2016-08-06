@@ -6,6 +6,7 @@
 #include "GLSLShader.hpp"
 #include "contact.hpp"
 #include "glelements/hologram.hpp"
+#include "glelements/worldcoordinate.hpp"
 #include "sensordatafborenderer.hpp"
 #include "targetcamera.h"
 #include "videostreamrenderer.hpp"
@@ -49,6 +50,7 @@ public:
   VideoStreamRenderer m_remoteFrameRenderer;
   VideoStreamRenderer m_localFrameRenderer;
   Hologram m_hologram;
+  WorldCoordinate m_worldCoordinate;
 
   bool sendingFrames = false;
 
