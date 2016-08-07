@@ -47,17 +47,7 @@ void Hologram::init() {
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
-  // some tex ==============
-  glGenTextures(1, &sensorDepthTexID);
-  glActiveTexture(GL_TEXTURE3);
-  glBindTexture(GL_TEXTURE_2D, sensorDepthTexID);
-  // set texture parameters
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-  glBindTexture(GL_TEXTURE_2D, 0);
-  // =====================
+  _initTextures();
 }
 
 void Hologram::render(glm::mat4 *MVP) {
@@ -81,7 +71,8 @@ void Hologram::_initShaders() {
   // load the shader
   shader.LoadFromFile(GL_VERTEX_SHADER,
                       "../al_ui/shaders/hologramRenderer.vert");
-  shader.LoadFromFile(GL_FRAGMENT_SHADER, "../al_ui/shaders/shader.frag");
+  shader.LoadFromFile(GL_FRAGMENT_SHADER,
+                      "../al_ui/shaders/hologramRenderer.frag");
   // compile and link shader
   shader.CreateAndLinkProgram();
   shader.Use();
@@ -94,4 +85,18 @@ void Hologram::_initShaders() {
   glUniform1i(shader("textureMap"), 3);
   // pass values of constant uniforms at initialization
   shader.UnUse();
+}
+
+void Hologram::_initTextures() {
+  // some tex ==============
+  glGenTextures(1, &sensorDepthTexID);
+  glActiveTexture(GL_TEXTURE3);
+  glBindTexture(GL_TEXTURE_2D, sensorDepthTexID);
+  // set texture parameters
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
+  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
+  glBindTexture(GL_TEXTURE_2D, 0);
+  // =====================
 }

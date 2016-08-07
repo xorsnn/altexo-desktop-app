@@ -16,8 +16,8 @@ public:
 
 protected:
   void _initShaders();
+  void _initTextures();
 
-private:
   // shader reference
   GLSLShader shader;
 

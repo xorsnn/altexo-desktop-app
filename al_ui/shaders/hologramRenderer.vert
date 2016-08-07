@@ -69,15 +69,10 @@ vec3 xyz(float x, float y, float depth) {
   // // return vec3(x  * z * fx, y * z * fy, -z); // my
   // ===== ~current =======
   //
-  // float z = depth * (maxD - minD) + minD;
   float outputMin = 0.0;
   float outputMax = 1.0;
   float inputMax = maxD;
   float inputMin = minD;
-
-  // float z =
-  //     (depth - outputMin) / (outputMax - outputMin) * (inputMax - inputMin) +
-  //     inputMin;
 
   float z =
       ((depth - outputMin) / (outputMax - outputMin)) * (inputMax - inputMin) + inputMin;
@@ -88,15 +83,6 @@ vec3 xyz(float x, float y, float depth) {
   // return vec3(x * z / f, // X = (x - cx) * d / fx
   //             y * z / f, // Y = (y - cy) * d / fy
   //             z);                        // Z = d
-
-  // ((value - inputMin) / (inputMax - inputMin) * (outputMax - outputMin) +
-  //  outputMin);
-  // v = (value - inputMin) / (inputMax - inputMin) * (outputMax - outputMin) +
-  // outputMin;
-  // v - outputMin = (value - inputMin) / (inputMax - inputMin) * (outputMax -
-  // outputMin)
-  // (v - outputMin)/(outputMax - outputMin) *(inputMax - inputMin) + inputMin =
-  // value
 }
 
 void main() {
@@ -118,10 +104,13 @@ void main() {
 
   // 1)
   // gl_Position = MVP * vec4(vVertex.x, vVertex.y, pos.z / 640, 1.0); // OLD
-  gl_Position = MVP * vec4(pos.x, pos.y, pos.z, 1.0);
+  // gl_Position = MVP * vec4(pos.x, pos.y, pos.z, 1.0);
+  // gl_Position = MVP * vec4(pos.x, pos.y, 0.0, 1.0);
+  gl_Position = MVP * vec4(vVertex.x*10.0, vVertex.y*10.0, 0.0, 1.0);
   // gl_Position = MVP * vec4(vVertex.x*10.0, vVertex.y*10.0,-hsl.x*10, 1.0);
   // 2)
   // gl_Position = vec4(vVertex.x, vVertex.y, 0, 1.0);
-  vUV = vec2(vTexCoord.x * 0.5 + 0.5, 1 - vTexCoord.y);
+  // vUV = vec2(vTexCoord.x * 0.5 + 0.5, 1 - vTexCoord.y);
+  vUV = vec2(vTexCoord.x, 1 - vTexCoord.y);
   gl_PointSize = 2.0;
 }
