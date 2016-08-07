@@ -24,7 +24,7 @@ protected:
 
 private:
   void _readPngFile(char *fileName);
-  uint8_t m_img[1280 * 480 * 4];
+  uint8_t m_img[1280 * 480 * 3];
   int x, y;
 
   int width, height;

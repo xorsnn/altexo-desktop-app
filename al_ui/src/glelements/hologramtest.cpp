@@ -80,37 +80,20 @@ void HologramTest::_readPngFile(char *file_name) {
 
   fclose(fp);
   std::cout << "FILE READ!!!" << std::endl;
-  std::cout << int(color_type) << std::endl;
   std::cout << width << std::endl;
   std::cout << height << std::endl;
-  if (color_type == PNG_COLOR_TYPE_RGB) {
-    std::cout << "FILE RGB!!!" << std::endl;
-  }
+
   int index = 0;
   for (y = 0; y < height; y++) {
     png_byte *row = row_pointers[y];
     for (x = 0; x < width; x++) {
-      png_byte *ptr = &(row[x * 4]);
-      m_img[index * 4] = uint8_t(ptr[0]);
-      m_img[index * 4 + 1] = uint8_t(ptr[1]);
-      m_img[index * 4 + 2] = uint8_t(ptr[2]);
-      m_img[index * 4 + 3] = uint8_t(ptr[3]);
+      png_byte *ptr = &(row[x * 3]);
+      m_img[index * 3] = uint8_t(ptr[0]);
+      m_img[index * 3 + 1] = uint8_t(ptr[1]);
+      m_img[index * 3 + 2] = uint8_t(ptr[2]);
       index++;
-      //     printf(
-      //         "Pixel at position [ %d - %d ] has RGBA values: %d - %d - %d -
-      //         %d\n",
-      //         x, y, ptr[0], ptr[1], ptr[2], ptr[3]);
-      //
-      //     /* set red value to 0 and green value to the blue one */
-      //     // ptr[0] = 0;
-      //     // ptr[1] = ptr[2];
     }
   }
-  // for (int i = 0; i < width * height * 3; i++) {
-  //   if (m_img[i] > 0) {
-  //     std::cout << int(m_img[i]) << std::endl;
-  //   }
-  // }
 }
 void HologramTest::_initTextures() {
   glGenTextures(1, &sensorDepthTexID);
@@ -126,6 +109,6 @@ void HologramTest::_initTextures() {
   // glBindTexture(GL_TEXTURE_2D, 0);
   // glActiveTexture(GL_TEXTURE3);
   // glBindTexture(GL_TEXTURE_2D, sensorDepthTexID);
-  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGBA,
+  glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, width, height, 0, GL_RGB,
                GL_UNSIGNED_BYTE, &(m_img[0]));
 }
