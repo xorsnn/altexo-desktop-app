@@ -12,9 +12,9 @@ void Hologram::init() {
   int index = 0;
   for (int yCoord = 0; yCoord < hAmount; yCoord++) {
     for (int xCoord = 0; xCoord < wAmount; xCoord++) {
-      vertices[index].position = glm::vec2(
-          float(xCoord) / normConst - (0.5 * float(wAmount) / normConst),
-          float(yCoord) / normConst - (0.5 * float(wAmount) / normConst));
+      vertices[index].position =
+          glm::vec2((float(xCoord) - (0.5 * float(wAmount))) / normConst,
+                    (float(yCoord) - (0.5 * float(hAmount))) / normConst);
       vertices[index].texCoord =
           glm::vec2(float(xCoord) / wAmount, float(yCoord) / hAmount);
       index++;

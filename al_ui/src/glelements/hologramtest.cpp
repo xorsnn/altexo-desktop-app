@@ -10,7 +10,7 @@ void abort_(const char *s, ...) {
   abort();
 }
 
-HologramTest::HologramTest() { _readPngFile("/home/xors/cto_intro1.png"); }
+HologramTest::HologramTest() { _readPngFile("/home/xors/cto_intro.png"); }
 
 void HologramTest::render(glm::mat4 *MVP) {
 

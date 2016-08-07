@@ -31,7 +31,7 @@ int SceneRenderer::init() {
 
   // setup the camera position and target
   // cam.SetPosition(glm::vec3(1, 1, 1));
-  cam.SetPosition(glm::vec3(3000, 3000, 3000));
+  cam.SetPosition(glm::vec3(1000, 1000, 1000));
   cam.SetTarget(glm::vec3(0, 0, 0));
 
   // also rotate the camera for proper orientation
@@ -41,6 +41,9 @@ int SceneRenderer::init() {
   float pitch = glm::degrees(asin(look.y));
   rX = yaw;
   rY = pitch;
+  std::cout << "------------------" << std::endl;
+  std::cout << rX << std::endl;
+  std::cout << rY << std::endl;
 
   cam.Rotate(rX, rY, 0);
 

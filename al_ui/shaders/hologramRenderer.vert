@@ -47,7 +47,8 @@ vec3 rgb2hsl(vec3 color) {
 const float minD = 555.0;
 const float maxD = 1005.0;
 
-const float fx = 1.094017094017094;  // 640.0/(( maxD + minD ) / 2)*640/480;
+const float fx = 1.094017094017094; // 640.0/(( maxD + minD ) / 2)*640/480;
+
 const float fy = 0.8205128205128206; // 480.0/(( maxD + minD ) / 2)*640/480;
 
 // taken from freenect example
@@ -60,57 +61,33 @@ varying vec2 vUv;
 varying float visibility;
 
 vec3 xyz(float x, float y, float depth) {
-  // float m_depth = depth/640.0;
-  // float m_depth = depth;
-  // ====== current =======
-  // float z = depth * (maxD - minD) + minD;
-  // return vec3((x / 640.0) * z * fx, (y / 480.0) * z * fy, -z); // my
-  // // return vec3( ( x / 640.0 ) * z, ( y / 640.0 ) * z, -z); //my
-  // // return vec3(x  * z * fx, y * z * fy, -z); // my
-  // ===== ~current =======
-  //
   float outputMin = 0.0;
   float outputMax = 1.0;
   float inputMax = maxD;
   float inputMin = minD;
+  float zDelta = inputMin + (inputMax - inputMax) / 2.0;
 
   float z =
-      ((depth - outputMin) / (outputMax - outputMin)) * (inputMax - inputMin) + inputMin;
+      ((depth - outputMin) / (outputMax - outputMin)) * (inputMax - inputMin) +
+      inputMin;
 
-  return vec3(x * (wAmount) * z / f, // X = (x - cx) * d / fx
-              y * (wAmount) * z / f, // Y = (y - cy) * d / fy
-              -z + inputMin);                       // Z = d
-  // return vec3(x * z / f, // X = (x - cx) * d / fx
-  //             y * z / f, // Y = (y - cy) * d / fy
-  //             z);                        // Z = d
+  return vec3(x * (wAmount * 2) * z / f, // X = (x - cx) * d / fx
+              y * (wAmount * 2) * z / f, // Y = (y - cy) * d / fy
+              -z + zDelta);              // Z = d
 }
 
 void main() {
-  // vec3 pos = position;
   visibility = 1.0;
-
   vUv = vec2(vTexCoord.x, 1 - vTexCoord.y);
   vUv.x = vUv.x * 0.5;
   vec3 hsl = rgb2hsl(texture2D(textureMap, vUv).xyz);
   vUv.x += 0.5;
   visibility = hsl.z * 2.0;
-
   vec3 pos = xyz(vVertex.x, vVertex.y, hsl.x);
-  // pos.z += (maxD - minD) / 3.0 + minD;
-
   // get the clip space position by multiplying the combined MVP matrix with the
   // object space
   // vertex position
-
-  // 1)
-  // gl_Position = MVP * vec4(vVertex.x, vVertex.y, pos.z / 640, 1.0); // OLD
   gl_Position = MVP * vec4(pos.x, pos.y, pos.z, 1.0);
-  // gl_Position = MVP * vec4(pos.x, pos.y, 0.0, 1.0);
-  // gl_Position = MVP * vec4(vVertex.x*10.0, vVertex.y*10.0, 0.0, 1.0);
-  // gl_Position = MVP * vec4(vVertex.x*10.0, vVertex.y*10.0,-hsl.x*10, 1.0);
-  // 2)
-  // gl_Position = vec4(vVertex.x, vVertex.y, 0, 1.0);
   vUV = vec2(vTexCoord.x * 0.5 + 0.5, 1 - vTexCoord.y);
-  // vUV = vec2(vTexCoord.x, 1 - vTexCoord.y);
   gl_PointSize = 2.0;
 }
