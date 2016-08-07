@@ -25,11 +25,18 @@ void Manager::initHoloRenderer(HologramRenderer *holoRenderer) {
 }
 
 void Manager::initSensor(AlSensorCb *sensorCb) {
-  boost::filesystem::path lib_path("/home/xors/workspace/QT/altexo/build/");
+  // boost::filesystem::path lib_path("/home/xors/workspace/QT/altexo/build/");
+  boost::filesystem::path lib_path("");
   std::cout << "Loading sensor plugin" << std::endl;
+#ifdef __APPLE__
+  m_sensor = boost::dll::import<AlSensorAPI>(
+      lib_path / "libal_kinect_1.dylib", "plugin",
+      boost::dll::load_mode::append_decorations);
+#else
   m_sensor = boost::dll::import<AlSensorAPI>(
       lib_path / "libal_kinect_1.so", "plugin",
       boost::dll::load_mode::append_decorations);
+#endif
 
   // TODO move this to call initialization
   // m_sensor->init(sensorCb);
@@ -49,20 +56,34 @@ void Manager::frameThread() {
 }
 
 void Manager::initWsConnection(AlWsCb *alWsCb) {
-  boost::filesystem::path lib_path("/home/xors/workspace/QT/altexo/build/");
+  // boost::filesystem::path lib_path("/home/xors/workspace/QT/altexo/build/");
+  boost::filesystem::path lib_path("");
   std::cout << "Loading ws plugin" << std::endl;
+#ifdef __APPLE__
+  m_wsClient =
+      boost::dll::import<AlWsAPI>(lib_path / "libws_client.dylib", "plugin",
+                                  boost::dll::load_mode::append_decorations);
+#else
   m_wsClient =
       boost::dll::import<AlWsAPI>(lib_path / "libws_client.so", "plugin",
                                   boost::dll::load_mode::append_decorations);
+#endif
   m_wsClient->init(alWsCb);
 }
 
 void Manager::initSdk() {
-  boost::filesystem::path lib_path("/home/xors/workspace/QT/altexo/build/");
+  // boost::filesystem::path lib_path("/home/xors/workspace/QT/altexo/build/");
+  boost::filesystem::path lib_path("");
   std::cout << "Loading sdk plugin" << std::endl;
+#ifdef __APPLE__
+  m_sdk =
+      boost::dll::import<AlSdkAPI>(lib_path / "libaltexo_sdk.dylib", "plugin",
+                                   boost::dll::load_mode::append_decorations);
+#else
   m_sdk =
       boost::dll::import<AlSdkAPI>(lib_path / "libaltexo_sdk.so", "plugin",
                                    boost::dll::load_mode::append_decorations);
+#endif
   m_sdk->init(this);
   updateResolutionSignal.connect(
       boost::bind(&AlSdkAPI::updateResolution, m_sdk, _1, _2));

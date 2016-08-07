@@ -196,11 +196,11 @@ int AlWsClient::threadMain() {
 
   signal(SIGINT, sighandler);
 
-  memset(&i, 0, sizeof(i));
+  memset(&m_i, 0, sizeof(m_i));
 
-  i.port = m_port;
+  m_i.port = m_port;
   char *pathTmp = (char *)(m_path.c_str());
-  if (lws_parse_uri(pathTmp, &prot, &i.address, &i.port, &p)) {
+  if (lws_parse_uri(pathTmp, &prot, &m_i.address, &m_i.port, &p)) {
     if (m_debug) {
       std::cout << "PARCE!" << std::endl;
     }
@@ -211,7 +211,7 @@ int AlWsClient::threadMain() {
   path[0] = '/';
   strncpy(path + 1, p, sizeof(path) - 2);
   path[sizeof(path) - 1] = '\0';
-  i.path = path;
+  m_i.path = path;
 
   if (!strcmp(prot, "http") || !strcmp(prot, "ws")) {
     m_useSsl = 0;
@@ -239,12 +239,12 @@ int AlWsClient::threadMain() {
     return 1;
   }
 
-  i.context = context;
-  i.ssl_connection = m_useSsl;
-  i.host = i.address;
-  i.origin = i.address;
-  i.ietf_version_or_minus_one = m_ietfVersion;
-  i.client_exts = exts;
+  m_i.context = context;
+  m_i.ssl_connection = m_useSsl;
+  m_i.host = m_i.address;
+  m_i.origin = m_i.address;
+  m_i.ietf_version_or_minus_one = m_ietfVersion;
+  m_i.client_exts = exts;
   /*
   * sit there servicing the websocket context to handle incoming
   * packets, and drawing random circles on the mirror protocol websocket
@@ -259,8 +259,8 @@ int AlWsClient::threadMain() {
 
     if (!wsi_dumb && ratelimit_connects(&rl_dumb, 2u)) {
       lwsl_notice("dumb: connecting\n");
-      i.protocol = m_protocols[PROTOCOL_DUMB_INCREMENT].name;
-      wsi_dumb = lws_client_connect_via_info(&i);
+      m_i.protocol = m_protocols[PROTOCOL_DUMB_INCREMENT].name;
+      wsi_dumb = lws_client_connect_via_info(&m_i);
     }
 
     // TODO: dirty solution

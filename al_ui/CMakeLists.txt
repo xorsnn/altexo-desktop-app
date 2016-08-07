@@ -9,13 +9,10 @@ file(GLOB SRC_LIST
   src/**/*.h
   src/**/*.cc
 )
-INCLUDE_DIRECTORIES(./src/)
 
 # Use our modified FindSDL2* modules
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${${PROJECT_NAME}_SOURCE_DIR}/cmake")
-
-# Set output dir
-# set(BIN_DIR ${${PROJECT_NAME}_SOURCE_DIR}/../../al_build/al_ui)
+set(CMAKE_AUTOMOC ON)
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -std=c++11")
@@ -30,17 +27,40 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
 endif()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 
-find_package(SDL2 REQUIRED)
-find_package(Boost)
-INCLUDE(${CMAKE_ROOT}/Modules/FindOpenGL.cmake)
+# set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-m64" LINK_FLAGS "-m64")
+# set_target_properties("al_ui.run" PROPERTIES COMPILE_FLAGS "-m64" LINK_FLAGS "-m64")
 
-include_directories(${SDL2_INCLUDE_DIR})
-include_directories(include)
-include_directories(../include)
-include_directories(../vendor/Boost.DLL/include/)
-include_directories(${OPENGL_INCLUDE_DIR})
+FIND_PACKAGE( SDL2 REQUIRED )
+FIND_PACKAGE( Boost COMPONENTS system filesystem thread REQUIRED )
+FIND_PACKAGE( glm REQUIRED )
+FIND_PACKAGE( GLEW REQUIRED )
+
+INCLUDE( ${CMAKE_ROOT}/Modules/FindOpenGL.cmake )
+
+INCLUDE_DIRECTORIES( ${SDL2_INCLUDE_DIR} )
+INCLUDE_DIRECTORIES( ${GLM_INCLUDE_DIRS} )
+INCLUDE_DIRECTORIES( include )
+INCLUDE_DIRECTORIES( ../include )
+INCLUDE_DIRECTORIES( ../vendor/Boost.DLL/include/ )
+INCLUDE_DIRECTORIES( ${OPENGL_INCLUDE_DIR} )
+INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
+INCLUDE_DIRECTORIES( ./src/ )
+if (GLEW_FOUND)
+    INCLUDE_DIRECTORIES(${GLEW_INCLUDE_DIRS})
+    link_libraries(${GLEW_LIBRARIES})
+endif()
+# TODO: temporary decision
+if(APPLE)
+  INCLUDE_DIRECTORIES(/opt/X11/include)
+  set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
+  set(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
+endif()
 
 add_executable(${PROJECT_NAME} ${SRC_LIST})
 target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARY}
-${OPENGL_LIBRARIES} boost_system boost_filesystem boost_thread -lGLEW -ldl)
+  ${OPENGL_LIBRARIES}
+  ${Boost_FILESYSTEM_LIBRARY}
+  ${Boost_SYSTEM_LIBRARY}
+  ${Boost_THREAD_LIBRARY}
+  -ldl)
 # install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${BIN_DIR})

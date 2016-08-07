@@ -55,10 +55,10 @@ add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
 # add_executable(${PROJECT_NAME} ${SRC_LIST})
 
 if (APPLE)
-  set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++11")
-  set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
-  set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "com.apple.compilers.llvm.clang.1_0")
-  set(CMAKE_MACOSX_RPATH 1)
+  # set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++11")
+  # set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
+  # set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "com.apple.compilers.llvm.clang.1_0")
+  # set(CMAKE_MACOSX_RPATH 1)
   set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-m64" LINK_FLAGS "-m64")
 elseif(UNIX)
   # compile and link for 64 bit mode
@@ -96,18 +96,9 @@ if (APPLE)
   TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC
     ${WEBRTC_LIBS}
     -lpthread
-    # -lX11
-    # -lXfixes
-    # -lXi
-    # -lXcomposite
-    # -lXext
-    # -lXrender
     -ldl
-    # -lrt
     -lexpat
-    # -lXrandr
     -lm -ldl
-    # boost_thread boost_system
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_SYSTEM_LIBRARY}
     ${Boost_THREAD_LIBRARY}

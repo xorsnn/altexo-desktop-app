@@ -44,6 +44,9 @@ if (APPLE)
   set(OPENSSL_LIBRARIES "/usr/local/Cellar/openssl/1.0.2h_1/lib")
   set(OPENSSL_ROOT_DIR "/usr/local/Cellar/openssl/1.0.2h_1/")
   include_directories("/usr/local/Cellar/openssl/1.0.2h_1/include/")
+  include_directories(/Volumes/MAC/workspace/libwebsockets/build)
+  include_directories(/Volumes/MAC/workspace/libwebsockets/lib)
+  link_directories(/Volumes/MAC/workspace/libwebsockets/build/lib )
 elseif(UNIX)
   set(LIB_CPR_PATH "/home/xors/workspace/ALTEXO/cpr")
 endif()
@@ -59,7 +62,8 @@ add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
 
 target_link_libraries(${PROJECT_NAME}
   ${LIB_CPR_PATH}/build/lib/libcpr.a
-  -lpthread -lssl -lcrypto -lcurl -lwebsockets
+  -lpthread -lssl -lcrypto -lcurl
+  -lwebsockets
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_THREAD_LIBRARY}
 )
