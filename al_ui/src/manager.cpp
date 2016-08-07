@@ -17,10 +17,10 @@ Manager::~Manager() {
   m_frameThread = NULL;
 }
 
-void Manager::initHoloRenderer(HologramRenderer *holoRenderer) {
+void Manager::initHoloRenderer(SceneRenderer *holoRenderer) {
   m_holoRenderer = holoRenderer;
   updateResolutionSignal.connect(
-      boost::bind(&HologramRenderer::updateResolution, holoRenderer, _1, _2));
+      boost::bind(&SceneRenderer::updateResolution, holoRenderer, _1, _2));
   updateResolutionSignal(WIDTH, HEIGHT);
 }
 
@@ -39,7 +39,7 @@ void Manager::initSensor(AlSensorCb *sensorCb) {
 #endif
 
   // TODO move this to call initialization
-  // m_sensor->init(sensorCb);
+  m_sensor->init(sensorCb);
   sensorList.push_back(AlTextMessage("Kinect"));
   // set sensor as default source
   // setDeviceName(sensorList[sensorList.size() - 1],

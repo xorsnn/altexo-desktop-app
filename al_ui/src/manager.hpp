@@ -6,7 +6,7 @@
 #include "AL_API/ws_client_api.hpp"
 #include "AL_CB/al_sdk_cb.hpp"
 #include "contact.hpp"
-#include "hologramrenderer.hpp"
+#include "scenerenderer.hpp"
 #include <boost/dll/import.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/signals2/signal.hpp>
@@ -40,7 +40,7 @@ public:
   void onMessageFromPeer(boost::property_tree::ptree msgPt);
 
   void handleMessages();
-  void initHoloRenderer(HologramRenderer *holoRenderer);
+  void initHoloRenderer(SceneRenderer *holoRenderer);
 
   void setDeviceName(AlTextMessage deviceNama, int deviceType);
   int getDeviceType() { return m_videoDeviceType; }
@@ -75,7 +75,7 @@ private:
 
   boost::signals2::signal<void(int, int)> updateResolutionSignal;
 
-  HologramRenderer *m_holoRenderer;
+  SceneRenderer *m_holoRenderer;
 
   // TODO move mode selection to UI
   int WIDTH = 320;

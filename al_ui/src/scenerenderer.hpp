@@ -1,10 +1,12 @@
-#ifndef HOLOGRAMRENDERER_H
-#define HOLOGRAMRENDERER_H
+#ifndef SCENERENDERER_H
+#define SCENERENDERER_H
 
 #include "AL_API/sdk_api.hpp"
 #include "AL_CB/al_sensor_cb.hpp"
 #include "GLSLShader.hpp"
 #include "contact.hpp"
+#include "glelements/hologram.hpp"
+#include "glelements/worldcoordinate.hpp"
 #include "sensordatafborenderer.hpp"
 #include "targetcamera.h"
 #include "videostreamrenderer.hpp"
@@ -18,16 +20,15 @@
 const int MOUSE_HISTORY_BUFFER_SIZE = 10;
 const float MOUSE_FILTER_WEIGHT = 0.75f;
 
-class HologramRenderer {
+class SceneRenderer {
 public:
-  HologramRenderer(int winWidth, int winHeight);
-  ~HologramRenderer() {}
+  SceneRenderer(int winWidth, int winHeight);
+  ~SceneRenderer() {}
 
   void updateResolution(int width, int height);
   int init();
   void render();
   void initFBO();
-  void resizeRenderTex();
   void initFrameSending(AlSdkAPI *alSdkApi);
 
   void OnStartMouseMove(int initX, int initY);
@@ -48,37 +49,24 @@ public:
 
   VideoStreamRenderer m_remoteFrameRenderer;
   VideoStreamRenderer m_localFrameRenderer;
+  Hologram m_hologram;
+  WorldCoordinate m_worldCoordinate;
 
   bool sendingFrames = false;
 
 private:
   void _updateRenderersPos();
+  void _resizeRenderTex();
 
   bool m_debug;
 
   // mouse history buffer
   glm::vec2 mouseHistory[MOUSE_HISTORY_BUFFER_SIZE];
 
-  // shader reference
-  GLSLShader shader;
-
-  // vertex array and vertex buffer object IDs
-  GLuint vaoID;
-  GLuint vboVerticesID;
-  GLuint vboIndicesID;
+  // GLuint vboIndicesID;
 
   // TODO remove unnesessary, rename used
   // GLuint sensorRGBTexID;
-  GLuint sensorDepthTexID;
-
-  // out vertex struct for interleaved attributes
-  struct Vertex {
-    glm::vec2 position;
-    glm::vec2 coord;
-  };
-
-  // triangle vertices and indices
-  Vertex vertices[320 * 240];
 
   // internal data
   std::vector<uint8_t> m_rgbFrame;
@@ -104,7 +92,9 @@ private:
   CTargetCamera cam;
   // camera tranformation variables
   int state = 1, oldX = 0, oldY = 0;
-  float rX = 0, rY = 0, dist = 10;
+  float rX = 0, rY = 0;
+  // float dist = 10;
+  float dist = 3000;
 
   float mouseX = 0, mouseY = 0; // filtered mouse values
 
@@ -113,4 +103,4 @@ private:
   bool pendingRenderTexResize;
 };
 
-#endif // HOLOGRAMRENDERER_H
+#endif // SCENERENDERER_H

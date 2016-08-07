@@ -3,10 +3,10 @@
 // of imgui.cpp.
 
 // #include "allog.hpp"
-#include "hologramrenderer.hpp"
 #include "imgui/imgui.h"
 #include "imgui_impl_sdl.h"
 #include "manager.hpp"
+#include "scenerenderer.hpp"
 #include <GL/glew.h>
 #include <GL/glu.h>
 #include <SDL.h>
@@ -67,11 +67,11 @@ int main(int, char **) {
   ImGui_ImplSdl_Init(window);
 
   // local init
-  HologramRenderer hologramRenderer(winWidth, winHeight);
-  hologramRenderer.init();
+  SceneRenderer sceneRenderer(winWidth, winHeight);
+  sceneRenderer.init();
   Manager manager;
-  manager.initHoloRenderer(&hologramRenderer);
-  manager.initSensor(&(hologramRenderer.m_sensorDataFboRenderer));
+  manager.initHoloRenderer(&sceneRenderer);
+  manager.initSensor(&(sceneRenderer.m_sensorDataFboRenderer));
   manager.initSdk();
   manager.initWsConnection(&manager);
   // ~ local init
@@ -105,11 +105,11 @@ int main(int, char **) {
       switch (event.type) {
       case SDL_MOUSEMOTION: {
         if (mouseDown) {
-          hologramRenderer.OnMouseMove(event.motion.x, event.motion.y);
+          sceneRenderer.OnMouseMove(event.motion.x, event.motion.y);
         }
       } break;
       case SDL_MOUSEBUTTONDOWN: {
-        hologramRenderer.OnStartMouseMove(event.button.x, event.button.y);
+        sceneRenderer.OnStartMouseMove(event.button.x, event.button.y);
         mouseDown = true;
       } break;
       case SDL_MOUSEBUTTONUP: {
@@ -118,8 +118,8 @@ int main(int, char **) {
       case SDL_WINDOWEVENT: {
         switch (event.window.event) {
         case SDL_WINDOWEVENT_RESIZED: {
-          hologramRenderer.onWinResize((int)ImGui::GetIO().DisplaySize.x,
-                                       (int)ImGui::GetIO().DisplaySize.y);
+          sceneRenderer.onWinResize((int)ImGui::GetIO().DisplaySize.x,
+                                    (int)ImGui::GetIO().DisplaySize.y);
         } break;
         default: { } break; }
       } break;
@@ -201,13 +201,13 @@ int main(int, char **) {
     glClearColor(clear_color.x, clear_color.y, clear_color.z, clear_color.w);
     glClear(GL_COLOR_BUFFER_BIT);
 
-    hologramRenderer.render();
+    sceneRenderer.render();
 
     // has to be called once
-    if (!hologramRenderer.sendingFrames && manager.connectionInitialized &&
+    if (!sceneRenderer.sendingFrames && manager.connectionInitialized &&
         manager.getDeviceType() ==
             AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS) {
-      hologramRenderer.initFrameSending(manager.m_sdk.get());
+      sceneRenderer.initFrameSending(manager.m_sdk.get());
     }
 
     ImGui::Render();

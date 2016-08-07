@@ -16,7 +16,6 @@ int SensorDataFboRenderer::init() {
   shader.Use();
   // add attributes and uniforms
   shader.AddAttribute("vVertex");
-  shader.AddAttribute("vColor");
   shader.AddUniform("MVP");
 
   shader.AddUniform("textureMap");
@@ -33,15 +32,11 @@ int SensorDataFboRenderer::init() {
 
   // setup triangle geometry
   // setup triangle vertices
-  vertices[0].color = glm::vec3(1, 0, 0);
-  vertices[1].color = glm::vec3(0, 1, 0);
-  vertices[2].color = glm::vec3(0, 0, 1);
-  vertices[3].color = glm::vec3(0, 1, 1);
 
-  vertices[0].position = glm::vec3(-1.0, -1.0, 0);
-  vertices[1].position = glm::vec3(1.0, -1.0, 0);
-  vertices[2].position = glm::vec3(1.0, 1.0, 0);
-  vertices[3].position = glm::vec3(-1.0, 1.0, 0);
+  vertices[0].position = glm::vec2(-1.0, -1.0);
+  vertices[1].position = glm::vec2(1.0, -1.0);
+  vertices[2].position = glm::vec2(1.0, 1.0);
+  vertices[3].position = glm::vec2(-1.0, 1.0);
 
   // setup triangle indices
   indices[0] = 0;
@@ -67,12 +62,8 @@ int SensorDataFboRenderer::init() {
   // GL_CHECK_ERRORS
   // enable vertex attribute array for position
   glEnableVertexAttribArray(shader["vVertex"]);
-  glVertexAttribPointer(shader["vVertex"], 3, GL_FLOAT, GL_FALSE, stride, 0);
-  // GL_CHECK_ERRORS
-  // enable vertex attribute array for colour
-  glEnableVertexAttribArray(shader["vColor"]);
-  glVertexAttribPointer(shader["vColor"], 3, GL_FLOAT, GL_FALSE, stride,
-                        (const GLvoid *)offsetof(Vertex, color));
+  glVertexAttribPointer(shader["vVertex"], 2, GL_FLOAT, GL_FALSE, stride, 0);
+
   // GL_CHECK_ERRORS
   // pass indices to element array buffer
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIndicesID);

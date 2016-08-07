@@ -1,6 +1,6 @@
-#include "hologramrenderer.hpp"
+#include "scenerenderer.hpp"
 
-HologramRenderer::HologramRenderer(int winWidth, int winHeight)
+SceneRenderer::SceneRenderer(int winWidth, int winHeight)
     : WIDTH(0), HEIGHT(0), m_outPixel(0), pendingRenderTexResize(false),
       m_debug(true), m_remoteFrameRenderer(-0.5, -0.5, -0.5, -0.5),
       m_localFrameRenderer(-0.5, -0.5, -0.5, -0.5), m_winWidth(winWidth),
@@ -9,102 +9,29 @@ HologramRenderer::HologramRenderer(int winWidth, int winHeight)
   _updateRenderersPos();
 }
 
-void HologramRenderer::updateResolution(int width, int height) {
+void SceneRenderer::updateResolution(int width, int height) {
   WIDTH = width;
   HEIGHT = height;
   m_outPixel.resize(WIDTH * HEIGHT * 2 * 3);
   pendingRenderTexResize = true;
 }
 
-int HologramRenderer::init() {
+int SceneRenderer::init() {
   m_newFrame = false;
   // GL_CHECK_ERRORS
-  // load the shader
-  shader.LoadFromFile(GL_VERTEX_SHADER, "../al_ui/shaders/shader.vert");
-  shader.LoadFromFile(GL_FRAGMENT_SHADER, "../al_ui/shaders/shader.frag");
-  // compile and link shader
-  shader.CreateAndLinkProgram();
-  shader.Use();
-  // add attributes and uniforms
-  shader.AddAttribute("vVertex");
-  shader.AddAttribute("vCoord");
-  shader.AddUniform("MVP");
-  shader.AddUniform("textureMap");
-  // pass values of constant uniforms at initialization
-  glUniform1i(shader("textureMap"), 3);
-  // pass values of constant uniforms at initialization
-  shader.UnUse();
 
-  // GL_CHECK_ERRORS
+  m_hologram.init();
 
-  // vertices[0].coord = glm::vec2(1, 0);
-  // vertices[1].coord = glm::vec2(0, 1);
-  // vertices[2].coord = glm::vec2(0, 0);
-  // vertices[3].coord = glm::vec2(0, 1);
-
-  int index = 0;
-  for (int yCoord = 0; yCoord < 240; yCoord++) {
-    for (int xCoord = 0; xCoord < 320; xCoord++) {
-      vertices[index].position =
-          glm::vec2(float(xCoord) / 320 - 0.5, float(yCoord) / 240 - 0.5);
-      index++;
-    }
-  }
-
-  // GL_CHECK_ERRORS
-
-  // setup triangle vao and vbo stuff
-  glGenVertexArrays(1, &vaoID);
-  glGenBuffers(1, &vboVerticesID);
-  glGenBuffers(1, &vboIndicesID);
-  GLsizei stride = sizeof(Vertex);
-
-  glBindVertexArray(vaoID);
-
-  glBindBuffer(GL_ARRAY_BUFFER, vboVerticesID);
-  // pass triangle verteices to buffer object
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices[0], GL_STATIC_DRAW);
-  // GL_CHECK_ERRORS
-  // enable vertex attribute array for position
-  glEnableVertexAttribArray(shader["vVertex"]);
-  glVertexAttribPointer(shader["vVertex"], 2, GL_FLOAT, GL_FALSE, stride, 0);
-  // GL_CHECK_ERRORS
-  // enable vertex attribute array for colour
-  glEnableVertexAttribArray(shader["vCoord"]);
-  glVertexAttribPointer(shader["vCoord"], 2, GL_FLOAT, GL_FALSE, stride,
-                        (const GLvoid *)offsetof(Vertex, coord));
-  // GL_CHECK_ERRORS
-  // pass indices to element array buffer
-  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIndicesID);
-  // glBufferData(GL_ELEMENT_ARRAY_BUFFER, sizeof(indices), &indices[0],
-  //              GL_STATIC_DRAW);
-  // GL_CHECK_ERRORS
-
-  // unbinding
-  glBindVertexArray(0);
-  glBindBuffer(GL_ARRAY_BUFFER, 0);
-  glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
-
-  // some tex ==============
-  glGenTextures(1, &sensorDepthTexID);
-  glActiveTexture(GL_TEXTURE3);
-  glBindTexture(GL_TEXTURE_2D, sensorDepthTexID);
-  // set texture parameters
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, GL_LINEAR);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, GL_CLAMP);
-  glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, GL_CLAMP);
-  glBindTexture(GL_TEXTURE_2D, 0);
-  // =====================
   initFBO();
 
   m_sensorDataFboRenderer.init();
-
   m_remoteFrameRenderer.init();
   m_localFrameRenderer.init();
+  m_worldCoordinate.init();
 
   // setup the camera position and target
-  cam.SetPosition(glm::vec3(1, 1, 1));
+  // cam.SetPosition(glm::vec3(1, 1, 1));
+  cam.SetPosition(glm::vec3(3000, 3000, 3000));
   cam.SetTarget(glm::vec3(0, 0, 0));
 
   // also rotate the camera for proper orientation
@@ -121,13 +48,17 @@ int HologramRenderer::init() {
   return 1;
 }
 
-void HologramRenderer::render() {
+void SceneRenderer::render() {
   // TODO: move to 'onResize' event
-  cam.SetupProjection(45, (GLfloat)m_winWidth / m_winHeight);
+  cam.SetupProjection(45, (GLfloat)m_winWidth / m_winHeight, 0.1f, 10000.0f);
+  // set the camera transformation
+  glm::mat4 MV = cam.GetViewMatrix();
+  glm::mat4 P = cam.GetProjectionMatrix();
+  glm::mat4 MVP = P * MV;
 
   if (pendingRenderTexResize) {
     pendingRenderTexResize = false;
-    resizeRenderTex();
+    _resizeRenderTex();
   }
 
   // ============ FBO ==============
@@ -161,31 +92,11 @@ void HologramRenderer::render() {
 
   glViewport(0, 0, m_winWidth, m_winHeight);
 
-  glBindVertexArray(vaoID);
-  glBindBuffer(GL_ARRAY_BUFFER, vboVerticesID);
-  // glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIndicesID);
-
-  // bind the shader
-  shader.Use();
-
-  // set the camera transformation
-  glm::mat4 MV = cam.GetViewMatrix();
-  glm::mat4 P = cam.GetProjectionMatrix();
-  glm::mat4 MVP = P * MV;
-  // pass the shader uniform
-  glUniformMatrix4fv(shader("MVP"), 1, GL_FALSE, glm::value_ptr(MVP));
-
-  // drwa triangle
-  glEnable(GL_PROGRAM_POINT_SIZE);
-  // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
-  // glDrawElements(GL_POINTS, 4, GL_FLOAT, 0);
-  glDrawArrays(GL_POINTS, 0, 320 * 240);
-  // unbind the shader
-  shader.UnUse();
-
-  // TODO testing remote render
+  // Elements rendering
+  m_hologram.render(&MVP);
   m_remoteFrameRenderer.render();
   m_localFrameRenderer.render();
+  m_worldCoordinate.render(&MVP);
 
   glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
@@ -196,7 +107,7 @@ void HologramRenderer::render() {
 }
 
 // initialize FBO
-void HologramRenderer::initFBO() {
+void SceneRenderer::initFBO() {
   // generate and bind fbo ID
   glGenFramebuffers(1, &fboID);
   glBindFramebuffer(GL_FRAMEBUFFER, fboID);
@@ -241,7 +152,7 @@ void HologramRenderer::initFBO() {
   glBindFramebuffer(GL_FRAMEBUFFER, 0);
 }
 
-void HologramRenderer::resizeRenderTex() {
+void SceneRenderer::_resizeRenderTex() {
   glBindRenderbuffer(GL_RENDERBUFFER, rbID);
   // set the render buffer storage
   glRenderbufferStorage(GL_RENDERBUFFER, GL_DEPTH_COMPONENT32, WIDTH * 2,
@@ -251,9 +162,9 @@ void HologramRenderer::resizeRenderTex() {
                GL_UNSIGNED_BYTE, NULL);
 }
 
-void HologramRenderer::initFrameSending(AlSdkAPI *alSdkApi) {
+void SceneRenderer::initFrameSending(AlSdkAPI *alSdkApi) {
   if (m_debug) {
-    std::cout << "HologramRenderer::initFrameSending" << std::endl;
+    std::cout << "SceneRenderer::initFrameSending" << std::endl;
   }
   if (!sendingFrames) {
     newFrameSignal.connect(
@@ -262,12 +173,12 @@ void HologramRenderer::initFrameSending(AlSdkAPI *alSdkApi) {
   sendingFrames = true;
 }
 
-void HologramRenderer::OnStartMouseMove(int initX, int initY) {
+void SceneRenderer::OnStartMouseMove(int initX, int initY) {
   oldX = initX;
   oldY = initY;
 }
 
-void HologramRenderer::OnMouseMove(int x, int y) {
+void SceneRenderer::OnMouseMove(int x, int y) {
   if (state == 0) {
     dist = (y - oldY) / 5.0f;
     cam.Zoom(dist);
@@ -297,7 +208,7 @@ void HologramRenderer::OnMouseMove(int x, int y) {
   oldY = y;
 }
 
-void HologramRenderer::filterMouseMoves(float dx, float dy) {
+void SceneRenderer::filterMouseMoves(float dx, float dy) {
 
   for (int i = MOUSE_HISTORY_BUFFER_SIZE - 1; i > 0; --i) {
     mouseHistory[i] = mouseHistory[i - 1];
@@ -324,23 +235,23 @@ void HologramRenderer::filterMouseMoves(float dx, float dy) {
   mouseY = averageY / averageTotal;
 }
 
-void HologramRenderer::updateRemoteFrame(const uint8_t *image, int width,
-                                         int height) {
+void SceneRenderer::updateRemoteFrame(const uint8_t *image, int width,
+                                      int height) {
   m_remoteFrameRenderer.updateFrame(image, width, height);
 }
 
-void HologramRenderer::updateLocalFrame(const uint8_t *image, int width,
-                                        int height) {
+void SceneRenderer::updateLocalFrame(const uint8_t *image, int width,
+                                     int height) {
   m_localFrameRenderer.updateFrame(image, width, height);
 }
 
-void HologramRenderer::onWinResize(int winWidth, int winHeight) {
+void SceneRenderer::onWinResize(int winWidth, int winHeight) {
   m_winWidth = winWidth;
   m_winHeight = winHeight;
   _updateRenderersPos();
 }
 
-void HologramRenderer::_updateRenderersPos() {
+void SceneRenderer::_updateRenderersPos() {
 
   m_remoteFrameRenderer.setPosition(-0.8, -0.8, 0.8, 0.8, m_winWidth,
                                     m_winHeight);
