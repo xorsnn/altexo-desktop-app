@@ -6,11 +6,11 @@ WorldCoordinate::~WorldCoordinate() {}
 
 void WorldCoordinate::init() {
   m_vertices[0].position = glm::vec3(0, 0, 0);
-  m_vertices[1].position = glm::vec3(0, 0, 1);
+  m_vertices[1].position = glm::vec3(0, 0, 5);
   m_vertices[2].position = glm::vec3(0, 0, 0);
-  m_vertices[3].position = glm::vec3(0, 1, 0);
+  m_vertices[3].position = glm::vec3(0, 5, 0);
   m_vertices[4].position = glm::vec3(0, 0, 0);
-  m_vertices[5].position = glm::vec3(1, 0, 0);
+  m_vertices[5].position = glm::vec3(5, 0, 0);
 
   m_vertices[0].color = glm::vec3(1, 0, 0);
   m_vertices[1].color = glm::vec3(1, 0, 0);
@@ -73,9 +73,6 @@ void WorldCoordinate::render(glm::mat4 *MVP) {
   // pass the shader uniform
   glUniformMatrix4fv(shader("MVP"), 1, GL_FALSE, glm::value_ptr(*MVP));
 
-  // draw triangle
-  // glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
-  // glDrawElements(GL_LINE_STRIP, 6, GL_UNSIGNED_SHORT, 0);
   glDrawElements(GL_LINES, 6, GL_UNSIGNED_SHORT, 0);
   // unbind the shader
   shader.UnUse();
@@ -101,9 +98,6 @@ void WorldCoordinate::_initShaders() {
   shader.AddAttribute("vVertex");
   shader.AddAttribute("vColor");
   shader.AddUniform("MVP");
-  shader.AddUniform("textureMap");
-  // pass values of constant uniforms at initialization
-  glUniform1i(shader("textureMap"), 4);
   // pass values of constant uniforms at initialization
   shader.UnUse();
   // GL_CHECK_ERRORS

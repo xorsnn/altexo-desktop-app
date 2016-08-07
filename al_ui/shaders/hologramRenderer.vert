@@ -8,6 +8,7 @@ uniform mat4 MVP; // combined modelview projection matrix
 
 varying vec2 vUV;
 uniform sampler2D textureMap;
+varying float cond;
 
 vec3 rgb2hsl(vec3 color) {
   float h = 0.0;
@@ -79,11 +80,11 @@ vec3 xyz(float x, float y, float depth) {
   //     inputMin;
 
   float z =
-      ((depth - outputMin) / (outputMax - outputMin)) * (inputMax - inputMin);
+      ((depth - outputMin) / (outputMax - outputMin)) * (inputMax - inputMin) + inputMin;
 
-  return vec3(x * (wAmount * 2) * z / f, // X = (x - cx) * d / fx
-              y * (wAmount * 2) * z / f, // Y = (y - cy) * d / fy
-              -z);                       // Z = d
+  return vec3(x * (wAmount) * z / f, // X = (x - cx) * d / fx
+              y * (wAmount) * z / f, // Y = (y - cy) * d / fy
+              -z + inputMin);                       // Z = d
   // return vec3(x * z / f, // X = (x - cx) * d / fx
   //             y * z / f, // Y = (y - cy) * d / fy
   //             z);                        // Z = d
@@ -118,14 +119,9 @@ void main() {
   // 1)
   // gl_Position = MVP * vec4(vVertex.x, vVertex.y, pos.z / 640, 1.0); // OLD
   gl_Position = MVP * vec4(pos.x, pos.y, pos.z, 1.0);
+  // gl_Position = MVP * vec4(vVertex.x*10.0, vVertex.y*10.0,-hsl.x*10, 1.0);
   // 2)
   // gl_Position = vec4(vVertex.x, vVertex.y, 0, 1.0);
   vUV = vec2(vTexCoord.x * 0.5 + 0.5, 1 - vTexCoord.y);
-  // if (pos.z > -1000.0 && pos.z < -700.0) {
-  // if (pos.x > -100.0 && pos.x < 100.0) {
-  //   visibility = 1.0;
-  // } else {
-  //   visibility = 0.0;
-  // }
   gl_PointSize = 2.0;
 }
