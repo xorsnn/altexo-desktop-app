@@ -71,8 +71,8 @@ int main(int, char **) {
   sceneRenderer.init();
   Manager manager;
   manager.initHoloRenderer(&sceneRenderer);
-  manager.initSensor(&(sceneRenderer.m_sensorDataFboRenderer));
-  // manager.initSdk();
+  // manager.initSensor(&(sceneRenderer.m_sensorDataFboRenderer));
+  manager.initSdk();
   // manager.initWsConnection(&manager);
   // ~ local init
 
