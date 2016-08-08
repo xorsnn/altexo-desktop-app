@@ -35,6 +35,19 @@ protected:
 
   // triangle vertices and indices
   Vertex vertices[320 * 240];
+
+  // plane
+  struct PlaneVertex {
+    glm::vec3 position;
+    glm::vec2 texCoord;
+  };
+  PlaneVertex m_planeVertices[4];
+  GLushort m_planeIndices[6];
+  GLuint m_PlaneVaoID;
+  GLuint m_PlaneVboVerticesID;
+  GLuint m_PlaneVboIndicesID;
+  // shader reference
+  GLSLShader m_plainShader;
 };
 
 #endif // HOLOGRAM_H

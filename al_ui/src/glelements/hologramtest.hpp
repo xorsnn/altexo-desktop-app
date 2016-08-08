@@ -26,18 +26,6 @@ protected:
 
 private:
   typedef Hologram super;
-  // plane
-  struct PlaneVertex {
-    glm::vec3 position;
-    glm::vec2 texCoord;
-  };
-  PlaneVertex m_planeVertices[4];
-  GLushort m_planeIndices[6];
-  GLuint m_PlaneVaoID;
-  GLuint m_PlaneVboVerticesID;
-  GLuint m_PlaneVboIndicesID;
-  // shader reference
-  GLSLShader m_plainShader;
 
   void _readPngFile(char *fileName);
   uint8_t m_img[1280 * 480 * 3];
