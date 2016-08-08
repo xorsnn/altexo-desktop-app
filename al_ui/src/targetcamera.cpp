@@ -12,7 +12,7 @@ CTargetCamera::CTargetCamera(void) {
   minRy = -60;
   maxRy = 60;
   minDistance = 1;
-  maxDistance = 10;
+  maxDistance = 10000;
 }
 
 CTargetCamera::~CTargetCamera(void) {}
@@ -33,6 +33,8 @@ void CTargetCamera::SetTarget(const glm::vec3 tgt) {
   target = tgt;
   distance = glm::distance(position, target);
   distance = std::max(minDistance, std::min(distance, maxDistance));
+  std::cout << "CTargetCamera::SetTarget" << std::endl;
+  std::cout << distance << std::endl;
   /*V = glm::lookAt(position, target, up);
 
   m_yaw = 0;

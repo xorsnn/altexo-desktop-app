@@ -6,20 +6,31 @@
 using namespace std;
 
 AlSdkPlugin::AlSdkPlugin()
-    : m_debug(true), WIDTH(0), HEIGHT(0), m_videoDeviceName("") {
+    : m_debug(true), WIDTH(0), HEIGHT(0), m_videoDeviceName(""),
+      m_internalThread(NULL) {
   m_manager = new AlManager();
 }
 
 AlSdkPlugin::~AlSdkPlugin() {
-  m_internalThread->interrupt();
-  // TODO interrupt custom sockerserver
-  // if (m_internalThread->joinable()) {
-  // m_internalThread->join();
-  // }
-  delete m_internalThread;
-  m_internalThread = NULL;
+  // sending a 'quit' message to custom socket server
+  std::pair<int, std::vector<char>> msg(AlCallback::SdkMessageType::QUIT_SM,
+                                        std::vector<char>());
+  m_messageQueue.push(msg);
+
+  std::cout << "AlSdkPlugin::~AlSdkPlugin 1" << std::endl;
+  if (m_internalThread != NULL) {
+    m_internalThread->interrupt();
+    // TODO interrupt custom sockerserver
+    // if (m_internalThread->joinable()) {
+    // m_internalThread->join();
+    // }
+    delete m_internalThread;
+    m_internalThread = NULL;
+    std::cout << "AlSdkPlugin::~AlSdkPlugin 2" << std::endl;
+  }
   delete m_manager;
   m_manager = NULL;
+  std::cout << "AlSdkPlugin::~AlSdkPlugin 3" << std::endl;
 }
 
 void AlSdkPlugin::init(AlSDKCb *alSdkCb) {

@@ -11,6 +11,7 @@ class AlManager {
 
 public:
   AlManager();
+  ~AlManager();
   /* use virtual otherwise linker will try to perform static linkage */
   virtual void init(AlCallback *alCallback);
   virtual void run();

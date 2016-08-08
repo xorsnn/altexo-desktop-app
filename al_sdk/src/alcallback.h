@@ -15,6 +15,7 @@ public:
     INIT_SM,
     NEW_FRAME_SM,
     UPDATE_RESOLUTION_SM,
+    QUIT_SM,
   };
 
   // TODO migrate to this 2

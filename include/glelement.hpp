@@ -13,6 +13,7 @@ public:
 
 protected:
   virtual void _initShaders() = 0;
+  virtual void _initTextures() = 0;
 };
 
 #endif // GLELEMENT_H

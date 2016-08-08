@@ -5,7 +5,7 @@
 #include "AL_CB/al_sensor_cb.hpp"
 #include "GLSLShader.hpp"
 #include "contact.hpp"
-#include "glelements/hologram.hpp"
+#include "glelements/hologramtest.hpp"
 #include "glelements/worldcoordinate.hpp"
 #include "sensordatafborenderer.hpp"
 #include "targetcamera.h"
@@ -49,6 +49,7 @@ public:
 
   VideoStreamRenderer m_remoteFrameRenderer;
   VideoStreamRenderer m_localFrameRenderer;
+  // HologramTest m_hologram;
   Hologram m_hologram;
   WorldCoordinate m_worldCoordinate;
 

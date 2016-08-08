@@ -6,11 +6,11 @@ WorldCoordinate::~WorldCoordinate() {}
 
 void WorldCoordinate::init() {
   m_vertices[0].position = glm::vec3(0, 0, 0);
-  m_vertices[1].position = glm::vec3(0, 0, 5);
+  m_vertices[1].position = glm::vec3(0, 0, 1000);
   m_vertices[2].position = glm::vec3(0, 0, 0);
-  m_vertices[3].position = glm::vec3(0, 5, 0);
+  m_vertices[3].position = glm::vec3(0, 1000, 0);
   m_vertices[4].position = glm::vec3(0, 0, 0);
-  m_vertices[5].position = glm::vec3(5, 0, 0);
+  m_vertices[5].position = glm::vec3(1000, 0, 0);
 
   m_vertices[0].color = glm::vec3(1, 0, 0);
   m_vertices[1].color = glm::vec3(1, 0, 0);

@@ -32,7 +32,9 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 
 FIND_PACKAGE( SDL2 REQUIRED )
 FIND_PACKAGE( Boost COMPONENTS system filesystem thread REQUIRED )
+if (APPLE)
 FIND_PACKAGE( glm REQUIRED )
+endif()
 FIND_PACKAGE( GLEW REQUIRED )
 
 INCLUDE( ${CMAKE_ROOT}/Modules/FindOpenGL.cmake )
@@ -62,5 +64,6 @@ target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARY}
   ${Boost_FILESYSTEM_LIBRARY}
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_THREAD_LIBRARY}
+  -lpng
   -ldl)
 # install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${BIN_DIR})
