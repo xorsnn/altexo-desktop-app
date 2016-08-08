@@ -33,9 +33,14 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 FIND_PACKAGE( SDL2 REQUIRED )
 FIND_PACKAGE( Boost COMPONENTS system filesystem thread REQUIRED )
 if (APPLE)
-FIND_PACKAGE( glm REQUIRED )
+  FIND_PACKAGE( glm REQUIRED )
+  FIND_LIBRARY( QUICKTIME QTKit )
 endif()
 FIND_PACKAGE( GLEW REQUIRED )
+
+# used for testing now
+FIND_PACKAGE( PNG REQUIRED )
+
 
 INCLUDE( ${CMAKE_ROOT}/Modules/FindOpenGL.cmake )
 
@@ -47,10 +52,12 @@ INCLUDE_DIRECTORIES( ../vendor/Boost.DLL/include/ )
 INCLUDE_DIRECTORIES( ${OPENGL_INCLUDE_DIR} )
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 INCLUDE_DIRECTORIES( ./src/ )
+INCLUDE_DIRECTORIES( ${PNG_INCLUDE_DIR} )
 if (GLEW_FOUND)
     INCLUDE_DIRECTORIES(${GLEW_INCLUDE_DIRS})
     link_libraries(${GLEW_LIBRARIES})
 endif()
+
 # TODO: temporary decision
 if(APPLE)
   INCLUDE_DIRECTORIES(/opt/X11/include)
@@ -59,11 +66,23 @@ if(APPLE)
 endif()
 
 add_executable(${PROJECT_NAME} ${SRC_LIST})
-target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARY}
-  ${OPENGL_LIBRARIES}
-  ${Boost_FILESYSTEM_LIBRARY}
-  ${Boost_SYSTEM_LIBRARY}
-  ${Boost_THREAD_LIBRARY}
-  -lpng
-  -ldl)
+
+if (APPLE)
+  target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARY}
+    ${OPENGL_LIBRARIES}
+    ${Boost_FILESYSTEM_LIBRARY}
+    ${Boost_SYSTEM_LIBRARY}
+    ${Boost_THREAD_LIBRARY}
+    ${PNG_LIBRARIES}
+    ${QUICKTIME}
+    -ldl)
+else()
+  target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARY}
+    ${OPENGL_LIBRARIES}
+    ${Boost_FILESYSTEM_LIBRARY}
+    ${Boost_SYSTEM_LIBRARY}
+    ${Boost_THREAD_LIBRARY}
+    -lpng
+    -ldl)
+endif()
 # install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${BIN_DIR})
