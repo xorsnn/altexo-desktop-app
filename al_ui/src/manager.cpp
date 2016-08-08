@@ -11,10 +11,24 @@ Manager::Manager()
 }
 
 Manager::~Manager() {
-  m_frameThread->interrupt();
-  m_frameThread->join();
-  delete m_frameThread;
-  m_frameThread = NULL;
+  if (m_frameThread != NULL) {
+    m_frameThread->interrupt();
+    m_frameThread->join();
+    delete m_frameThread;
+    m_frameThread = NULL;
+  }
+  if (m_wsClient != NULL) {
+    m_wsClient.reset();
+    m_wsClient = NULL;
+  }
+  if (m_sensor != NULL) {
+    m_sensor.reset();
+    m_sensor = NULL;
+  }
+  if (m_sdk != NULL) {
+    m_sdk.reset();
+    m_sdk = NULL;
+  }
 }
 
 void Manager::initHoloRenderer(SceneRenderer *holoRenderer) {

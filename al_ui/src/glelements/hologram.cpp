@@ -76,13 +76,14 @@ void Hologram::init() {
   // GL_CHECK_ERRORS
   // enable vertex attribute array for position
   glEnableVertexAttribArray(m_plainShader["vVertex"]);
-  glVertexAttribPointer(m_plainShader["vVertex"], 3, GL_FLOAT, GL_FALSE, planeStride,
-                        0);
+  glVertexAttribPointer(m_plainShader["vVertex"], 3, GL_FLOAT, GL_FALSE,
+                        planeStride, 0);
   // GL_CHECK_ERRORS
   // enable vertex attribute array for tex coord
   glEnableVertexAttribArray(m_plainShader["vTexCoord"]);
   glVertexAttribPointer(m_plainShader["vTexCoord"], 2, GL_FLOAT, GL_FALSE,
-                        planeStride, (const GLvoid *)offsetof(Vertex, texCoord));
+                        planeStride,
+                        (const GLvoid *)offsetof(Vertex, texCoord));
   // GL_CHECK_ERRORS
   // pass indices to element array buffer
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_PlaneVboIndicesID);
