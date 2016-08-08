@@ -7,6 +7,12 @@ using namespace std;
 AlManager::AlManager()
     : m_conductor(NULL), m_socketServer(NULL), m_thread(NULL), m_debug(true) {}
 
+AlManager::~AlManager() {
+  // CustomSocketServer *m_socketServer;
+  // rtc::Thread *m_thread;
+  // rtc::scoped_refptr<Conductor> m_conductor;
+}
+
 void AlManager::init(AlCallback *alCallback) {
   // auto_thread = new rtc::AutoThread();
   rtc::AutoThread auto_thread;

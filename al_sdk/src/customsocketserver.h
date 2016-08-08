@@ -20,22 +20,12 @@ public:
   // TODO - introduce callback!!!
   // Override so that we can also pump the GTK message loop.
   virtual bool Wait(int cms, bool process_io) {
-    // std::cout << "ping!" << std::endl;
 
     // Pump GTK events.
     // TODO(henrike): We really should move either the socket server or UI to a
     // different thread.  Alternatively we could look at merging the two loops
     // by implementing a dispatcher for the socket server and/or use
     // g_main_context_set_poll_func.
-    // TODO make a callback for this
-    //        qtApp_->processEvents();
-    // TODO false is temporary solution
-    // if (m_alCallback) {
-    //   m_alCallback->processUiEventsCb();
-    // }
-    // if (false && !m_conductor->connection_active()) {
-    //   m_thread->Quit();
-    // }
 
     if (m_alCallback->ifNewMessage()) {
       std::pair<int, std::vector<char>> msg = m_alCallback->degueueMessage();
@@ -68,6 +58,12 @@ public:
       case AlCallback::SdkMessageType::UPDATE_RESOLUTION_SM: {
         width = m_alCallback->getWidth();
         height = m_alCallback->getHeight();
+      } break;
+      case AlCallback::SdkMessageType::QUIT_SM: {
+        if (m_debug) {
+          std::cout << "AlCallback::SdkMessageType::QUIT_SM" << std::endl;
+        }
+        m_thread->Quit();
       } break;
       default: {
         // unhandled
