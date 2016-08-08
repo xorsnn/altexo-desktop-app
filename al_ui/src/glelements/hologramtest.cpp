@@ -10,11 +10,13 @@ void abort_(const char *s, ...) {
   abort();
 }
 
-HologramTest::HologramTest() { _readPngFile("/home/xors/cto_intro.png"); }
+HologramTest::HologramTest() { _readPngFile("al_ui/cto_intro.png"); }
 
 void HologramTest::init() { super::init(); }
 
 void HologramTest::render(glm::mat4 *MVP) {
+  glActiveTexture(GL_TEXTURE3);
+  glBindTexture(GL_TEXTURE_2D, sensorDepthTexID);
   super::render(MVP);
   // seems to be needed by something, otherwise some artifacts appears
   // glActiveTexture(GL_TEXTURE0);

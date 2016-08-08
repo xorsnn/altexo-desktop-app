@@ -10,6 +10,8 @@ file(GLOB SRC_LIST
   src/**/*.cc
 )
 
+file(COPY res/cto_intro.png DESTINATION .)
+
 # Use our modified FindSDL2* modules
 set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${${PROJECT_NAME}_SOURCE_DIR}/cmake")
 set(CMAKE_AUTOMOC ON)
