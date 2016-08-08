@@ -41,9 +41,6 @@ int SceneRenderer::init() {
   float pitch = glm::degrees(asin(look.y));
   rX = yaw;
   rY = pitch;
-  std::cout << "------------------" << std::endl;
-  std::cout << rX << std::endl;
-  std::cout << rY << std::endl;
 
   cam.Rotate(rX, rY, 0);
 

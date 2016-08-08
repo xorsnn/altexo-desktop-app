@@ -99,37 +99,32 @@ void Hologram::init() {
 }
 
 void Hologram::render(glm::mat4 *MVP) {
+  // RENDER BOTTOM PLANE
   glBindVertexArray(m_PlaneVaoID);
   glBindBuffer(GL_ARRAY_BUFFER, m_PlaneVboVerticesID);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, m_PlaneVboIndicesID);
-
   // bind the shader
   m_plainShader.Use();
-
   // pass the shader uniform
   glUniformMatrix4fv(shader("MVP"), 1, GL_FALSE, glm::value_ptr(*MVP));
-
   // draw triangle
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
   // unbind the shader
   m_plainShader.UnUse();
-
   glBindVertexArray(0);
   glBindBuffer(GL_ARRAY_BUFFER, 0);
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, 0);
 
+  // RENDER HOLOGRAM
   glActiveTexture(GL_TEXTURE3);
-  glBindTexture(GL_TEXTURE_2D, sensorDepthTexID);
-
+  // TODO: take a look this should be an FBO texture
+  // glBindTexture(GL_TEXTURE_2D, sensorDepthTexID);
   glBindVertexArray(vaoID);
   glBindBuffer(GL_ARRAY_BUFFER, vboVerticesID);
-
   // bind the shader
   shader.Use();
-
   // pass the shader uniform
   glUniformMatrix4fv(shader("MVP"), 1, GL_FALSE, glm::value_ptr(*MVP));
-
   // drwa triangle
   glEnable(GL_PROGRAM_POINT_SIZE);
   glDrawArrays(GL_POINTS, 0, 320 * 240);
@@ -168,10 +163,6 @@ void Hologram::_initShaders() {
   m_plainShader.AddAttribute("vVertex");
   m_plainShader.AddAttribute("vTexCoord");
   m_plainShader.AddUniform("MVP");
-  m_plainShader.AddUniform("textureMap");
-  // pass values of constant uniforms at initialization
-  glUniform1i(m_plainShader("textureMap"), 3);
-  // pass values of constant uniforms at initialization
   m_plainShader.UnUse();
 }
 

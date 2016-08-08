@@ -49,7 +49,8 @@ public:
 
   VideoStreamRenderer m_remoteFrameRenderer;
   VideoStreamRenderer m_localFrameRenderer;
-  HologramTest m_hologram;
+  // HologramTest m_hologram;
+  Hologram m_hologram;
   WorldCoordinate m_worldCoordinate;
 
   bool sendingFrames = false;

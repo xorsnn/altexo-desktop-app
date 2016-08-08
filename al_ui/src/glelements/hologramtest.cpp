@@ -17,7 +17,7 @@ void HologramTest::init() { super::init(); }
 void HologramTest::render(glm::mat4 *MVP) {
   super::render(MVP);
   // seems to be needed by something, otherwise some artifacts appears
-  glActiveTexture(GL_TEXTURE0);
+  // glActiveTexture(GL_TEXTURE0);
 }
 
 void HologramTest::_readPngFile(char *file_name) {
