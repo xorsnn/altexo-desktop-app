@@ -20,6 +20,7 @@ int SceneRenderer::init() {
   m_newFrame = false;
   // GL_CHECK_ERRORS
 
+  m_bottomPlane.init();
   m_hologram.init();
 
   initFBO();
@@ -93,9 +94,12 @@ void SceneRenderer::render() {
   glViewport(0, 0, m_winWidth, m_winHeight);
 
   // Elements rendering
+  m_bottomPlane.render(&MVP);
   m_hologram.render(&MVP);
+  // TODO use them only if streams exists
   m_remoteFrameRenderer.render();
   m_localFrameRenderer.render();
+
   m_worldCoordinate.render(&MVP);
 
   glBindVertexArray(0);

@@ -11,7 +11,7 @@
 //#define IM_ASSERT(_EXPR)  MyAssert(_EXPR)
 
 //---- Define attributes of all API symbols declarations, e.g. for DLL under
-// Windows.
+//Windows.
 //#define IMGUI_API __declspec( dllexport )
 //#define IMGUI_API __declspec( dllimport )
 
@@ -19,7 +19,7 @@
 //#define IMGUI_INCLUDE_IMGUI_USER_H
 
 //---- Don't implement default handlers for Windows (so as not to link with
-// OpenClipboard() and others Win32 functions)
+//OpenClipboard() and others Win32 functions)
 //#define IMGUI_DISABLE_WIN32_DEFAULT_CLIPBOARD_FUNCS
 //#define IMGUI_DISABLE_WIN32_DEFAULT_IME_FUNCS
 
@@ -34,7 +34,7 @@
 //#define IMGUI_STB_NAMESPACE     ImGuiStb
 
 //---- Define constructor and implicit cast operators to convert back<>forth
-// from your math types and ImVec2/ImVec4.
+//from your math types and ImVec2/ImVec4.
 /*
 #define IM_VEC2_CLASS_EXTRA                                                 \
         ImVec2(const MyVec2& f) { x = f.x; y = f.y; }                       \
@@ -46,9 +46,9 @@
 */
 
 //---- Tip: You can add extra functions within the ImGui:: namespace, here or in
-// your own headers files.
+//your own headers files.
 //---- e.g. create variants of the ImGui::Value() helper for your low-level math
-// types, or your own widgets/helpers.
+//types, or your own widgets/helpers.
 /*
 namespace ImGui
 {

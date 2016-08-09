@@ -1,20 +1,18 @@
 // ImGui - standalone example application for SDL2 + OpenGL
 // If you are new to ImGui, see examples/README.txt and documentation at the top
 // of imgui.cpp.
+// #include <GL/glew.h>
 
-// #include "allog.hpp"
-#include "imgui/imgui.h"
-#include "imgui_impl_sdl.h"
-#include "manager.hpp"
-#include "scenerenderer.hpp"
-#include <GL/glew.h>
-#include <GL/glu.h>
+#include <imgui/imgui.h>
+
+#include "imgui_impl_sdl_gl3.h"
+#include <GL/gl3w.h>
 #include <SDL.h>
-#include <SDL_opengl.h>
 #include <iostream>
 #include <stdio.h>
 
-#define IM_ARRAYSIZE(_ARR) ((int)(sizeof(_ARR) / sizeof(*_ARR)))
+#include "manager.hpp"
+// #include "scenerenderer.hpp"
 
 int main(int, char **) {
   // TODO move it to stored settings
@@ -28,50 +26,31 @@ int main(int, char **) {
   }
 
   // Setup window
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_FLAGS,
+                      SDL_GL_CONTEXT_FORWARD_COMPATIBLE_FLAG);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_PROFILE_MASK, SDL_GL_CONTEXT_PROFILE_CORE);
   SDL_GL_SetAttribute(SDL_GL_DOUBLEBUFFER, 1);
   SDL_GL_SetAttribute(SDL_GL_DEPTH_SIZE, 24);
   SDL_GL_SetAttribute(SDL_GL_STENCIL_SIZE, 8);
-
-  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 2);
+  SDL_GL_SetAttribute(SDL_GL_CONTEXT_MAJOR_VERSION, 3);
   SDL_GL_SetAttribute(SDL_GL_CONTEXT_MINOR_VERSION, 2);
-
   SDL_DisplayMode current;
   SDL_GetCurrentDisplayMode(0, &current);
   SDL_Window *window = SDL_CreateWindow(
       "Altexo holographic chat", SDL_WINDOWPOS_CENTERED, SDL_WINDOWPOS_CENTERED,
       winWidth, winHeight, SDL_WINDOW_OPENGL | SDL_WINDOW_RESIZABLE);
   SDL_GLContext glcontext = SDL_GL_CreateContext(window);
-
-  // Opengl
-
-  // Initialize GLEW
-  glewExperimental = GL_TRUE;
-  GLenum glewError = glewInit();
-  if (glewError != GLEW_OK) {
-    printf("Error initializing GLEW! %s\n", glewGetErrorString(glewError));
-  }
-
-  // Use Vsync
-  if (SDL_GL_SetSwapInterval(1) < 0) {
-    printf("Warning: Unable to set VSync! SDL Error: %s\n", SDL_GetError());
-  }
-
-  // // Initialize OpenGL
-  // if (!initGL()) {
-  //   printf("Unable to initialize OpenGL!\n");
-  //   // success = false;
-  // }
-  // ~ opengl
+  gl3wInit();
 
   // Setup ImGui binding
-  ImGui_ImplSdl_Init(window);
+  ImGui_ImplSdlGL3_Init(window);
 
   // local init
   SceneRenderer sceneRenderer(winWidth, winHeight);
   sceneRenderer.init();
   Manager manager;
   manager.initHoloRenderer(&sceneRenderer);
-  // manager.initSensor(&(sceneRenderer.m_sensorDataFboRenderer));
+  manager.initSensor(&(sceneRenderer.m_sensorDataFboRenderer));
   manager.initSdk();
   // manager.initWsConnection(&manager);
   // ~ local init
@@ -84,12 +63,12 @@ int main(int, char **) {
   // io.Fonts->AddFontFromFileTTF("../../extra_fonts/Cousine-Regular.ttf",
   // 15.0f);
   // io.Fonts->AddFontFromFileTTF("../../extra_fonts/DroidSans.ttf", 16.0f);
-  // io.Fonts->AddFontFromFileTTF("../../extra_fonts/ProggyClean.ttf",
-  // 13.0f);
-  // io.Fonts->AddFontFromFileTTF("../../extra_fonts/ProggyTiny.ttf",
-  // 10.0f);
+  // io.Fonts->AddFontFromFileTTF("../../extra_fonts/ProggyClean.ttf", 13.0f);
+  // io.Fonts->AddFontFromFileTTF("../../extra_fonts/ProggyTiny.ttf", 10.0f);
   // io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f,
   // NULL, io.Fonts->GetGlyphRangesJapanese());
+
+  std::cout << glGetString(GL_VERSION) << std::endl;
 
   bool show_test_window = true;
 
@@ -101,7 +80,7 @@ int main(int, char **) {
   while (!done) {
     SDL_Event event;
     while (SDL_PollEvent(&event)) {
-      ImGui_ImplSdl_ProcessEvent(&event);
+      ImGui_ImplSdlGL3_ProcessEvent(&event);
       switch (event.type) {
       case SDL_MOUSEMOTION: {
         if (mouseDown) {
@@ -129,7 +108,7 @@ int main(int, char **) {
       default: { } break; }
     }
 
-    ImGui_ImplSdl_NewFrame(window);
+    ImGui_ImplSdlGL3_NewFrame(window);
 
     // 1. Show a simple window
     // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears
@@ -216,7 +195,7 @@ int main(int, char **) {
   }
 
   // Cleanup
-  ImGui_ImplSdl_Shutdown();
+  ImGui_ImplSdlGL3_Shutdown();
   SDL_GL_DeleteContext(glcontext);
   SDL_DestroyWindow(window);
   SDL_Quit();

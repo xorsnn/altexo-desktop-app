@@ -1,14 +1,23 @@
-#version 120
+#version 330 core
 
-attribute vec2 vVertex; // object space vertex position
-attribute vec2 vTexCoord;
+layout(location=0) in vec2 vVertex; // object space vertex position
+layout(location=1) in vec2 vTexCoord;
 
 // uniform
 uniform mat4 MVP; // combined modelview projection matrix
-
-varying vec2 vUV;
 uniform sampler2D textureMap;
-varying float cond;
+
+smooth out vec2 vUV;
+smooth out vec2 vUv;
+smooth out float visibility;
+
+const float minD = 555.0;
+const float maxD = 1005.0;
+
+// taken from freenect example
+const float wAmount = 320.0; // TODO move to uniform
+const float hAmount = 240.0; // TODO move to uniform
+const float f = 595.0; // devide by wAmoutn to normalize
 
 vec3 rgb2hsl(vec3 color) {
   float h = 0.0;
@@ -44,22 +53,6 @@ vec3 rgb2hsl(vec3 color) {
   return vec3(h, s, l);
 }
 
-const float minD = 555.0;
-const float maxD = 1005.0;
-
-const float fx = 1.094017094017094; // 640.0/(( maxD + minD ) / 2)*640/480;
-
-const float fy = 0.8205128205128206; // 480.0/(( maxD + minD ) / 2)*640/480;
-
-// taken from freenect example
-const float wAmount = 320.0; // TODO move to uniform
-const float hAmount = 240.0; // TODO move to uniform
-// const float f = 595.0/640.0; // devide by wAmoutn to normalize
-const float f = 595.0; // devide by wAmoutn to normalize
-
-varying vec2 vUv;
-varying float visibility;
-
 vec3 xyz(float x, float y, float depth) {
   float outputMin = 0.0;
   float outputMax = 1.0;
@@ -80,7 +73,7 @@ void main() {
   visibility = 1.0;
   vUv = vec2(vTexCoord.x, 1 - vTexCoord.y);
   vUv.x = vUv.x * 0.5;
-  vec3 hsl = rgb2hsl(texture2D(textureMap, vUv).xyz);
+  vec3 hsl = rgb2hsl(texture(textureMap, vUv).xyz);
   vUv.x += 0.5;
   visibility = hsl.z * 2.0;
   vec3 pos = xyz(vVertex.x, vVertex.y, hsl.x);
@@ -88,6 +81,10 @@ void main() {
   // object space
   // vertex position
   gl_Position = MVP * vec4(pos.x, pos.y, pos.z, 1.0);
+  // gl_Position = MVP * vec4(pos.x, pos.y, 0.0, 1.0); // TODO: for testing
+  // visibility = 1.0; // TODO: for testing
+
   vUV = vec2(vTexCoord.x * 0.5 + 0.5, 1 - vTexCoord.y);
+  // vUV = vec2(vTexCoord.x, 1 - vTexCoord.y); // TODO: for testing
   gl_PointSize = 2.0;
 }

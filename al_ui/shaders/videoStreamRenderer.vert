@@ -1,10 +1,14 @@
-#version 120
+#version 330 core
 
-attribute vec2 vVertex; // object space vertex position
-attribute vec2 vTexCoord;
+// attribute vec2 vVertex; // object space vertex position
+// attribute vec2 vTexCoord;
+
+layout(location=0) in vec2 vVertex; // object space vertex position
+layout(location=1) in vec2 vTexCoord;
+
 uniform mat4 MVP; // combined modelview projection matrix
+smooth out vec2 vUV;
 
-varying vec2 vUV;
 void main() {
   // get the clip space position by multiplying the combined MVP matrix with the
   // object space

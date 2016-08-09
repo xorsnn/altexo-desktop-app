@@ -1,7 +1,6 @@
-#version 120
+#version 330 core
 
-attribute vec3 vVertex; // object space vertex position
-attribute vec2 vTexCoord;
+layout(location=0) in vec3 vVertex; // object space vertex position
 uniform mat4 MVP; // combined modelview projection matrix
 
 void main() {

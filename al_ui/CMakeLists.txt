@@ -8,6 +8,7 @@ file(GLOB SRC_LIST
   src/**/*.cpp
   src/**/*.h
   src/**/*.cc
+  src/**/*.c
 )
 
 file(COPY res/cto_intro.png DESTINATION .)
@@ -43,8 +44,11 @@ FIND_PACKAGE( GLEW REQUIRED )
 # used for testing now
 FIND_PACKAGE( PNG REQUIRED )
 
-
-INCLUDE( ${CMAKE_ROOT}/Modules/FindOpenGL.cmake )
+if (APPLE)
+  FIND_PACKAGE( OpenGL REQUIRED )
+else()
+  INCLUDE( ${CMAKE_ROOT}/Modules/FindOpenGL.cmake )
+endif()
 
 INCLUDE_DIRECTORIES( ${SDL2_INCLUDE_DIR} )
 INCLUDE_DIRECTORIES( ${GLM_INCLUDE_DIRS} )
