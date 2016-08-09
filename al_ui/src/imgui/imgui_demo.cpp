@@ -33,11 +33,10 @@
 #pragma clang diagnostic ignored                                               \
     "-Wold-style-cast" // warning : use of old-style cast
                        // // yes, they are more terse.
-#pragma clang diagnostic ignored "-Wdeprecated-declarations" // warning : 'xx'
-                                                             // is deprecated:
-                                                             // The POSIX name
-// for this item.. // for strdup used in demo
-// code (so user can copy & paste the code)
+#pragma clang diagnostic ignored                                               \
+    "-Wdeprecated-declarations" // warning : 'xx' is deprecated: The POSIX name
+                                // for this item.. // for strdup used in demo
+                                // code (so user can copy & paste the code)
 #pragma clang diagnostic ignored                                               \
     "-Wint-to-void-pointer-cast" // warning : cast to 'void *' from smaller
                                  // integer type 'int'
@@ -55,17 +54,17 @@
     "-Wreserved-id-macro" // warning : macro name is a reserved identifier //
 #elif defined(__GNUC__)
 #pragma GCC diagnostic ignored "-Wint-to-pointer-cast" // warning: cast to
-// pointer from integer
-// of different size
-#pragma GCC diagnostic ignored "-Wformat-security"     // warning : format string is
-// not a string literal
-// (potentially insecure)
+                                                       // pointer from integer
+                                                       // of different size
+#pragma GCC diagnostic ignored "-Wformat-security" // warning : format string is
+                                                   // not a string literal
+                                                   // (potentially insecure)
 #pragma GCC diagnostic ignored                                                 \
     "-Wdouble-promotion" // warning: implicit conversion from 'float' to
-// 'double' when passing argument to function
+                         // 'double' when passing argument to function
 #pragma GCC diagnostic ignored                                                 \
     "-Wconversion" // warning: conversion to 'xxxx' from 'xxxx' may alter its
-// value
+                   // value
 #endif
 
 // Play it nice with Windows users. Notepad in 2015 still doesn't display text
