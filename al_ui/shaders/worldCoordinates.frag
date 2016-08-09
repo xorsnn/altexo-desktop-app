@@ -1,7 +1,8 @@
-#version 120
+#version 330 core
 
-varying vec3 col;
+smooth in vec4 vSmoothColor;
+layout(location=0) out vec4 vFragColor; // object space vertex position
 
 void main() {
-  gl_FragColor = vec4(col, 1.0);
+  vFragColor = vSmoothColor;
 }

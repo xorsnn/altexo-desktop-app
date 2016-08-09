@@ -1,7 +1,6 @@
-#version 120
-
-varying vec2 vUV;
+#version 330 core
+layout(location=0) out vec4 vFragColor;
 
 void main() {
-  gl_FragColor = vec4(0.8, 0.8, 0.8, 1.0);
+  vFragColor = vec4(0.8, 0.8, 0.8, 1.0);
 }

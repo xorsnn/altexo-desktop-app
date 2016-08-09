@@ -1,14 +1,13 @@
-#version 120
+#version 330 core
 
-attribute vec2 vVertex; // object space vertex position
-attribute vec2 vTexCoord;
+layout(location=0) in vec2 vVertex; // object space vertex position
+layout(location=1) in vec2 vTexCoord;
 
 // uniform
 uniform mat4 MVP; // combined modelview projection matrix
-
-varying vec2 vUV;
 uniform sampler2D textureMap;
-varying float cond;
+
+smooth out vec2 vUV;
 
 vec3 rgb2hsl(vec3 color) {
   float h = 0.0;
@@ -57,8 +56,8 @@ const float hAmount = 240.0; // TODO move to uniform
 // const float f = 595.0/640.0; // devide by wAmoutn to normalize
 const float f = 595.0; // devide by wAmoutn to normalize
 
-varying vec2 vUv;
-varying float visibility;
+out vec2 vUv;
+out float visibility;
 
 vec3 xyz(float x, float y, float depth) {
   float outputMin = 0.0;
@@ -80,7 +79,7 @@ void main() {
   visibility = 1.0;
   vUv = vec2(vTexCoord.x, 1 - vTexCoord.y);
   vUv.x = vUv.x * 0.5;
-  vec3 hsl = rgb2hsl(texture2D(textureMap, vUv).xyz);
+  vec3 hsl = rgb2hsl(texture(textureMap, vUv).xyz);
   vUv.x += 0.5;
   visibility = hsl.z * 2.0;
   vec3 pos = xyz(vVertex.x, vVertex.y, hsl.x);
