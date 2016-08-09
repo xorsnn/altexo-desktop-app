@@ -5,6 +5,7 @@
 #include "AL_CB/al_sensor_cb.hpp"
 #include "GLSLShader.hpp"
 #include "contact.hpp"
+#include "glelements/bottomplane.hpp"
 #include "glelements/hologramtest.hpp"
 #include "glelements/worldcoordinate.hpp"
 #include "sensordatafborenderer.hpp"
@@ -51,6 +52,7 @@ public:
   // VideoStreamRenderer m_localFrameRenderer;
   HologramTest m_hologram;
   // Hologram m_hologram;
+  BottomPlane m_bottomPlane;
   WorldCoordinate m_worldCoordinate;
 
   bool sendingFrames = false;

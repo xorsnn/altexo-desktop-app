@@ -21,6 +21,7 @@ int SceneRenderer::init() {
   m_newFrame = false;
   // GL_CHECK_ERRORS
 
+  m_bottomPlane.init();
   m_hologram.init();
 
   initFBO();
@@ -94,6 +95,7 @@ void SceneRenderer::render() {
   glViewport(0, 0, m_winWidth, m_winHeight);
 
   // Elements rendering
+  m_bottomPlane.render(&MVP);
   m_hologram.render(&MVP);
   // m_remoteFrameRenderer.render();
   // m_localFrameRenderer.render();
