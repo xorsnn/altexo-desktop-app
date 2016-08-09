@@ -48,10 +48,10 @@ public:
   void updateRemoteFrame(const uint8_t *image, int width, int height);
   void updateLocalFrame(const uint8_t *image, int width, int height);
 
-  // VideoStreamRenderer m_remoteFrameRenderer;
-  // VideoStreamRenderer m_localFrameRenderer;
-  HologramTest m_hologram;
-  // Hologram m_hologram;
+  VideoStreamRenderer m_remoteFrameRenderer;
+  VideoStreamRenderer m_localFrameRenderer;
+  // HologramTest m_hologram;
+  Hologram m_hologram;
   BottomPlane m_bottomPlane;
   WorldCoordinate m_worldCoordinate;
 

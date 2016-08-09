@@ -2,10 +2,9 @@
 
 SceneRenderer::SceneRenderer(int winWidth, int winHeight)
     : WIDTH(0), HEIGHT(0), m_outPixel(0), pendingRenderTexResize(false),
-      m_debug(true),
-      // m_remoteFrameRenderer(-0.5, -0.5, -0.5, -0.5),
-      // m_localFrameRenderer(-0.5, -0.5, -0.5, -0.5),
-      m_winWidth(winWidth), m_winHeight(winHeight) {
+      m_debug(true), m_remoteFrameRenderer(-0.5, -0.5, -0.5, -0.5),
+      m_localFrameRenderer(-0.5, -0.5, -0.5, -0.5), m_winWidth(winWidth),
+      m_winHeight(winHeight) {
 
   _updateRenderersPos();
 }
@@ -26,9 +25,9 @@ int SceneRenderer::init() {
 
   initFBO();
 
-  // m_sensorDataFboRenderer.init();
-  // m_remoteFrameRenderer.init();
-  // m_localFrameRenderer.init();
+  m_sensorDataFboRenderer.init();
+  m_remoteFrameRenderer.init();
+  m_localFrameRenderer.init();
   m_worldCoordinate.init();
 
   // setup the camera position and target
@@ -63,42 +62,44 @@ void SceneRenderer::render() {
     _resizeRenderTex();
   }
 
-  // // ============ FBO ==============
-  // // enable FBO
-  // glBindFramebuffer(GL_FRAMEBUFFER, fboID);
-  // // render to colour attachment 0
-  // glDrawBuffer(GL_COLOR_ATTACHMENT0);
-  // // clear the colour and depth buffers
-  // glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
-  // // clear the colour and depth buffer
-  // // ============ ~FBO ==============
-  //
-  // m_sensorDataFboRenderer.render(WIDTH * 2, HEIGHT);
-  //
-  // if (sendingFrames) {
-  //   glReadPixels(0, 0, WIDTH * 2, HEIGHT, GL_RGB, GL_UNSIGNED_BYTE,
-  //                &(m_outPixel[0]));
-  //   // TODO: NOT SURE IF IT IS OK TO MULTIPLY BY 2
-  //   newFrameSignal(m_outPixel, WIDTH * 2, HEIGHT);
-  // }
-  //
-  // // ============ FBO ==============
-  // // unbind the FBO
-  // glBindFramebuffer(GL_FRAMEBUFFER, 0);
-  // // restore the default back buffer
-  // glDrawBuffer(GL_BACK_LEFT);
-  // // bind the FBO output at the current texture
-  // glActiveTexture(GL_TEXTURE3);
-  // glBindTexture(GL_TEXTURE_2D, renderTextureID);
-  // // ============ ~FBO ==============
+  // ============ FBO ==============
+  // enable FBO
+  glBindFramebuffer(GL_FRAMEBUFFER, fboID);
+  // render to colour attachment 0
+  glDrawBuffer(GL_COLOR_ATTACHMENT0);
+  // clear the colour and depth buffers
+  glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT);
+  // clear the colour and depth buffer
+  // ============ ~FBO ==============
+
+  m_sensorDataFboRenderer.render(WIDTH * 2, HEIGHT);
+
+  if (sendingFrames) {
+    glReadPixels(0, 0, WIDTH * 2, HEIGHT, GL_RGB, GL_UNSIGNED_BYTE,
+                 &(m_outPixel[0]));
+    // TODO: NOT SURE IF IT IS OK TO MULTIPLY BY 2
+    newFrameSignal(m_outPixel, WIDTH * 2, HEIGHT);
+  }
+
+  // ============ FBO ==============
+  // unbind the FBO
+  glBindFramebuffer(GL_FRAMEBUFFER, 0);
+  // restore the default back buffer
+  glDrawBuffer(GL_BACK_LEFT);
+  // bind the FBO output at the current texture
+  glActiveTexture(GL_TEXTURE3);
+  glBindTexture(GL_TEXTURE_2D, renderTextureID);
+  // ============ ~FBO ==============
 
   glViewport(0, 0, m_winWidth, m_winHeight);
 
   // Elements rendering
   m_bottomPlane.render(&MVP);
   m_hologram.render(&MVP);
-  // m_remoteFrameRenderer.render();
-  // m_localFrameRenderer.render();
+  // TODO use them only if streams exists
+  m_remoteFrameRenderer.render();
+  m_localFrameRenderer.render();
+
   m_worldCoordinate.render(&MVP);
 
   glBindVertexArray(0);
@@ -240,12 +241,12 @@ void SceneRenderer::filterMouseMoves(float dx, float dy) {
 
 void SceneRenderer::updateRemoteFrame(const uint8_t *image, int width,
                                       int height) {
-  // m_remoteFrameRenderer.updateFrame(image, width, height);
+  m_remoteFrameRenderer.updateFrame(image, width, height);
 }
 
 void SceneRenderer::updateLocalFrame(const uint8_t *image, int width,
                                      int height) {
-  // m_localFrameRenderer.updateFrame(image, width, height);
+  m_localFrameRenderer.updateFrame(image, width, height);
 }
 
 void SceneRenderer::onWinResize(int winWidth, int winHeight) {
@@ -256,21 +257,21 @@ void SceneRenderer::onWinResize(int winWidth, int winHeight) {
 
 void SceneRenderer::_updateRenderersPos() {
 
-  // m_remoteFrameRenderer.setPosition(-0.8, -0.8, 0.8, 0.8, m_winWidth,
-  //                                   m_winHeight);
-  // // 50px from left and 50px from bottom
-  // // 200 px for reqtangle
-  // int size = 200;
-  // VideoStreamRenderer::Borders absoluteBorders;
-  // absoluteBorders.x2 = float(m_winWidth - 50);
-  // absoluteBorders.x1 = float(m_winWidth - 50 - size);
-  // absoluteBorders.y1 = m_winHeight - float(m_winHeight - 50);
-  // absoluteBorders.y2 = m_winHeight - float(m_winHeight - 50 - size);
-  // VideoStreamRenderer::Borders relativeBorders =
-  //     VideoStreamRenderer::absoluteToRelative(absoluteBorders, m_winWidth,
-  //                                             m_winHeight);
-  //
-  // m_localFrameRenderer.setPosition(relativeBorders.x1, relativeBorders.y1,
-  //                                  relativeBorders.x2, relativeBorders.y2,
-  //                                  m_winWidth, m_winHeight);
+  m_remoteFrameRenderer.setPosition(-0.8, -0.8, 0.8, 0.8, m_winWidth,
+                                    m_winHeight);
+  // 50px from left and 50px from bottom
+  // 200 px for reqtangle
+  int size = 200;
+  VideoStreamRenderer::Borders absoluteBorders;
+  absoluteBorders.x2 = float(m_winWidth - 50);
+  absoluteBorders.x1 = float(m_winWidth - 50 - size);
+  absoluteBorders.y1 = m_winHeight - float(m_winHeight - 50);
+  absoluteBorders.y2 = m_winHeight - float(m_winHeight - 50 - size);
+  VideoStreamRenderer::Borders relativeBorders =
+      VideoStreamRenderer::absoluteToRelative(absoluteBorders, m_winWidth,
+                                              m_winHeight);
+
+  m_localFrameRenderer.setPosition(relativeBorders.x1, relativeBorders.y1,
+                                   relativeBorders.x2, relativeBorders.y2,
+                                   m_winWidth, m_winHeight);
 }
