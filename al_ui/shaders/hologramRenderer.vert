@@ -80,10 +80,11 @@ void main() {
   // get the clip space position by multiplying the combined MVP matrix with the
   // object space
   // vertex position
-  // gl_Position = MVP * vec4(pos.x, pos.y, pos.z, 1.0);
-  gl_Position = MVP * vec4(pos.x, pos.y, 0.0, 1.0);
-  visibility = 1.0;
-  // vUV = vec2(vTexCoord.x * 0.5 + 0.5, 1 - vTexCoord.y);
-  vUV = vec2(vTexCoord.x, 1 - vTexCoord.y);
+  gl_Position = MVP * vec4(pos.x, pos.y, pos.z, 1.0);
+  // gl_Position = MVP * vec4(pos.x, pos.y, 0.0, 1.0); // TODO: for testing
+  // visibility = 1.0; // TODO: for testing
+
+  vUV = vec2(vTexCoord.x * 0.5 + 0.5, 1 - vTexCoord.y);
+  // vUV = vec2(vTexCoord.x, 1 - vTexCoord.y); // TODO: for testing
   gl_PointSize = 2.0;
 }

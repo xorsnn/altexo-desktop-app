@@ -1,5 +1,7 @@
 #version 330 core
+
 // #extension GL_EXT_gpu_shader4 : enable
+
 layout(location=0) out vec4 vFragColor;
 uniform sampler2D textureMap;
 uniform usampler2D depthTexMap;
@@ -108,13 +110,11 @@ void main() {
     vec2 vUV2 = vUV;
     vUV2.x = vUV2.x - 1.0;
     vUV2.y /= 2;
-    // gl_FragColor = texture2D(textureMap, vUV2);
     vFragColor = texture(textureMap, vUV2);
   } else {
     vec2 vUV1 = vUV;
     vUV1.y /= 2;
-    uint val = texture(depthTexMap, vUV1).x;
-    // gl_FragColor = huePixelForDepth(float(val));
+    uint val = texture(depthTexMap, vUV1).r;
     vFragColor = huePixelForDepth(float(val));
   }
 }
