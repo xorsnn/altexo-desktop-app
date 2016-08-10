@@ -301,55 +301,35 @@ void Conductor::OnIceCandidate(const webrtc::IceCandidateInterface *candidate) {
 void Conductor::OnMessageFromPeer(std::string peer_id,
                                   std::vector<char> msgVec) {
   std::string message(msgVec.begin(), msgVec.end());
-  if (this->m_debug) {
-    std::cout << "Conductor::OnMessageFromPeer" << std::endl;
-    std::cout << msgVec.size() << std::endl;
-    std::cout << message << std::endl;
-  }
-  //    ASSERT(peer_id_ == peer_id || peer_id_ == "-1");
+
+  // if (this->m_debug) {
+  //   std::cout << "Conductor::OnMessageFromPeer" << std::endl;
+  //   std::cout << msgVec.size() << std::endl;
+  //   std::cout << message << std::endl;
+  // }
+
+  // ASSERT(peer_id_ == peer_id || peer_id_ == "-1");
   ASSERT(!message.empty());
 
   if (!m_peerConnection.get()) {
-    //        ASSERT(peer_id_ == "-1");
-    //        TODO remove when cleaning up
-    // std::cout << "< 11" << std::endl;
-    // std::cout << peer_id << std::endl;
-    //        peer_id_ = peer_id;
+    // ASSERT(peer_id_ == "-1");
     // TODO HACK!
     this->m_isAcceptingConnection = true;
 
-    std::cout << "< 11" << std::endl;
     if (!InitializePeerConnection()) {
-      std::cout << "< 12" << std::endl;
       LOG(LS_ERROR) << "Failed to initialize our PeerConnection instance";
       std::cout << "Failed to initialize our PeerConnection instance"
                 << std::endl;
-      //            TODO see
-      //            m_client->SignOut();
+      // TODO see
+      // m_client->SignOut();
       return;
     }
-    std::cout << "< 13" << std::endl;
-  }
-  //    else if (peer_id != peer_id_) {
-  //        ASSERT(peer_id_ != "-1");
-  //        LOG(WARNING) << "Received a message from unknown peer while already
-  //        in a "
-  //                        "conversation with a different peer.";
-  //        std::cout << "Received a message from unknown peer while already in
-  //        a "
-  //                    "conversation with a different peer." << std::endl;
-  //        return;
-  //    }
-
-  if (this->m_debug) {
-    std::cout << "< 10" << std::endl;
   }
 
   Json::Reader reader;
   Json::Value jmessage;
-  // TODO parced QString
   if (!reader.parse(message, jmessage)) {
-    //        LOG(WARNING) << "Received unknown message. " << message;
+    // LOG(WARNING) << "Received unknown message. " << message;
     std::cout << "Received unknown message. " << message << std::endl;
     return;
   }
@@ -358,21 +338,6 @@ void Conductor::OnMessageFromPeer(std::string peer_id,
 
   rtc::GetStringFromJsonObject(jmessage, kSessionDescriptionTypeName, &type);
   if (!type.empty()) {
-    //        if (type == "offer-loopback") {
-    //            // This is a loopback call.
-    //            // Recreate the peerconnection with DTLS disabled.
-    //            if (!ReinitializePeerConnectionForLoopback()) {
-    //                LOG(LS_ERROR) << "Failed to initialize our PeerConnection
-    //                instance";
-    //                std::cout << "Failed to initialize our PeerConnection
-    //                instance" << std::endl;
-    //                DeletePeerConnection();
-    ////                TODO take a look
-    ////                m_client->SignOut();
-    //            }
-    //            return;
-    //        }
-
     std::string sdp;
     if (!rtc::GetStringFromJsonObject(jmessage, kSessionDescriptionSdpName,
                                       &sdp)) {
@@ -391,7 +356,7 @@ void Conductor::OnMessageFromPeer(std::string peer_id,
                 << "SdpParseError was: " << error.description << std::endl;
       return;
     }
-    //        LOG(INFO) << " Received session description :" << message;
+    // LOG(INFO) << " Received session description :" << message;
     std::cout << " Received session description :" << message << std::endl;
     m_peerConnection->SetRemoteDescription(
         DummySetSessionDescriptionObserver::Create(), session_description);
@@ -431,7 +396,7 @@ void Conductor::OnMessageFromPeer(std::string peer_id,
       std::cout << "Failed to apply the received candidate" << std::endl;
       return;
     }
-    //        LOG(INFO) << " Received candidate :" << message;
+    // LOG(INFO) << " Received candidate :" << message;
     std::cout << " Received candidate :" << message << std::endl;
     return;
   }
@@ -478,7 +443,6 @@ void Conductor::OnMessageFromPeer(std::string peer_id,
 cricket::VideoCapturer *Conductor::OpenVideoCaptureDevice() {
   if (m_debug) {
     std::cout << "Conductor::OpenVideoCaptureDevice" << std::endl;
-    // std::cout << m_dataManager->m_desiredVideoSource << std::endl;
   }
   if (m_dataManager->m_desiredVideoSource ==
       AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS) {
@@ -488,9 +452,6 @@ cricket::VideoCapturer *Conductor::OpenVideoCaptureDevice() {
     }
     AlVideoCapturer *capturer = new AlVideoCapturer();
     m_dataManager->startVideoCapturer(capturer);
-
-    //        capturer = this->videoCapturer_;
-    //        qDebug() << "capturer = " << capturer;
 
     return capturer;
   } else {
@@ -660,10 +621,7 @@ void Conductor::UIThreadCallback(int msg_id, void *data) {
     // Only render the first track.
     if (!tracks.empty()) {
       webrtc::VideoTrackInterface *track = tracks[0];
-      //            m_alCallback->startRemoteRendererCb(track);
       m_remoteRenderer.reset(new AlVideoRenderer(1, track, m_alCallback));
-      // TODO: remove
-      // m_dataManager->startRemoteRenderer(track, m_alCallback);
     }
     stream->Release();
     break;
