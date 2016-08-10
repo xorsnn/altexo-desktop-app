@@ -50,9 +50,9 @@ int main(int, char **) {
   sceneRenderer.init();
   Manager manager;
   manager.initHoloRenderer(&sceneRenderer);
-  manager.initSensor(&(sceneRenderer.m_sensorDataFboRenderer));
+  // manager.initSensor(&(sceneRenderer.m_sensorDataFboRenderer));
   manager.initSdk();
-  // manager.initWsConnection(&manager);
+  manager.initWsConnection(&manager);
   // ~ local init
 
   // Load Fonts
@@ -159,6 +159,8 @@ int main(int, char **) {
           selected = i;
           manager.setDeviceName(manager.sensorList[i],
                                 AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS);
+          // TODO: be sure init once
+          manager.initSensor(&(sceneRenderer.m_sensorDataFboRenderer));
           std::cout << selected << std::endl;
         }
       }

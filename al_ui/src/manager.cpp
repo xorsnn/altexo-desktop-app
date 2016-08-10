@@ -5,9 +5,10 @@
 #include <iostream>
 
 Manager::Manager()
-    : m_wsClient(NULL), m_sensor(NULL), m_sdk(NULL), m_videoDeviceType(-1),
-      m_videoDeviceName(""), m_id(""), m_peerId("-1"), m_frameThread(NULL) {
+    : m_sdk(NULL), m_wsClient(NULL), m_sensor(NULL), m_frameThread(NULL),
+      m_id(""), m_peerId("-1"), m_videoDeviceName(""), m_videoDeviceType(-1) {
   alLog("Manager constructor");
+  sensorList.push_back(AlTextMessage("Kinect"));
 }
 
 Manager::~Manager() {
@@ -39,7 +40,6 @@ void Manager::initHoloRenderer(SceneRenderer *holoRenderer) {
 }
 
 void Manager::initSensor(AlSensorCb *sensorCb) {
-  // boost::filesystem::path lib_path("/home/xors/workspace/QT/altexo/build/");
   boost::filesystem::path lib_path("");
   std::cout << "Loading sensor plugin" << std::endl;
 #ifdef __APPLE__
@@ -54,7 +54,7 @@ void Manager::initSensor(AlSensorCb *sensorCb) {
 
   // TODO move this to call initialization
   m_sensor->init(sensorCb);
-  sensorList.push_back(AlTextMessage("Kinect"));
+  // sensorList.push_back(AlTextMessage("Kinect"));
   // set sensor as default source
   // setDeviceName(sensorList[sensorList.size() - 1],
   //               AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS);
@@ -70,7 +70,6 @@ void Manager::frameThread() {
 }
 
 void Manager::initWsConnection(AlWsCb *alWsCb) {
-  // boost::filesystem::path lib_path("/home/xors/workspace/QT/altexo/build/");
   boost::filesystem::path lib_path("");
   std::cout << "Loading ws plugin" << std::endl;
 #ifdef __APPLE__
@@ -86,7 +85,6 @@ void Manager::initWsConnection(AlWsCb *alWsCb) {
 }
 
 void Manager::initSdk() {
-  // boost::filesystem::path lib_path("/home/xors/workspace/QT/altexo/build/");
   boost::filesystem::path lib_path("");
   std::cout << "Loading sdk plugin" << std::endl;
 #ifdef __APPLE__
