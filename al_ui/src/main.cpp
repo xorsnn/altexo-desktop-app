@@ -1,7 +1,3 @@
-// ImGui - standalone example application for SDL2 + OpenGL
-// If you are new to ImGui, see examples/README.txt and documentation at the top
-// of imgui.cpp.
-// #include <GL/glew.h>
 
 #include <imgui/imgui.h>
 
@@ -12,7 +8,6 @@
 #include <stdio.h>
 
 #include "manager.hpp"
-// #include "scenerenderer.hpp"
 
 int main(int, char **) {
   // TODO move it to stored settings
