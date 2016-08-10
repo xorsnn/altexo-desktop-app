@@ -104,8 +104,6 @@ void Manager::initSdk() {
 
 void Manager::onWsMessageCb(std::vector<char> msg) {
   std::string msgStr(msg.begin(), msg.end());
-  alLog("=== ws message ===");
-  alLog(msgStr);
   boost::property_tree::ptree pt;
   std::stringstream ss(msgStr);
   boost::property_tree::read_json(ss, pt);
@@ -162,7 +160,7 @@ void Manager::onMessageFromPeer(boost::property_tree::ptree msgPt) {
   std::stringstream ss(messageStr);
   boost::property_tree::read_json(ss, jsonMsg);
 
-  alLog(messageStr);
+  // alLog(messageStr);
 
   boost::optional<bool> callAccepted =
       jsonMsg.get_optional<bool>("callAccepted");
@@ -194,12 +192,15 @@ void Manager::onMessageFromPeer(boost::property_tree::ptree msgPt) {
   } else if (mode) {
     // TODO: handle this
   } else {
-    alLog("================");
-    alLog("sdp or candidate");
-    alLog("================");
+    // alLog("================");
+    // alLog("sdp or candidate");
+    // alLog("================");
     boost::optional<std::string> sdp = jsonMsg.get_optional<std::string>("sdp");
     if (sdp) {
       m_remoteSdp = messageStr;
+      alLog("================");
+      alLog("sdp");
+      alLog(m_remoteSdp);
     } else {
       m_remoteCandidates.push(messageStr);
     }
