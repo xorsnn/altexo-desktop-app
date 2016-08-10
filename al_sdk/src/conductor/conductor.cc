@@ -232,12 +232,12 @@ void Conductor::OnIceCandidate(const webrtc::IceCandidateInterface *candidate) {
   }
   LOG(INFO) << __FUNCTION__ << " " << candidate->sdp_mline_index();
   // For loopback test. To save some connecting delay.
-  if (loopback_) {
-    if (!m_peerConnection->AddIceCandidate(candidate)) {
-      LOG(WARNING) << "Failed to apply the received candidate";
-    }
-    return;
-  }
+  // if (loopback_) {
+  //   if (!m_peerConnection->AddIceCandidate(candidate)) {
+  //     LOG(WARNING) << "Failed to apply the received candidate";
+  //   }
+  //   return;
+  // }
 
   Json::StyledWriter writer;
   Json::Value jmessage;
@@ -367,6 +367,10 @@ void Conductor::OnMessageFromPeer(std::string peer_id,
     }
     return;
   } else {
+    if (this->m_debug) {
+      std::cout << "Fucked up msg" << std::endl;
+      std::cout << message << std::endl;
+    }
     std::string sdp_mid;
     int sdp_mlineindex = 0;
     std::string sdp;
@@ -397,7 +401,7 @@ void Conductor::OnMessageFromPeer(std::string peer_id,
       return;
     }
     // LOG(INFO) << " Received candidate :" << message;
-    std::cout << " Received candidate :" << message << std::endl;
+    // std::cout << " Received candidate :" << message << std::endl;
     return;
   }
 }
