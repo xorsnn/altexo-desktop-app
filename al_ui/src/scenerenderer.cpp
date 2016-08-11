@@ -178,38 +178,42 @@ void SceneRenderer::initFrameSending(AlSdkAPI *alSdkApi) {
 }
 
 void SceneRenderer::OnStartMouseMove(int initX, int initY) {
-  oldX = initX;
-  oldY = initY;
+  oldRotateX = initX;
+  oldRotateY = initY;
+  oldPanX = initX;
+  oldPanY = initY;
 }
 
-void SceneRenderer::OnMouseMove(int x, int y) {
-  if (state == 0) {
-    dist = (y - oldY) / 5.0f;
-    cam.Zoom(dist);
-  } else if (state == 2) {
-    float dy = float(y - oldY) / 100.0f;
-    float dx = float(oldX - x) / 100.0f;
-    if (useFiltering) {
-      filterMouseMoves(dx, dy);
-    } else {
-      mouseX = dx;
-      mouseY = dy;
-    }
-    cam.Pan(mouseX, mouseY);
+void SceneRenderer::onZoom(int deltaZoom) { cam.Zoom(deltaZoom * 100.0f); }
+
+void SceneRenderer::onPan(int x, int y) {
+  float dy = float(y - oldPanY) / 5.0f;
+  float dx = float(oldPanX - x) / 5.0f;
+  if (useFiltering) {
+    filterMouseMoves(dx, dy);
   } else {
-    // seems like when state == 1 it means left button
-    rY += (y - oldY) / 5.0f;
-    rX += (oldX - x) / 5.0f;
-    if (useFiltering) {
-      filterMouseMoves(rX, rY);
-    } else {
-      mouseX = rX;
-      mouseY = rY;
-    }
-    cam.Rotate(mouseX, mouseY, 0);
+    mouseX = dx;
+    mouseY = dy;
   }
-  oldX = x;
-  oldY = y;
+  cam.Pan(mouseX, mouseY);
+  oldPanX = x;
+  oldPanY = y;
+}
+
+void SceneRenderer::onRotate(int x, int y) {
+  // seems like when state == 1 it means left button
+  rY += (y - oldRotateY) / 5.0f;
+  rX += (oldRotateX - x) / 5.0f;
+  if (useFiltering) {
+    filterMouseMoves(rX, rY);
+  } else {
+    mouseX = rX;
+    mouseY = rY;
+  }
+  cam.Rotate(mouseX, mouseY, 0);
+
+  oldRotateX = x;
+  oldRotateY = y;
 }
 
 void SceneRenderer::filterMouseMoves(float dx, float dy) {

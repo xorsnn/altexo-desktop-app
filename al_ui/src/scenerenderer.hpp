@@ -33,8 +33,9 @@ public:
   void initFrameSending(AlSdkAPI *alSdkApi);
 
   void OnStartMouseMove(int initX, int initY);
-  // mouse move handler
-  void OnMouseMove(int x, int y);
+  void onZoom(int deltaZoom);
+  void onPan(int x, int y);
+  void onRotate(int x, int y);
 
   // mouse move filtering function
   void filterMouseMoves(float dx, float dy);
@@ -94,15 +95,16 @@ private:
   // target camera instance
   CTargetCamera cam;
   // camera tranformation variables
-  int state = 1, oldX = 0, oldY = 0;
+  int state = 1;
+  int oldRotateX = 0, oldRotateY = 0;
+  int oldPanX = 0, oldPanY = 0;
   float rX = 0, rY = 0;
-  // float dist = 10;
-  float dist = 3000;
 
   float mouseX = 0, mouseY = 0; // filtered mouse values
 
   // flag to enable filtering
-  bool useFiltering = true;
+  // bool useFiltering = true;
+  bool useFiltering = false;
   bool pendingRenderTexResize;
 };
 
