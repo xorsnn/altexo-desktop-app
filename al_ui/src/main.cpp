@@ -69,7 +69,7 @@ int main(int, char **) {
 
   ImVec4 clear_color = ImColor(114, 144, 154);
 
-  bool mouseDown = false;
+  int mouseButtonPressed = -1; // -1 - not pressed
   // Main loop
   bool done = false;
   while (!done) {
@@ -78,17 +78,29 @@ int main(int, char **) {
       ImGui_ImplSdlGL3_ProcessEvent(&event);
       switch (event.type) {
       case SDL_MOUSEMOTION: {
-        if (mouseDown) {
-          sceneRenderer.OnMouseMove(event.motion.x, event.motion.y);
+        switch (mouseButtonPressed) {
+        case SDL_BUTTON_LEFT: {
+          sceneRenderer.onRotate(event.motion.x, event.motion.y);
+        } break;
+        case SDL_BUTTON_RIGHT: {
+          sceneRenderer.onPan(event.motion.x, event.motion.y);
         }
+        default: { } break; }
       } break;
+
       case SDL_MOUSEBUTTONDOWN: {
+        mouseButtonPressed = int(event.button.button);
         sceneRenderer.OnStartMouseMove(event.button.x, event.button.y);
-        mouseDown = true;
       } break;
+
       case SDL_MOUSEBUTTONUP: {
-        mouseDown = false;
+        mouseButtonPressed = -1;
       } break;
+
+      case SDL_MOUSEWHEEL: {
+        sceneRenderer.onZoom(event.wheel.y);
+      } break;
+
       case SDL_WINDOWEVENT: {
         switch (event.window.event) {
         case SDL_WINDOWEVENT_RESIZED: {
@@ -97,9 +109,11 @@ int main(int, char **) {
         } break;
         default: { } break; }
       } break;
+
       case SDL_QUIT: {
         done = true;
       } break;
+
       default: { } break; }
     }
 
