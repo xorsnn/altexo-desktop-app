@@ -37,6 +37,7 @@ public:
                    int winHeight);
   void updateFrame(const uint8_t *image, int width, int height);
   // void initFBO();
+  void bindToTex();
 
 private:
   void _updateVertices();

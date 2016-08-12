@@ -65,7 +65,7 @@ int main(int, char **) {
 
   std::cout << glGetString(GL_VERSION) << std::endl;
 
-  bool show_test_window = true;
+  bool show_test_window = false;
 
   ImVec4 clear_color = ImColor(114, 144, 154);
 

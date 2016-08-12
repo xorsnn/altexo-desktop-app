@@ -145,6 +145,17 @@ void VideoStreamRenderer::updateFrame(const uint8_t *image, int width,
   m_newFrame = true;
 }
 
+void VideoStreamRenderer::bindToTex() {
+  if (m_newFrame) {
+    m_remoteFrameMtx.lock();
+    glActiveTexture(GL_TEXTURE3);
+    glBindTexture(GL_TEXTURE_2D, sensorDepthTexID);
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_BGRA,
+                 GL_UNSIGNED_BYTE, &(m_remoteFrame[0]));
+    m_remoteFrameMtx.unlock();
+  }
+}
+
 void VideoStreamRenderer::setPosition(float x1, float y1, float x2, float y2,
                                       int winWidth, int winHeight) {
   m_x1 = x1;

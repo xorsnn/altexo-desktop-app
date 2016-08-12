@@ -26,6 +26,14 @@ public:
   SceneRenderer(int winWidth, int winHeight);
   ~SceneRenderer() {}
 
+  enum StreamMode {
+    AUDIO_VIDEO = 1,
+    HOLOGRAM,
+  };
+
+  void setRemoteStreamMode(int mode);
+  void setLocalStreamMode(int mode);
+
   void updateResolution(int width, int height);
   int init();
   void render();
@@ -59,10 +67,13 @@ public:
   bool sendingFrames = false;
 
 private:
+  bool m_debug;
+
   void _updateRenderersPos();
   void _resizeRenderTex();
 
-  bool m_debug;
+  int m_remoteStreamMode;
+  int m_localStreamMode;
 
   // mouse history buffer
   glm::vec2 mouseHistory[MOUSE_HISTORY_BUFFER_SIZE];

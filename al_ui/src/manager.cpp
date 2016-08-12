@@ -190,17 +190,15 @@ void Manager::onMessageFromPeer(boost::property_tree::ptree msgPt) {
     m_wsClient->sendMessageToPeer(AlTextMessage(m_peerId),
                                   AlTextMessage(strJson));
   } else if (mode) {
-    // TODO: handle this
+    if (mode.get() == "audio+video") {
+      m_holoRenderer->setRemoteStreamMode(SceneRenderer::AUDIO_VIDEO);
+    } else if (mode.get() == "hologram") {
+      m_holoRenderer->setRemoteStreamMode(SceneRenderer::HOLOGRAM);
+    }
   } else {
-    // alLog("================");
-    // alLog("sdp or candidate");
-    // alLog("================");
     boost::optional<std::string> sdp = jsonMsg.get_optional<std::string>("sdp");
     if (sdp) {
       m_remoteSdp = messageStr;
-      alLog("================");
-      alLog("sdp");
-      alLog(m_remoteSdp);
     } else {
       m_remoteCandidates.push(messageStr);
     }
@@ -266,6 +264,16 @@ void Manager::updateLocalFrameCb(const uint8_t *image, int width, int height) {
 void Manager::setDeviceName(AlTextMessage deviceName, int deviceType) {
   m_videoDeviceName = deviceName.getText();
   m_videoDeviceType = deviceType;
+  switch (m_videoDeviceType) {
+  case AlSdkAPI::DesiredVideoSource::CAMERA: {
+    m_holoRenderer->setLocalStreamMode(SceneRenderer::AUDIO_VIDEO);
+  } break;
+  case AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS: {
+    m_holoRenderer->setLocalStreamMode(SceneRenderer::HOLOGRAM);
+  } break;
+  default:
+    break;
+  }
 }
 
 void Manager::callToPeer(std::string peerId) { initConnection(peerId); }
