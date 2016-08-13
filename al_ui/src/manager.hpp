@@ -80,6 +80,8 @@ private:
   // TODO move mode selection to UI
   int WIDTH = 320;
   int HEIGHT = 240;
+  // int WIDTH = 640;
+  // int HEIGHT = 480;
 };
 
 #endif // MANAGER_H
