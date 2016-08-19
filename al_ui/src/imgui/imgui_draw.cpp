@@ -31,7 +31,9 @@
 #ifdef _MSC_VER
 #pragma warning (disable: 4505) // unreferenced local function has been removed (stb stuff)
 #pragma warning (disable: 4996) // 'This function or variable may be unsafe': strcpy, strdup, sprintf, vsnprintf, sscanf, fopen
+#if _MSC_VER &lt; 1900
 #define snprintf _snprintf
+#endif
 #endif
 
 #ifdef __clang__
