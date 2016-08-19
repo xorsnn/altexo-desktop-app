@@ -11,8 +11,15 @@ file(GLOB SRC_LIST
   src/**/*.c
 )
 
-file(COPY res/cto_intro.png DESTINATION .)
+file(GLOB SHADERS_LIST
+  shaders/*.frag
+  shaders/*.vert
+)
 
+file( COPY res/cto_intro.png DESTINATION . )
+
+# shaders
+file( COPY ${SHADERS_LIST} DESTINATION ./shaders )
 
 if (WIN32)
 else()

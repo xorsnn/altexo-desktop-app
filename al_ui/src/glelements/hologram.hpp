@@ -19,7 +19,7 @@ protected:
   void _initTextures();
 
   // shader reference
-  GLSLShader shader;
+  GLSLShader m_shader;
 
   // vertex array and vertex buffer object IDs
   GLuint vaoID;
@@ -34,7 +34,9 @@ protected:
   };
 
   // triangle vertices and indices
-  Vertex vertices[320 * 240];
+  static const int wAmount = 320;
+  static const int hAmount = 240;
+  Vertex *m_vertices;
 };
 
 #endif // HOLOGRAM_H

@@ -5,7 +5,6 @@ SceneRenderer::SceneRenderer(int winWidth, int winHeight)
       m_debug(true), m_remoteFrameRenderer(-0.5, -0.5, -0.5, -0.5),
       m_localFrameRenderer(-0.5, -0.5, -0.5, -0.5), m_winWidth(winWidth),
       m_winHeight(winHeight), m_remoteStreamMode(1), m_localStreamMode(1) {
-
   _updateRenderersPos();
 }
 
@@ -199,7 +198,9 @@ void SceneRenderer::OnStartMouseMove(int initX, int initY) {
   oldPanY = initY;
 }
 
-void SceneRenderer::onZoom(int deltaZoom) { cam.Zoom(deltaZoom * 100.0f); }
+void SceneRenderer::onZoom(int deltaZoom) {
+  cam.Zoom(deltaZoom * 100.0f);
+}
 
 void SceneRenderer::onPan(int x, int y) {
   float dy = float(y - oldPanY) / 5.0f;
@@ -275,7 +276,6 @@ void SceneRenderer::onWinResize(int winWidth, int winHeight) {
 }
 
 void SceneRenderer::_updateRenderersPos() {
-
   m_remoteFrameRenderer.setPosition(-0.8, -0.8, 0.8, 0.8, m_winWidth,
                                     m_winHeight);
   // 50px from left and 50px from bottom

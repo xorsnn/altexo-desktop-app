@@ -1,4 +1,5 @@
 #include "glelements/bottomplane.hpp"
+#include <iostream>
 
 BottomPlane::BottomPlane() {}
 
@@ -76,14 +77,14 @@ void BottomPlane::render(glm::mat4 *MVP) {
 }
 
 void BottomPlane::_initShaders() {
-  // LOADING SHADER FOR PLANE
-  m_shader.LoadFromFile(GL_VERTEX_SHADER, "../al_ui/shaders/holoPlane.vert");
-  m_shader.LoadFromFile(GL_FRAGMENT_SHADER, "../al_ui/shaders/holoPlane.frag");
+// LOADING SHADER FOR PLANE
+  m_shader.LoadFromFile(GL_VERTEX_SHADER, "shaders/holoPlane.vert");
+  m_shader.LoadFromFile(GL_FRAGMENT_SHADER, "shaders/holoPlane.frag");
   // compile and link shader
   m_shader.CreateAndLinkProgram();
   m_shader.Use();
   // add attributes and uniforms
-  // m_shader.AddAttribute("vVertex");
+  m_shader.AddAttribute("vVertex");
   m_shader.AddAttribute("vTexCoord");
   m_shader.AddUniform("MVP");
   m_shader.UnUse();

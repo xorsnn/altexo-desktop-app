@@ -71,7 +71,7 @@ int main(int, char **) {
 
   std::cout << glGetString(GL_VERSION) << std::endl;
 
-  bool show_test_window = false;
+  bool show_test_window = true;
 
   ImVec4 clear_color = ImColor(114, 144, 154);
 
@@ -217,5 +217,6 @@ int main(int, char **) {
   SDL_DestroyWindow(window);
   SDL_Quit();
 
+  std::cout << "FIN!" << std::endl;
   return 0;
 }
