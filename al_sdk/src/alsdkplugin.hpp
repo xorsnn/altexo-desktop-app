@@ -1,6 +1,7 @@
 #ifndef ALSDKPLUGIN_H
 #define ALSDKPLUGIN_H
 
+
 #include "AL_API/sdk_api.hpp"
 #include "AL_CB/al_sdk_cb.hpp"
 #include "alcallback.h"

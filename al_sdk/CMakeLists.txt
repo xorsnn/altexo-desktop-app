@@ -35,30 +35,51 @@ if (APPLE)
   set(WEBRTCTRUNK "/Volumes/MAC/workspace/WEBRTC/webrtc/src")
 elseif(UNIX)
   set(WEBRTCTRUNK "/home/xors/workspace/ALTEXO/webrtc/src")
+elseif (WIN32)
+  set(WEBRTCTRUNK "D:\\WORKSPACE\\webrtc\\src")
 endif()
 set(WEBRTCBUILD "${WEBRTCTRUNK}/out/Release")
 
 ##
 # DEFINES
 #
-add_definitions(-DUNIX)
-if(UNIX)
-  add_definitions(-DLINUX)
+if (WIN32)
+  add_definitions(-DWEBRTC_WIN)
+  add_definitions(-DPOSIX)
+  add_definitions(-DNOMINMAX)
+else()
+  add_definitions(-DUNIX)
+  if(UNIX)
+    add_definitions(-DLINUX)
+  endif()
+  add_definitions(-DWEBRTC_POSIX)
+  add_definitions(-DPOSIX)
 endif()
-add_definitions(-DWEBRTC_POSIX)
-add_definitions(-DPOSIX)
 
-# Set output dir
-# set(BIN_DIR ${${PROJECT_NAME}_SOURCE_DIR}/../../al_build/al_ui)
+if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -std=c++11")
+  set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG} -g")
+  set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE} -O2")
+elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
+  if (CMAKE_CXX_FLAGS MATCHES "/W[0-4]")
+    string(REGEX REPLACE "/W[0-4]" "/W4" CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}")
+  else()
+    set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
+  endif()
+endif()
 
-add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
+# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /LD")
+
+if (UNIX)
+  add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
+else()
+  # seems like only static is allowed for win
+  # add_library(${PROJECT_NAME} STATIC ${SRC_LIST})
+  add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
+endif()
 # add_executable(${PROJECT_NAME} ${SRC_LIST})
 
 if (APPLE)
-  # set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LANGUAGE_STANDARD "c++11")
-  # set(CMAKE_XCODE_ATTRIBUTE_CLANG_CXX_LIBRARY "libc++")
-  # set(CMAKE_XCODE_ATTRIBUTE_GCC_VERSION "com.apple.compilers.llvm.clang.1_0")
-  # set(CMAKE_MACOSX_RPATH 1)
   set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-m64" LINK_FLAGS "-m64")
 elseif(UNIX)
   # compile and link for 64 bit mode
@@ -86,11 +107,17 @@ if (APPLE)
   include(al-webrtc-deps-mac.cmake)
 elseif(UNIX)
   include(al-webrtc-deps.cmake)
+elseif (WIN32)
+  include(al-webrtc-deps-win.cmake)
 endif()
 
-find_package( Boost COMPONENTS system filesystem thread REQUIRED )
+if(UNIX)
+  FIND_PACKAGE( Boost COMPONENTS system filesystem thread REQUIRED )
+  INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
+else()
+  INCLUDE_DIRECTORIES( "C:\\local\\boost_1_61_0" )
+endif()
 
-INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 
 if (APPLE)
   TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC
@@ -111,5 +138,24 @@ elseif(UNIX)
     -lpthread
     -lX11 -lXfixes -lXi -lXcomposite -lXext -lXrender -ldl -lrt -lexpat -lXrandr -lm -ldl
     boost_thread boost_system
+  )
+elseif (WIN32)
+  TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC
+    ${WEBRTC_LIBS}
+
+    "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.10586.0\\um\\x86\\strmiids.lib"
+    "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.10586.0\\um\\x86\\WS2_32.Lib"
+    "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.10586.0\\um\\x86\\Secur32.Lib"
+    "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.10586.0\\um\\x86\\Crypt32.Lib"
+    "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.10586.0\\um\\x86\\msdmo.lib"
+    "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.10586.0\\um\\x86\\WinMM.Lib"
+    "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.10586.0\\um\\x86\\dmoguids.lib"
+    "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.10586.0\\um\\x86\\wmcodecdspuuid.lib"
+
+    "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_system-vc140-mt-1_61.lib"
+    "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_filesystem-vc140-mt-1_61.lib"
+    "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_thread-vc140-mt-1_61.lib"
+    "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_date_time-vc140-mt-1_61.lib"
+    "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_chrono-vc140-mt-1_61.lib"
   )
 endif()
