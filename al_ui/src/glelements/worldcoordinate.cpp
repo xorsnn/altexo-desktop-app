@@ -88,9 +88,9 @@ void WorldCoordinate::render(glm::mat4 *MVP) {
 void WorldCoordinate::_initShaders() {
   // load the shader
   shader.LoadFromFile(GL_VERTEX_SHADER,
-                      "../al_ui/shaders/worldCoordinates.vert");
+                      "shaders/worldCoordinates.vert");
   shader.LoadFromFile(GL_FRAGMENT_SHADER,
-                      "../al_ui/shaders/worldCoordinates.frag");
+                      "shaders/worldCoordinates.frag");
   // compile and link shader
   shader.CreateAndLinkProgram();
   shader.Use();

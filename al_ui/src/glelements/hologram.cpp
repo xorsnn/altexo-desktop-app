@@ -1,21 +1,19 @@
 #include "glelements/hologram.hpp"
 
-Hologram::Hologram() {}
+Hologram::Hologram() { m_vertices = new Vertex[wAmount * hAmount]; }
 
-Hologram::~Hologram() {}
+Hologram::~Hologram() { delete m_vertices; }
 
 void Hologram::init() {
   _initShaders();
-  int wAmount = 320;
-  int hAmount = 240;
   int normConst = wAmount;
   int index = 0;
   for (int yCoord = 0; yCoord < hAmount; yCoord++) {
     for (int xCoord = 0; xCoord < wAmount; xCoord++) {
-      vertices[index].position =
+      m_vertices[index].position =
           glm::vec2((float(xCoord) - (0.5 * float(wAmount))) / normConst,
                     (float(yCoord) - (0.5 * float(hAmount))) / normConst);
-      vertices[index].texCoord =
+      m_vertices[index].texCoord =
           glm::vec2(float(xCoord) / wAmount, float(yCoord) / hAmount);
       index++;
     }
@@ -30,15 +28,16 @@ void Hologram::init() {
 
   glBindBuffer(GL_ARRAY_BUFFER, vboVerticesID);
   // pass triangle verteices to buffer object
-  glBufferData(GL_ARRAY_BUFFER, sizeof(vertices), &vertices[0], GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(m_vertices), &m_vertices[0],
+               GL_STATIC_DRAW);
   // GL_CHECK_ERRORS
   // enable vertex attribute array for position
-  glEnableVertexAttribArray(shader["vVertex"]);
-  glVertexAttribPointer(shader["vVertex"], 2, GL_FLOAT, GL_FALSE, stride, 0);
+  glEnableVertexAttribArray(m_shader["vVertex"]);
+  glVertexAttribPointer(m_shader["vVertex"], 2, GL_FLOAT, GL_FALSE, stride, 0);
   // GL_CHECK_ERRORS
   // enable vertex attribute array for colour
-  glEnableVertexAttribArray(shader["vTexCoord"]);
-  glVertexAttribPointer(shader["vTexCoord"], 2, GL_FLOAT, GL_FALSE, stride,
+  glEnableVertexAttribArray(m_shader["vTexCoord"]);
+  glVertexAttribPointer(m_shader["vTexCoord"], 2, GL_FLOAT, GL_FALSE, stride,
                         (const GLvoid *)offsetof(Vertex, texCoord));
   // GL_CHECK_ERRORS
 
@@ -58,34 +57,34 @@ void Hologram::render(glm::mat4 *MVP) {
   glBindVertexArray(vaoID);
   glBindBuffer(GL_ARRAY_BUFFER, vboVerticesID);
   // bind the shader
-  shader.Use();
+  m_shader.Use();
   // pass the shader uniform
-  glUniformMatrix4fv(shader("MVP"), 1, GL_FALSE, glm::value_ptr(*MVP));
+  glUniformMatrix4fv(m_shader("MVP"), 1, GL_FALSE, glm::value_ptr(*MVP));
   // drwa triangle
   glEnable(GL_PROGRAM_POINT_SIZE);
   glDrawArrays(GL_POINTS, 0, 320 * 240);
   // unbind the shader
-  shader.UnUse();
+  m_shader.UnUse();
 }
 
 void Hologram::_initShaders() {
   // load the shader
-  shader.LoadFromFile(GL_VERTEX_SHADER,
-                      "../al_ui/shaders/hologramRenderer.vert");
-  shader.LoadFromFile(GL_FRAGMENT_SHADER,
-                      "../al_ui/shaders/hologramRenderer.frag");
+  m_shader.LoadFromFile(GL_VERTEX_SHADER,
+                        "shaders/hologramRenderer.vert");
+  m_shader.LoadFromFile(GL_FRAGMENT_SHADER,
+                        "shaders/hologramRenderer.frag");
   // compile and link shader
-  shader.CreateAndLinkProgram();
-  shader.Use();
+  m_shader.CreateAndLinkProgram();
+  m_shader.Use();
   // add attributes and uniforms
-  shader.AddAttribute("vVertex");
-  shader.AddAttribute("vTexCoord");
-  shader.AddUniform("MVP");
-  shader.AddUniform("textureMap");
+  m_shader.AddAttribute("vVertex");
+  m_shader.AddAttribute("vTexCoord");
+  m_shader.AddUniform("MVP");
+  m_shader.AddUniform("textureMap");
   // pass values of constant uniforms at initialization
-  glUniform1i(shader("textureMap"), 3);
+  glUniform1i(m_shader("textureMap"), 3);
   // pass values of constant uniforms at initialization
-  shader.UnUse();
+  m_shader.UnUse();
 }
 
 void Hologram::_initTextures() {

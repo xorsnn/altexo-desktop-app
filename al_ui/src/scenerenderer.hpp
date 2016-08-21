@@ -6,7 +6,8 @@
 #include "GLSLShader.hpp"
 #include "contact.hpp"
 #include "glelements/bottomplane.hpp"
-#include "glelements/hologramtest.hpp"
+// #include "glelements/hologramtest.hpp"
+#include "glelements/hologram.hpp"
 #include "glelements/worldcoordinate.hpp"
 #include "sensordatafborenderer.hpp"
 #include "targetcamera.h"
@@ -50,12 +51,13 @@ public:
 
   void onWinResize(int winWidth, int winHeight);
 
-  // Sensor data capturer
-  SensorDataFboRenderer m_sensorDataFboRenderer;
 
   // Plain video stream renderer
   void updateRemoteFrame(const uint8_t *image, int width, int height);
   void updateLocalFrame(const uint8_t *image, int width, int height);
+
+  // Sensor data capturer
+  SensorDataFboRenderer m_sensorDataFboRenderer;
 
   VideoStreamRenderer m_remoteFrameRenderer;
   VideoStreamRenderer m_localFrameRenderer;

@@ -2,6 +2,7 @@
 #include "targetcamera.h"
 #include <cmath>
 #include <iostream>
+#include <algorithm>
 
 #include <glm/gtx/euler_angles.hpp>
 
@@ -33,8 +34,6 @@ void CTargetCamera::SetTarget(const glm::vec3 tgt) {
   target = tgt;
   distance = glm::distance(position, target);
   distance = std::max(minDistance, std::min(distance, maxDistance));
-  std::cout << "CTargetCamera::SetTarget" << std::endl;
-  std::cout << distance << std::endl;
   /*V = glm::lookAt(position, target, up);
 
   m_yaw = 0;

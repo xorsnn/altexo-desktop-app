@@ -1,8 +1,15 @@
-#include "manager.hpp"
 #include "allog.hpp"
+#include "boost/dll/import.hpp"
+#include "boost/function.hpp"
+#include "boost/shared_ptr.hpp"
+#include "manager.hpp"
+#include <boost/dll/import.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <iostream>
+
+namespace boostfs = boost::filesystem;
+namespace boostdll = boost::dll;
 
 Manager::Manager()
     : m_sdk(NULL), m_wsClient(NULL), m_sensor(NULL), m_frameThread(NULL),
@@ -92,9 +99,35 @@ void Manager::initSdk() {
       boost::dll::import<AlSdkAPI>(lib_path / "libaltexo_sdk.dylib", "plugin",
                                    boost::dll::load_mode::append_decorations);
 #else
+#ifdef _WIN32
+  std::cout << "Boost DLL testing ..." << std::endl;
+
+  /* Load the plugin from current working path
+   * (e.g. The plugin on Windows is ${CWD}/ProgPlug.dll )
+   */
+  boostfs::path pluginPath = boostfs::current_path() /
+                             boostfs::path("Release") /
+                             boostfs::path("altexo_sdk");
+  std::cout << "Load Plugin from " << pluginPath << std::endl;
+
+  typedef boost::shared_ptr<AlSdkAPI>(PluginCreate)();
+  boost::function<PluginCreate> pluginCreator;
+  try {
+    pluginCreator = boostdll::import_alias<PluginCreate>(
+        pluginPath, "create_plugin", boostdll::load_mode::append_decorations);
+  } catch (const boost::system::system_error &err) {
+    std::cerr << "Cannot load Plugin from " << pluginPath << std::endl;
+    std::cerr << err.what() << std::endl;
+    return;
+  }
+  /* create the plugin */
+  // auto plugin = pluginCreator();
+  m_sdk = pluginCreator();
+#else
   m_sdk =
       boost::dll::import<AlSdkAPI>(lib_path / "libaltexo_sdk.so", "plugin",
                                    boost::dll::load_mode::append_decorations);
+#endif
 #endif
   m_sdk->init(this);
   updateResolutionSignal.connect(

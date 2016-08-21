@@ -3,6 +3,7 @@
 
 #include "imgui_impl_sdl_gl3.h"
 #include <GL/gl3w.h>
+// #define SDL_MAIN_HANDLED
 #include <SDL.h>
 #include <iostream>
 #include <stdio.h>
@@ -13,6 +14,8 @@ int main(int, char **) {
   // TODO move it to stored settings
   int winWidth = 1280;
   int winHeight = 720;
+
+  std::cout << "< 1" << std::endl;
 
   // Setup SDL
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
@@ -47,7 +50,10 @@ int main(int, char **) {
   manager.initHoloRenderer(&sceneRenderer);
   // manager.initSensor(&(sceneRenderer.m_sensorDataFboRenderer));
   manager.initSdk();
+
+  #ifndef _WIN32
   manager.initWsConnection(&manager);
+  #endif
   // ~ local init
 
   // Load Fonts
@@ -65,7 +71,7 @@ int main(int, char **) {
 
   std::cout << glGetString(GL_VERSION) << std::endl;
 
-  bool show_test_window = false;
+  bool show_test_window = true;
 
   ImVec4 clear_color = ImColor(114, 144, 154);
 
@@ -211,5 +217,6 @@ int main(int, char **) {
   SDL_DestroyWindow(window);
   SDL_Quit();
 
+  std::cout << "FIN!" << std::endl;
   return 0;
 }

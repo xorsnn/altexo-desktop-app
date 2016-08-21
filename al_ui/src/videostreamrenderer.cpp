@@ -31,9 +31,9 @@ int VideoStreamRenderer::init() {
   // GL_CHECK_ERRORS
   // load the shader
   shader.LoadFromFile(GL_VERTEX_SHADER,
-                      "../al_ui/shaders/videoStreamRenderer.vert");
+                      "shaders/videoStreamRenderer.vert");
   shader.LoadFromFile(GL_FRAGMENT_SHADER,
-                      "../al_ui/shaders/videoStreamRenderer.frag");
+                      "shaders/videoStreamRenderer.frag");
   // compile and link shader
   shader.CreateAndLinkProgram();
   shader.Use();

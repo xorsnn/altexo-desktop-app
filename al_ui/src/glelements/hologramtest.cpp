@@ -10,7 +10,11 @@ void abort_(const char *s, ...) {
   abort();
 }
 
-HologramTest::HologramTest() { _readPngFile("al_ui/cto_intro.png"); }
+HologramTest::HologramTest() {
+#ifndef _WIN32
+  _readPngFile("al_ui/cto_intro.png");
+#endif
+}
 
 void HologramTest::init() { super::init(); }
 
@@ -22,6 +26,7 @@ void HologramTest::render(glm::mat4 *MVP) {
   // glActiveTexture(GL_TEXTURE0);
 }
 
+#ifndef _WIN32
 void HologramTest::_readPngFile(char *file_name) {
   unsigned char header[8]; // 8 is the maximum size that can be checked
 
@@ -88,6 +93,7 @@ void HologramTest::_readPngFile(char *file_name) {
     }
   }
 }
+#endif
 
 void HologramTest::_initShaders() { super::_initShaders(); }
 

@@ -8,6 +8,9 @@ using namespace std;
 AlSdkPlugin::AlSdkPlugin()
     : m_debug(true), WIDTH(0), HEIGHT(0), m_videoDeviceName(""),
       m_internalThread(NULL) {
+  if (m_debug) {
+    std::cout << "AlSdkPlugin::AlSdkPlugin()" << std::endl;
+  }
   m_manager = new AlManager();
 }
 
