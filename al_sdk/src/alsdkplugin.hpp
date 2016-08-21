@@ -1,13 +1,14 @@
 #ifndef ALSDKPLUGIN_H
 #define ALSDKPLUGIN_H
 
-
 #include "AL_API/sdk_api.hpp"
 #include "AL_CB/al_sdk_cb.hpp"
 #include "alcallback.h"
 #include "altextmessage.hpp"
 #include "boost/thread.hpp"
 #include <boost/config.hpp>
+#include "boost/dll/alias.hpp"
+#include "boost/make_shared.hpp"
 #include <boost/signals2/signal.hpp>
 #include <queue>
 #include <string>
@@ -18,6 +19,10 @@ class AlSdkPlugin : public AlSdkAPI, public AlCallback {
 public:
   AlSdkPlugin();
   ~AlSdkPlugin();
+  // Factory method
+  static boost::shared_ptr<AlSdkAPI> create() {
+    return boost::make_shared<AlSdkPlugin>();
+  }
 
   void init(AlSDKCb *alSdkCb);
   // AlWsCb *getWsCb();
@@ -167,7 +172,13 @@ private:
   int HEIGHT;
 };
 
-extern "C" BOOST_SYMBOL_EXPORT AlSdkPlugin plugin;
-AlSdkPlugin plugin;
+// #ifdef _WIN32
+BOOST_DLL_ALIAS(AlSdkPlugin::create, // <-- this function is exported with...
+                create_plugin        // <-- ...this alias name
+                )
+// #else
+// extern "C" BOOST_SYMBOL_EXPORT AlSdkPlugin plugin;
+// AlSdkPlugin plugin;
+// #endif
 
 #endif // ALSDKPLUGIN_H

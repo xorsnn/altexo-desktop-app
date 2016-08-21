@@ -1,13 +1,8 @@
 
 SET(WEBRTC_LIBS
-  ${WEBRTCBUILD}\\boringssl.dll.lib
   ${WEBRTCBUILD}\\libyuv.lib
-  ${WEBRTCBUILD}\\protobuf_lite.dll.lib
-  ${WEBRTCBUILD}\\obj\\testing\\gmock.lib
-  ${WEBRTCBUILD}\\obj\\testing\\gtest.lib
+  ${WEBRTCBUILD}\\obj\\third_party\\boringssl\\boringssl.lib
   ${WEBRTCBUILD}\\obj\\third_party\\boringssl\\boringssl_asm.lib
-  ${WEBRTCBUILD}\\obj\\third_party\\expat\\expat.lib
-  ${WEBRTCBUILD}\\obj\\third_party\\gflags\\gflags.lib
   ${WEBRTCBUILD}\\obj\\third_party\\jsoncpp\\jsoncpp.lib
   ${WEBRTCBUILD}\\obj\\third_party\\libjpeg_turbo\\libjpeg.lib
   ${WEBRTCBUILD}\\obj\\third_party\\libsrtp\\libsrtp.lib
@@ -21,6 +16,7 @@ SET(WEBRTC_LIBS
   ${WEBRTCBUILD}\\obj\\third_party\\openmax_dl\\dl\\openmax_dl.lib
   ${WEBRTCBUILD}\\obj\\third_party\\opus\\opus.lib
   ${WEBRTCBUILD}\\obj\\third_party\\protobuf\\protobuf_full_do_not_use.lib
+  ${WEBRTCBUILD}\\obj\\third_party\\protobuf\\protobuf_lite.lib
   ${WEBRTCBUILD}\\obj\\third_party\\protobuf\\protoc_lib.lib
   ${WEBRTCBUILD}\\obj\\third_party\\usrsctp\\usrsctplib.lib
   ${WEBRTCBUILD}\\obj\\third_party\\winsdk_samples\\directshow_baseclasses.lib
@@ -28,27 +24,17 @@ SET(WEBRTC_LIBS
   ${WEBRTCBUILD}\\obj\\webrtc\\rtc_event_log.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\rtc_event_log_parser.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\rtc_event_log_proto.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\video_quality_test.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\webrtc.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\webrtc_common.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\api\\libjingle_peerconnection.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\base\\rtc_base.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\base\\rtc_base_approved.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\base\\rtc_base_tests_utils.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\base\\rtc_task_queue.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\common_audio\\common_audio.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\common_audio\\common_audio_sse2.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\common_video\\common_video.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\libjingle\\xmllite\\rtc_xmllite.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\libjingle\\xmpp\\rtc_xmpp.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\media\\rtc_media.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\media\\rtc_unittest_main.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\modules\\acm_receive_test.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\modules\\acm_send_test.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\modules\\audioproc_debug_proto.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\modules\\audioproc_protobuf_utils.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\modules\\audioproc_test_utils.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\modules\\audioproc_unittest_proto.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\modules\\audio_coding_module.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\modules\\audio_conference_mixer.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\modules\\audio_decoder_factory_interface.lib
@@ -60,8 +46,6 @@ SET(WEBRTC_LIBS
   ${WEBRTCBUILD}\\obj\\webrtc\\modules\\audio_processing_sse2.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\modules\\bitrate_controller.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\modules\\builtin_audio_decoder_factory.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\modules\\bwe_simulator.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\modules\\bwe_tools_util.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\modules\\cng.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\modules\\congestion_controller.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\modules\\desktop_capture.lib
@@ -74,22 +58,16 @@ SET(WEBRTC_LIBS
   ${WEBRTCBUILD}\\obj\\webrtc\\modules\\isac_fix.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\modules\\media_file.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\modules\\neteq.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\modules\\neteq_test_support.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\modules\\neteq_test_tools.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\modules\\neteq_unittest_proto.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\modules\\neteq_unittest_tools.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\modules\\new_audio_conference_mixer.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\modules\\paced_sender.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\modules\\pcm16b.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\modules\\red.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\modules\\remote_bitrate_estimator.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\modules\\rent_a_codec.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\modules\\rtc_event_log_source.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\modules\\rtp_rtcp.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\modules\\video_capture.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\modules\\video_capture_module.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\modules\\video_capture_module_internal_impl.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\modules\\video_codecs_test_framework.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\modules\\video_processing.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\modules\\video_processing_sse2.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\modules\\webrtc_h264.lib
@@ -106,20 +84,9 @@ SET(WEBRTC_LIBS
   ${WEBRTCBUILD}\\obj\\webrtc\\system_wrappers\\field_trial_default.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\system_wrappers\\metrics_default.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\system_wrappers\\system_wrappers.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\test\\channel_transport.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\test\\field_trial.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\test\\metrics.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\test\\rtp_test_utils.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\test\\test_common.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\test\\test_main.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\test\\test_renderer.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\test\\test_support.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\test\\test_support_main.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\test\\video_test_common.lib
-  ${WEBRTCBUILD}\\obj\\webrtc\\tools\\agc_test_utils.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\tools\\command_line_parser.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\tools\\frame_editing_lib.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\tools\\video_quality_analysis.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\voice_engine\\level_indicator.lib
   ${WEBRTCBUILD}\\obj\\webrtc\\voice_engine\\voice_engine.lib
-)
+)

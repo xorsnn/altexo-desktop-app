@@ -99,7 +99,7 @@ def composeComment():
 
 def main():
     # composeDetails()
-    # composeBrief()
+    composeBrief()
     # composeComment()
 
 if __name__ == '__main__':
