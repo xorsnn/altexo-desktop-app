@@ -1,8 +1,15 @@
-#include "manager.hpp"
 #include "allog.hpp"
+#include "manager.hpp"
+#include <boost/dll/import.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <iostream>
+#include "boost/shared_ptr.hpp"
+#include "boost/function.hpp"
+#include "boost/dll/import.hpp"
+
+namespace boostfs = boost::filesystem;
+namespace boostdll = boost::dll;
 
 Manager::Manager()
     : m_sdk(NULL), m_wsClient(NULL), m_sensor(NULL), m_frameThread(NULL),
@@ -92,14 +99,47 @@ void Manager::initSdk() {
       boost::dll::import<AlSdkAPI>(lib_path / "libaltexo_sdk.dylib", "plugin",
                                    boost::dll::load_mode::append_decorations);
 #else
+#ifdef _WIN32
+    std::cout << "Boost DLL testing ..." << std::endl;
+
+    /* Load the plugin from current working path
+     * (e.g. The plugin on Windows is ${CWD}/ProgPlug.dll )
+     */
+    boostfs::path pluginPath = boostfs::current_path() / boostfs::path("Release") / boostfs::path("al_plugin_test");
+    std::cout << "Load Plugin from " << pluginPath << std::endl;
+
+    typedef boost::shared_ptr<AlPluginTestAPI>(PluginCreate)();
+    boost::function <PluginCreate> pluginCreator;
+    try
+    {
+        pluginCreator = boostdll::import_alias<PluginCreate>(pluginPath,
+            "create_plugin", boostdll::load_mode::append_decorations);
+    }
+    catch (const boost::system::system_error &err)
+    {
+        std::cerr << "Cannot load Plugin from " << pluginPath << std::endl;
+        std::cerr << err.what() << std::endl;
+        return ;
+    }
+
+    /* create the plugin */
+    auto plugin = pluginCreator();
+    // std::cout << "Plugin Name: " << plugin->name() << std::endl;
+    // std::cout << "Plugin API test: 1 + 1 = " << plugin->add(1, 1) << std::endl;
+    // std::cout << "Plugin Name: " << plugin->name() << std::endl;
+    // std::cout << "Plugin API test: 1 + 1 = " << plugin->testMethod() << std::endl;
+    plugin->testMethod();
+    return;
+#else
   m_sdk =
       boost::dll::import<AlSdkAPI>(lib_path / "libaltexo_sdk.so", "plugin",
                                    boost::dll::load_mode::append_decorations);
 #endif
-  m_sdk->init(this);
-  updateResolutionSignal.connect(
-      boost::bind(&AlSdkAPI::updateResolution, m_sdk, _1, _2));
-  updateResolutionSignal(WIDTH, HEIGHT);
+#endif
+  // m_sdk->init(this);
+  // updateResolutionSignal.connect(
+  //     boost::bind(&AlSdkAPI::updateResolution, m_sdk, _1, _2));
+  // updateResolutionSignal(WIDTH, HEIGHT);
 }
 
 void Manager::onWsMessageCb(std::vector<char> msg) {

@@ -49,7 +49,7 @@ int main(int, char **) {
   Manager manager;
   manager.initHoloRenderer(&sceneRenderer);
   // manager.initSensor(&(sceneRenderer.m_sensorDataFboRenderer));
-  // manager.initSdk();
+  manager.initSdk();
 
   #ifndef _WIN32
   manager.initWsConnection(&manager);

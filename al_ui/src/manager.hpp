@@ -2,6 +2,7 @@
 #define MANAGER_H
 
 #include "AL_API/sdk_api.hpp"
+#include "AL_API/al_plugin_test_api.hpp"
 #include "AL_API/sensor_api.hpp"
 #include "AL_API/ws_client_api.hpp"
 #include "AL_CB/al_sdk_cb.hpp"
@@ -48,6 +49,7 @@ public:
   void callToPeer(std::string peerId);
 
   boost::shared_ptr<AlSdkAPI> m_sdk;
+  boost::shared_ptr<AlPluginTestAPI> m_plugin_test;
   std::vector<CONTACT> contactList;
   std::vector<AlTextMessage> webcamList;
   std::vector<AlTextMessage> sensorList;
