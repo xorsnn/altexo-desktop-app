@@ -107,10 +107,10 @@ void Manager::initSdk() {
    */
   boostfs::path pluginPath = boostfs::current_path() /
                              boostfs::path("Release") /
-                             boostfs::path("al_plugin_test");
+                             boostfs::path("altexo_sdk");
   std::cout << "Load Plugin from " << pluginPath << std::endl;
 
-  typedef boost::shared_ptr<AlPluginTestAPI>(PluginCreate)();
+  typedef boost::shared_ptr<AlSdkAPI>(PluginCreate)();
   boost::function<PluginCreate> pluginCreator;
   try {
     pluginCreator = boostdll::import_alias<PluginCreate>(
@@ -121,19 +121,18 @@ void Manager::initSdk() {
     return;
   }
   /* create the plugin */
-  auto plugin = pluginCreator();
-  // plugin->testMethod();
-  return;
+  // auto plugin = pluginCreator();
+  m_sdk = pluginCreator();
 #else
   m_sdk =
       boost::dll::import<AlSdkAPI>(lib_path / "libaltexo_sdk.so", "plugin",
                                    boost::dll::load_mode::append_decorations);
 #endif
 #endif
-  // m_sdk->init(this);
-  // updateResolutionSignal.connect(
-  //     boost::bind(&AlSdkAPI::updateResolution, m_sdk, _1, _2));
-  // updateResolutionSignal(WIDTH, HEIGHT);
+  m_sdk->init(this);
+  updateResolutionSignal.connect(
+      boost::bind(&AlSdkAPI::updateResolution, m_sdk, _1, _2));
+  updateResolutionSignal(WIDTH, HEIGHT);
 }
 
 void Manager::onWsMessageCb(std::vector<char> msg) {

@@ -180,18 +180,6 @@ elseif (WIN32)
     "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.10586.0\\um\\x86\\wmcodecdspuuid.lib"
     "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.10586.0\\um\\x86\\AdvAPI32.Lib"
 
-    # "C:\\Windows\\WinSxS\\x86_microsoft-windows-advapi32_31bf3856ad364e35_10.0.10240.16644_none_8f2d83d368ce779f\\advapi32.dll"
-
-# kernel32.lib
-# user32.lib
-# gdi32.lib
-# winspool.lib
-# comdlg32.lib
-# advapi32.lib
-# shell32.lib
-# ole32.lib
-# oleaut32.
-# lib uuid.lib
     # "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_system-vc140-mt-1_61.lib"
     # "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_filesystem-vc140-mt-1_61.lib"
     # "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_thread-vc140-mt-1_61.lib"
