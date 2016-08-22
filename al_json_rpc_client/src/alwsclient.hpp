@@ -17,6 +17,7 @@
 // 	  "[-d <log bitfield>] [-l]\n");
 // }
 
+// supposed to be just a transport
 class AlWsClient {
 public:
   AlWsClient();
@@ -37,6 +38,9 @@ public:
 
   void sendMessageToPeer(std::vector<char> peerId, std::vector<char> msg) {}
   void sendMessage(AlTextMessage msg);
+
+  // kind of parent implementation
+  virtual void onMessage(AlTextMessage msg) = 0;
 
 private:
   int threadMain();

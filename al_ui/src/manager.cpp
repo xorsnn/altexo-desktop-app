@@ -1,8 +1,8 @@
+#include "manager.hpp"
 #include "allog.hpp"
 #include "boost/dll/import.hpp"
 #include "boost/function.hpp"
 #include "boost/shared_ptr.hpp"
-#include "manager.hpp"
 #include <boost/dll/import.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
@@ -79,6 +79,7 @@ void Manager::frameThread() {
 void Manager::initWsConnection(AlWsCb *alWsCb) {
   boost::filesystem::path lib_path("");
   std::cout << "Loading ws plugin" << std::endl;
+// TODO: remove when migrate to json rpc
 // #ifdef __APPLE__
 //   m_wsClient =
 //       boost::dll::import<AlWsAPI>(lib_path / "libws_client.dylib", "plugin",

@@ -30,28 +30,6 @@ static int cbDumbIncrementStatic(struct lws *wsi,
   return me->cbDumbIncrement(wsi, reason, user, in, len);
 };
 
-/*
-* This demo shows how to connect multiple websockets simultaneously to a
-* websocket server (there is no restriction on their having to be the same
-* server just it simplifies the demo).
-*
-*  dumb-increment-protocol:  we connect to the server and print the number
-*				we are given
-*
-*  lws-mirror-protocol: draws random circles, which are mirrored on to every
-*				client (see them being drawn in every browser
-*				session also using the test server)
-*/
-
-enum demo_protocols {
-
-  PROTOCOL_DUMB_INCREMENT,
-  PROTOCOL_LWS_MIRROR,
-
-  /* always last */
-  DEMO_PROTOCOL_COUNT
-};
-
 static const struct lws_extension exts[] = {
     {"permessage-deflate", lws_extension_callback_pm_deflate,
      "permessage-deflate; client_max_window_bits"},
@@ -75,12 +53,6 @@ static int ratelimit_connects(unsigned int *last, unsigned int secs) {
 AlWsClient::AlWsClient()
     : m_writable(NULL), m_internalThread(NULL), m_debug(true) {
   me = this;
-  // lws_protocols pr1 = {
-  //     "dumb-increment-protocol,fake-nonexistant-protocol",
-  //     // boost::bind(&AlWsClient::cbDumbIncrement, this, _1, _2, _3, _4, _5),
-  //     cbDumbIncrementStatic, 0,
-  //     4096, // 20 was before
-  // };
   lws_protocols pr1 = {"default", cbDumbIncrementStatic, 0};
   m_protocols[0] = pr1;
 
@@ -121,9 +93,9 @@ int AlWsClient::cbDumbIncrement(struct lws *wsi,
                                 void *in, size_t len) {
   unsigned char buf[LWS_PRE + 4096];
 
-  if (m_debug) {
-    std::cout << "reason: " << reason << std::endl;
-  }
+  // if (m_debug) {
+  //   std::cout << "reason: " << reason << std::endl;
+  // }
 
   switch (reason) {
 
@@ -146,18 +118,12 @@ int AlWsClient::cbDumbIncrement(struct lws *wsi,
     if (m_debug) {
       std::cout << "LWS_CALLBACK_CLIENT_WRITEABLE" << std::endl;
     }
-
     if (!m_messageQueue.empty()) {
       AlTextMessage msg = m_messageQueue.front();
       m_messageQueue.pop();
-
-      // std::string peerIdStr = msgPair.first;
-      // std::string msgStr = msgPair.second;
-
       std::string msgStr = msg.toString();
       std::copy(std::begin(msgStr), std::end(msgStr), &(buf[LWS_PRE]));
       buf[LWS_PRE + msgStr.size()] = '\0';
-
       int n = lws_write(wsi, &buf[LWS_PRE], msgStr.size(), LWS_WRITE_TEXT);
       if (m_debug) {
         std::cout << "+++++++++++++++" << std::endl;
@@ -274,7 +240,7 @@ int AlWsClient::threadMain() {
 
     if (!wsi_dumb && ratelimit_connects(&rl_dumb, 2u)) {
       lwsl_notice("dumb: connecting\n");
-      m_i.protocol = m_protocols[PROTOCOL_DUMB_INCREMENT].name;
+      m_i.protocol = m_protocols[0].name;
       wsi_dumb = lws_client_connect_via_info(&m_i);
     }
 
@@ -296,49 +262,36 @@ void AlWsClient::sendMessage(AlTextMessage msg) {
   if (m_debug) {
     std::cout << "AlWsClient::sendMessage" << std::endl;
   }
-  // std::pair<std::string, std::string> msgPair("123", "123");
-
-  // **
-  // * composing message to send
-  // *
-  // std::ostringstream stream;
-  // boost::property_tree::ptree pt;
-  // boost::property_tree::ptree dataNode;
-  // pt.put("action", "send_to_peer");
-  // dataNode.put("peer_id", peerIdStr);
-  // dataNode.put("message", msgStr);
-  // pt.add_child("data", dataNode);
-  // boost::property_tree::write_json(stream, pt, false);
-  // std::string strJson = stream.str();
-
   m_messageQueue.push(msg);
 }
 
 void AlWsClient::_onMessageReceived(AlTextMessage msg) {
-  if (m_debug) {
-    std::cout << "AlWsClient::_onMessageReceived" << std::endl;
-  }
-  if (m_debug) {
-    std::cout << msg.toString() << std::endl;
-  }
-
-  if (!m_tmpFlag) {
-    // TODO: just for testing, replace
-    //===============================
-    std::ostringstream stream1;
-    boost::property_tree::ptree ptAuth1;
-    // boost::property_tree::ptree dataNode;
-    // authenticate [ token ] -> boolean
-    ptAuth1.put("jsonrpc", "2.0");
-    ptAuth1.put("method", "room/open");
-    ptAuth1.put("params", "[\"test111\", \"true\"]");
-    ptAuth1.put("id", "3");
-    boost::property_tree::write_json(stream1, ptAuth1, false);
-    std::string strJson1 = stream1.str();
-    AlTextMessage msgToSend1(strJson1);
-    m_messageQueue.push(msgToSend1);
-    //===============================
-    m_tmpFlag = true;
-  }
-  // newMessageSignal(msgVec);
+  onMessage(msg);
+  // if (m_debug) {
+  //   std::cout << "AlWsClient::_onMessageReceived" << std::endl;
+  // }
+  // if (m_debug) {
+  //   std::cout << msg.toString() << std::endl;
+  // }
+  //
+  // if (!m_tmpFlag) {
+  //   // TODO: just for testing, replace
+  //   //===============================
+  //   std::ostringstream stream1;
+  //   boost::property_tree::ptree ptAuth1;
+  //   // boost::property_tree::ptree dataNode;
+  //   // authenticate [ token ] -> boolean
+  //   ptAuth1.put("jsonrpc", "2.0");
+  //   ptAuth1.put("method", "room/open");
+  //   ptAuth1.put("params", "[\"test111\", \"true\"]");
+  //   ptAuth1.put("id", "3");
+  //   boost::property_tree::write_json(stream1, ptAuth1, false);
+  //   std::string strJson1 = stream1.str();
+  //   AlTextMessage msgToSend1(strJson1);
+  //
+  //   sendMessage(msgToSend1);
+  //   //===============================
+  //   m_tmpFlag = true;
+  // }
+  // // newMessageSignal(msgVec);
 }

@@ -74,18 +74,7 @@ void AlConnClient::handleHttpResponse(cpr::Response r, int responseType) {
     // **
     // * Sending authenticate
     // *
-    std::ostringstream stream;
-    boost::property_tree::ptree ptAuth;
-    // boost::property_tree::ptree dataNode;
-    // authenticate [ token ] -> boolean
-    ptAuth.put("jsonrpc", "2.0");
-    ptAuth.put("method", "authenticate");
-    ptAuth.put("params", m_token);
-    ptAuth.put("id", "2");
-    boost::property_tree::write_json(stream, ptAuth, false);
-    std::string strJson = stream.str();
-    AlTextMessage msgToSend(strJson);
-    m_wsCl.sendMessage(msgToSend);
+    m_wsCl.authenticate(m_token);
 
     // std::ostringstream stream1;
     // boost::property_tree::ptree ptAuth1;

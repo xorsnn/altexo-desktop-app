@@ -51,9 +51,9 @@ int main(int, char **) {
   // manager.initSensor(&(sceneRenderer.m_sensorDataFboRenderer));
   manager.initSdk();
 
-  #ifndef _WIN32
+#ifndef _WIN32
   manager.initWsConnection(&manager);
-  #endif
+#endif
   // ~ local init
 
   // Load Fonts

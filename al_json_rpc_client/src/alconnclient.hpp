@@ -6,7 +6,8 @@
 #include <vector>
 
 #include "AL_CB/al_ws_cb.hpp"
-#include "alwsclient.hpp"
+// #include "alwsclient.hpp"
+#include "alrpc.hpp"
 #include "boost/thread.hpp"
 
 class AlConnClient : public AlWsCb {
@@ -37,7 +38,7 @@ private:
   std::string m_wssLink;
   std::string m_peerId;
 
-  AlWsClient m_wsCl;
+  AlRpc m_wsCl;
   // boost::thread m_internalThread;
   AlWsCb *m_alWsCb;
 };
