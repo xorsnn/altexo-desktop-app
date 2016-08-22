@@ -10,6 +10,7 @@ public:
   virtual ~AlWsAPI() {}
   virtual void init(AlWsCb *alWsCb) = 0;
   virtual void sendMessageToPeer(AlTextMessage peerId, AlTextMessage msg) = 0;
+  virtual void sendMessage(AlTextMessage msg) = 0;
 };
 //]
 
