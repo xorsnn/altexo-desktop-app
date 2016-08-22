@@ -11,8 +11,6 @@ Show what the library does as concisely as possible, developers should be able t
 A short description of the motivation behind the creation and maintenance of the project. This should explain **why** the project exists.
 
 ## Installation
-LINUX:
-  install libjsonrpccpp-dev
 MAC:
 - webrrtc:
 in:
