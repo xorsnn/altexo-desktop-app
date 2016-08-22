@@ -12,30 +12,9 @@ A short description of the motivation behind the creation and maintenance of the
 
 ## Installation
 
-windows:
-1) cpr
-  cmake ..\ -DUSE_SYSTEM_CURL=ON -DBUILD_CPR_TESTS=OFF -DUSE_SYSTEM_GTEST=OFF -DCURL_LIBRARY=D:\WORKSPACE\BUILD_ALTEXO\curl\build\lib\Release\ -DCURL_INCLUDE_DIR="D:\WORKSPACE\BUILD_ALTEXO\curl\build\include"
-
-1.2) curl (copy include to build)
-  https://github.com/curl/curl.git
-  cmake ..\ -DBUILD_TESTING=OFF -DBUILD_CURL_EXE=OFF
-  cmake --build . --config Release
-
-2) Seems like instead of using libfreenect it makes more sense to use original kinect sdk
-
-3) libpng http://www.libpng.org/pub/png/libpng.html
-3.1) zlib https://github.com/madler/zlib.git
-3.2) libpng build
-  cmake .. -DZLIB_LIBRARY="D:\\WORKSPACE\\BUILD_ALTEXO\\zlib\\build\\Release\\zlibstatic.lib" -DZLIB_INCLUDE_DIR="D:\\WORKSPACE\\BUILD_ALTEXO\\zlib\\build"
-
-
-  set SDL2DIR="D:\\WORKSPACE\\BUILD_ALTEXO\\SDL2-2.0.4\\"
-
-
-
 MAC:
 - webrrtc:
-<!-- in:
+in:
 - webrtc/src/chromium/src/build/common.gypi
 
 RTTI - (typeinfo link problem)
@@ -49,7 +28,7 @@ undefined warning workaround
 
 STDLIB flag (std::__1:: vs std:: symbols mismatch at link time)
 +              'CLANG_CXX_LIBRARY':           'libc++', # -stdlib=libc++
- -->
+
 
 ## API Reference
 
