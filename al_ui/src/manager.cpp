@@ -72,16 +72,28 @@ void Manager::frameThread() {
 void Manager::initWsConnection(AlWsCb *alWsCb) {
   boost::filesystem::path lib_path("");
   std::cout << "Loading ws plugin" << std::endl;
+// #ifdef __APPLE__
+//   m_wsClient =
+//       boost::dll::import<AlWsAPI>(lib_path / "libws_client.dylib", "plugin",
+//                                   boost::dll::load_mode::append_decorations);
+// #else
+//   m_wsClient =
+//       boost::dll::import<AlWsAPI>(lib_path / "libws_client.so", "plugin",
+//                                   boost::dll::load_mode::append_decorations);
+// #endif
 #ifdef __APPLE__
-  m_wsClient =
-      boost::dll::import<AlWsAPI>(lib_path / "libws_client.dylib", "plugin",
-                                  boost::dll::load_mode::append_decorations);
+  m_wsClient = boost::dll::import<AlWsAPI>(
+      lib_path / "libjson_rpc_client.dylib", "plugin",
+      boost::dll::load_mode::append_decorations);
 #else
   m_wsClient =
-      boost::dll::import<AlWsAPI>(lib_path / "libws_client.so", "plugin",
+      boost::dll::import<AlWsAPI>(lib_path / "libjson_rpc_client.so", "plugin",
                                   boost::dll::load_mode::append_decorations);
 #endif
   m_wsClient->init(alWsCb);
+
+  // TEST
+  // m_wsClient->sendMessage(AlTextMessage("{123}"));
 }
 
 void Manager::initSdk() {

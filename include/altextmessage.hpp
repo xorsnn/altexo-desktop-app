@@ -13,7 +13,12 @@ public:
   // TODO avoid  in the future
   AlTextMessage(std::vector<char> msg) { m_message = msg; }
 
+  // TODO: remove, deprecated
   std::string getText() {
+    return std::string(m_message.begin(), m_message.end());
+  }
+
+  std::string toString() {
     return std::string(m_message.begin(), m_message.end());
   }
 
