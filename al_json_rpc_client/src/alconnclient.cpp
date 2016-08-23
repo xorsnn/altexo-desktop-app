@@ -76,19 +76,6 @@ void AlConnClient::handleHttpResponse(cpr::Response r, int responseType) {
     // *
     m_wsCl.authenticate(m_token);
 
-    // std::ostringstream stream1;
-    // boost::property_tree::ptree ptAuth1;
-    // // boost::property_tree::ptree dataNode;
-    // // authenticate [ token ] -> boolean
-    // ptAuth1.put("jsonrpc", "2.0");
-    // ptAuth1.put("method", "room/open");
-    // ptAuth1.put("params", "[\"test111\", \"true\"]");
-    // ptAuth1.put("id", "3");
-    // boost::property_tree::write_json(stream1, ptAuth1, false);
-    // std::string strJson1 = stream1.str();
-    // AlTextMessage msgToSend1(strJson1);
-    // m_wsCl.sendMessage(msgToSend1);
-
   } break;
   default:
     std::cout << "unknown http response" << std::endl;

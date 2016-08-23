@@ -5,8 +5,9 @@
 class AlRpcRequest {
 public:
   enum SERVER_MESSAGE_TYPE {
-    AUTHENTICATE =
-        1, // authenticate [ token ] -> boolean аутентификация соединения;
+    NONE = 1,
+    AUTHENTICATE, // authenticate [ token ] -> boolean аутентификация
+                  // соединения;
     ROOM_OPEN, // room/open [ name, p2p ] -> boolean создание комнаты;
     ROOM_CLOSE, // room/close -> boolean закрытие текущей комнат;
     ROOM_ENTER, // room/enter [ name ] -> boolean вход в созданную комнату;

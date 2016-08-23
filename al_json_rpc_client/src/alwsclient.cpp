@@ -267,31 +267,5 @@ void AlWsClient::sendMessage(AlTextMessage msg) {
 
 void AlWsClient::_onMessageReceived(AlTextMessage msg) {
   onMessage(msg);
-  // if (m_debug) {
-  //   std::cout << "AlWsClient::_onMessageReceived" << std::endl;
-  // }
-  // if (m_debug) {
-  //   std::cout << msg.toString() << std::endl;
-  // }
-  //
-  // if (!m_tmpFlag) {
-  //   // TODO: just for testing, replace
-  //   //===============================
-  //   std::ostringstream stream1;
-  //   boost::property_tree::ptree ptAuth1;
-  //   // boost::property_tree::ptree dataNode;
-  //   // authenticate [ token ] -> boolean
-  //   ptAuth1.put("jsonrpc", "2.0");
-  //   ptAuth1.put("method", "room/open");
-  //   ptAuth1.put("params", "[\"test111\", \"true\"]");
-  //   ptAuth1.put("id", "3");
-  //   boost::property_tree::write_json(stream1, ptAuth1, false);
-  //   std::string strJson1 = stream1.str();
-  //   AlTextMessage msgToSend1(strJson1);
-  //
-  //   sendMessage(msgToSend1);
-  //   //===============================
-  //   m_tmpFlag = true;
-  // }
-  // // newMessageSignal(msgVec);
+  // newMessageSignal(msgVec);
 }

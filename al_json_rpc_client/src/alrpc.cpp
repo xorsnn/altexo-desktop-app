@@ -18,7 +18,13 @@ void AlRpc::authenticate(std::string token) {
   boost::property_tree::ptree ptAuth;
   ptAuth.put("jsonrpc", "2.0");
   ptAuth.put("method", "authenticate");
-  ptAuth.put("params", token);
+
+  boost::property_tree::ptree params;
+  boost::property_tree::ptree tokenVal;
+  tokenVal.put("", token);
+  params.push_back(std::make_pair("", tokenVal));
+
+  ptAuth.add_child("params", params);
   ptAuth.put("id", reqId);
   boost::property_tree::write_json(stream, ptAuth, false);
   std::string strJson = stream.str();
@@ -34,7 +40,15 @@ void AlRpc::roomOpen() {
   boost::property_tree::ptree ptRoomOpen;
   ptRoomOpen.put("jsonrpc", "2.0");
   ptRoomOpen.put("method", "room/open");
-  ptRoomOpen.put("params", "[\"test111\", \"true\"]");
+
+  boost::property_tree::ptree params;
+  boost::property_tree::ptree nameVal;
+  nameVal.put("", "123");
+  boost::property_tree::ptree p2pVal;
+  p2pVal.put("", true);
+  params.push_back(std::make_pair("", nameVal));
+  params.push_back(std::make_pair("", p2pVal));
+  ptRoomOpen.add_child("params", params);
   ptRoomOpen.put("id", reqId);
   boost::property_tree::write_json(stream, ptRoomOpen, false);
   std::string strJson = stream.str();
@@ -51,7 +65,7 @@ void AlRpc::roomEnter() {
   boost::property_tree::ptree ptRoomOpen;
   ptRoomOpen.put("jsonrpc", "2.0");
   ptRoomOpen.put("method", "room/enter");
-  ptRoomOpen.put("params", "[\"brazzers\"]");
+  ptRoomOpen.put("params", "123");
   ptRoomOpen.put("id", reqId);
   boost::property_tree::write_json(stream, ptRoomOpen, false);
   std::string strJson = stream.str();
@@ -66,28 +80,53 @@ void AlRpc::offer() {}
 void AlRpc::onIceCandidate() {}
 
 void AlRpc::onMessage(AlTextMessage msg) {
-  std::cout << "AlRpc::onMessage" << std::endl;
+  // std::cout << "AlRpc::onMessage" << std::endl;
+  // std::cout << msg.toString() << std::endl;
 
   boost::property_tree::ptree pt;
   std::stringstream ss(msg.toString());
   boost::property_tree::read_json(ss, pt);
-  long msgId = pt.get<long>("id");
-  int msgType = m_requests[msgId];
-  m_requests.erase(msgId);
-  std::cout << msgId << std::endl;
+
+  long msgId = pt.get<long>("id", -1);
+  std::string method = pt.get<std::string>("method", "none");
+  int msgType = AlRpcRequest::SERVER_MESSAGE_TYPE::NONE;
+
+  // offer notification
+  if (method == "offer") {
+    msgType = AlRpcRequest::SERVER_MESSAGE_TYPE::ROOM_OFFER;
+  }
+  // ice-cadidate notification
+  else if (method == "ice-candidate") {
+    msgType = AlRpcRequest::SERVER_MESSAGE_TYPE::ROOM_ICE_CANDIDATE;
+  } else {
+    std::map<long, int>::iterator it = m_requests.find(msgId);
+    if (it != m_requests.end()) {
+      msgType = m_requests[msgId];
+      m_requests.erase(it);
+    }
+  }
+
+  // std::cout << msgId << std::endl;
   switch (msgType) {
   case AlRpcRequest::SERVER_MESSAGE_TYPE::AUTHENTICATE: {
     bool result = pt.get<bool>("result");
     if (result) {
-      // roomOpen();
-      roomEnter();
+      roomOpen();
     }
   } break;
   case AlRpcRequest::SERVER_MESSAGE_TYPE::ROOM_OPEN: {
     bool result = pt.get<bool>("result");
     // if (result) {
-    // roomEnter();
+    //   roomEnter();
     // }
+  } break;
+  case AlRpcRequest::SERVER_MESSAGE_TYPE::ROOM_OFFER: {
+    // std::cout << "AlRpcRequest::SERVER_MESSAGE_TYPE::ROOM_OFFER" <<
+    // std::endl;
+  } break;
+  case AlRpcRequest::SERVER_MESSAGE_TYPE::ROOM_ICE_CANDIDATE: {
+    // std::cout << "AlRpcRequest::SERVER_MESSAGE_TYPE::ROOM_ICE_CANDIDATE"
+    //           << std::endl;
   } break;
   default: {
     std::cout << "AlRpc unhandled message" << std::endl;
