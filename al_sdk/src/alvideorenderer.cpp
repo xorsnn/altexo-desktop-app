@@ -7,6 +7,7 @@ AlVideoRenderer::AlVideoRenderer(const int nameReceiver,
     : m_width(0), m_height(0), m_rendered_track(track_to_render),
       m_nameReceiver(nameReceiver), m_alCallback(alCallback) {
   m_rendered_track->AddOrUpdateSink(this, rtc::VideoSinkWants());
+  std::cout << "ping1!" << std::endl;
 }
 
 AlVideoRenderer::~AlVideoRenderer() { m_rendered_track->RemoveSink(this); }
@@ -21,6 +22,7 @@ void AlVideoRenderer::SetSize(int width, int height) {
 }
 
 void AlVideoRenderer::OnFrame(const cricket::VideoFrame &video_frame) {
+  std::cout << "ping!" << std::endl;
   const cricket::VideoFrame *frame = video_frame.GetCopyWithRotationApplied();
   SetSize(frame->width(), frame->height());
   int size = m_width * m_height * 4;

@@ -31,9 +31,13 @@ public:
   // TODO: message from server endpoint
   void onMessage(AlTextMessage msg);
 
+  void sendSdpAnswer(AlTextMessage msg);
+  void sendIceCandidate(AlTextMessage msg);
+
 private:
   long m_sessionMsgCounter;
   std::map<long, int> m_requests;
+  long m_sdpOfferId;
 };
 
 #endif // ALRPC_H

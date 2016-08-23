@@ -203,7 +203,7 @@ void Conductor::OnAddStream(webrtc::MediaStreamInterface *stream) {
     // Video track
 
     //        this->m_alCallback->startRemoteRendererCb(track);
-    // std::cout << "============qwe=============" << std::endl;
+    std::cout << "============qwe=============" << std::endl;
     m_remoteRenderer.reset(new AlVideoRenderer(1, track, m_alCallback));
     // TODO: remove
     // this->m_dataManager->startRemoteRenderer(track, m_alCallback);
@@ -357,7 +357,7 @@ void Conductor::OnMessageFromPeer(std::string peer_id,
       return;
     }
     // LOG(INFO) << " Received session description :" << message;
-    std::cout << " Received session description :" << message << std::endl;
+    // std::cout << " Received session description :" << message << std::endl;
     m_peerConnection->SetRemoteDescription(
         DummySetSessionDescriptionObserver::Create(), session_description);
     if (session_description->type() ==
@@ -367,10 +367,10 @@ void Conductor::OnMessageFromPeer(std::string peer_id,
     }
     return;
   } else {
-    if (this->m_debug) {
-      std::cout << "Fucked up msg" << std::endl;
-      std::cout << message << std::endl;
-    }
+    // if (this->m_debug) {
+    //   std::cout << "Fucked up msg" << std::endl;
+    //   std::cout << message << std::endl;
+    // }
     std::string sdp_mid;
     int sdp_mlineindex = 0;
     std::string sdp;
@@ -622,6 +622,8 @@ void Conductor::UIThreadCallback(int msg_id, void *data) {
     webrtc::MediaStreamInterface *stream =
         reinterpret_cast<webrtc::MediaStreamInterface *>(data);
     webrtc::VideoTrackVector tracks = stream->GetVideoTracks();
+    std::cout << "VVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVVV"
+              << std::endl;
     // Only render the first track.
     if (!tracks.empty()) {
       webrtc::VideoTrackInterface *track = tracks[0];

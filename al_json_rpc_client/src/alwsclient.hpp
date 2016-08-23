@@ -27,6 +27,8 @@ public:
     m_path = path;
     m_cb = cb;
     newMessageSignal.connect(boost::bind(&AlWsCb::onWsMessageCb, cb, _1));
+    iceCandidateSignal.connect(boost::bind(&AlWsCb::onIceCandidateCb, cb, _1));
+    sdpSignal.connect(boost::bind(&AlWsCb::onSdpCb, cb, _1));
     return 1;
   }
 
@@ -41,6 +43,11 @@ public:
 
   // kind of parent implementation
   virtual void onMessage(AlTextMessage msg) = 0;
+
+protected:
+  boost::signals2::signal<void(AlTextMessage)> newMessageSignal;
+  boost::signals2::signal<void(AlTextMessage)> iceCandidateSignal;
+  boost::signals2::signal<void(AlTextMessage)> sdpSignal;
 
 private:
   int threadMain();
@@ -62,7 +69,6 @@ private:
   struct lws_protocols m_protocols[2];
   boost::thread *m_internalThread;
   AlWsCb *m_cb;
-  boost::signals2::signal<void(std::vector<char>)> newMessageSignal;
 
   // std::queue<std::pair<std::string, std::string>> m_messageQueue;
   std::queue<AlTextMessage> m_messageQueue;

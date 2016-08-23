@@ -54,13 +54,13 @@ public:
   void threadMain();
 
   void onSdpCb(const std::string &message) {
-    std::vector<char> msg(message.begin(), message.end());
-    m_sdkCb->onSdp(msg);
+    AlTextMessage msg(message);
+    m_sdkCb->onLocalSdpCb(msg);
   }
 
   void onCandidateCb(const std::string &message) {
-    std::vector<char> msg(message.begin(), message.end());
-    m_sdkCb->onCandidate(msg);
+    AlTextMessage msg(message);
+    m_sdkCb->onLocalIceCandidateCb(msg);
   }
 
   void sendHangUpCb(std::string peer_id) {
