@@ -152,37 +152,19 @@ void AlRpc::onMessage(AlTextMessage msg) {
 }
 
 void AlRpc::sendSdpAnswer(AlTextMessage msg) {
-  // std::cout << "AlRpc::sendSdpAnswer" << std::endl;
-  // std::cout << msg.toString() << std::endl;
-
   boost::property_tree::ptree pt;
   std::stringstream ss(msg.toString());
   boost::property_tree::read_json(ss, pt);
 
-  boost::property_tree::ptree ptToSend;
-  ptToSend.put("id", m_sdpOfferId);
-  ptToSend.put("jsonrpc", "2.0");
-  ptToSend.put("result", pt.get<std::string>("sdp"));
-
   std::ostringstream stream;
-  boost::property_tree::write_json(stream, ptToSend, false);
-  std::string strJson = stream.str();
-  AlTextMessage msgToSend(strJson);
-
-  std::ostringstream stream1;
   Json::Value docVal(Json::objectValue), resVal(Json::arrayValue);
   resVal.append(pt.get<std::string>("sdp"));
   docVal["result"] = resVal;
   docVal["id"] = int(m_sdpOfferId);
   docVal["jsonrpc"] = "2.0";
-  stream1 << docVal;
-  std::cout << "VVVVVVVVVVVVVVVVVVVVVVVVVVsending: " << std::endl;
-  // std::cout << stream1.str() << std::endl;
-  // std::cout << "sending: " << std::endl;
-  // std::cout << msgToSend.toString() << std::endl;
+  stream << docVal;
 
-  sendMessage(AlTextMessage(stream1.str()));
-  // sendMessage(msgToSend);
+  sendMessage(AlTextMessage(stream.str()));
 }
 
 void AlRpc::sendIceCandidate(AlTextMessage msg) {

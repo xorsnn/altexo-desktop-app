@@ -22,7 +22,6 @@ void AlVideoRenderer::SetSize(int width, int height) {
 }
 
 void AlVideoRenderer::OnFrame(const cricket::VideoFrame &video_frame) {
-  std::cout << "ping!" << std::endl;
   const cricket::VideoFrame *frame = video_frame.GetCopyWithRotationApplied();
   SetSize(frame->width(), frame->height());
   int size = m_width * m_height * 4;
