@@ -1,6 +1,7 @@
 #include "alrpc.hpp"
 #include <boost/foreach.hpp>
 #include <iostream>
+#include <jsoncpp/json/json.h>
 
 template <typename T>
 std::vector<T> as_vector(boost::property_tree::ptree const &pt,
@@ -53,14 +54,14 @@ void AlRpc::roomOpen() {
 
   boost::property_tree::ptree params;
   boost::property_tree::ptree nameVal;
-  nameVal.put("", "1234567");
+  nameVal.put("", "1234");
   boost::property_tree::ptree p2pVal;
   p2pVal.put("", true);
   params.push_back(std::make_pair("", nameVal));
   params.push_back(std::make_pair("", p2pVal));
   ptRoomOpen.add_child("params", params);
   ptRoomOpen.put("id", reqId);
-  boost::property_tree::write_json(stream, ptRoomOpen, false);
+  boost::property_tree::write_json(stream, ptRoomOpen, true);
   std::string strJson = stream.str();
   AlTextMessage msgToSend(strJson);
   sendMessage(msgToSend);
@@ -75,7 +76,7 @@ void AlRpc::roomEnter() {
   boost::property_tree::ptree ptRoomOpen;
   ptRoomOpen.put("jsonrpc", "2.0");
   ptRoomOpen.put("method", "room/enter");
-  ptRoomOpen.put("params", "1234567");
+  ptRoomOpen.put("params", "1234");
   ptRoomOpen.put("id", reqId);
   boost::property_tree::write_json(stream, ptRoomOpen, false);
   std::string strJson = stream.str();
@@ -168,15 +169,26 @@ void AlRpc::sendSdpAnswer(AlTextMessage msg) {
   std::string strJson = stream.str();
   AlTextMessage msgToSend(strJson);
 
+  std::ostringstream stream1;
+  Json::Value docVal(Json::objectValue), resVal(Json::arrayValue);
+  resVal.append(pt.get<std::string>("sdp"));
+  docVal["result"] = resVal;
+  docVal["id"] = int(m_sdpOfferId);
+  docVal["jsonrpc"] = "2.0";
+  stream1 << docVal;
+  std::cout << "VVVVVVVVVVVVVVVVVVVVVVVVVVsending: " << std::endl;
+  // std::cout << stream1.str() << std::endl;
   // std::cout << "sending: " << std::endl;
   // std::cout << msgToSend.toString() << std::endl;
 
-  sendMessage(msgToSend);
+  sendMessage(AlTextMessage(stream1.str()));
+  // sendMessage(msgToSend);
 }
 
 void AlRpc::sendIceCandidate(AlTextMessage msg) {
   std::cout << "AlRpc::sendIceCandidate" << std::endl;
   std::cout << msg.toString() << std::endl;
+
   // TODO: add method and all other nesessary fields
   // sendMessage(msg);
   boost::property_tree::ptree pt;

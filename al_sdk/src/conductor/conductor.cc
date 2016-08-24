@@ -399,6 +399,9 @@ void Conductor::OnMessageFromPeer(std::string peer_id,
       LOG(WARNING) << "Failed to apply the received candidate";
       std::cout << "Failed to apply the received candidate" << std::endl;
       return;
+    } else {
+      std::cout << "AAAA, candidate!" << std::endl;
+      std::cout << jmessage << std::endl;
     }
     // LOG(INFO) << " Received candidate :" << message;
     // std::cout << " Received candidate :" << message << std::endl;
