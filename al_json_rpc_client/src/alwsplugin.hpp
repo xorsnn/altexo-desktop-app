@@ -23,6 +23,7 @@ public:
   void sendMessageToPeer(AlTextMessage peerId, AlTextMessage msg);
   void sendMessage(AlTextMessage msg);
 
+  void sendSdpOffer(AlTextMessage msg);
   void sendSdpAnswer(AlTextMessage msg);
   void sendIceCandidate(AlTextMessage msg);
 
@@ -39,6 +40,7 @@ private:
   // TODO: deprecated
   boost::signals2::signal<void(AlTextMessage)> sendWsMessageSignal;
 
+  boost::signals2::signal<void(AlTextMessage)> sendSdpOfferSignal;
   boost::signals2::signal<void(AlTextMessage)> sendSdpAnswerSignal;
   boost::signals2::signal<void(AlTextMessage)> sendIceCandidateSignal;
 };

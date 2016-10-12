@@ -9,7 +9,9 @@ class AlWsCb {
 public:
   virtual void onWsMessageCb(AlTextMessage msg) = 0;
   virtual void onIceCandidateCb(AlTextMessage msg) = 0;
-  virtual void onSdpCb(AlTextMessage msg) = 0;
+  virtual void onSdpOfferCb(AlTextMessage msg) = 0;
+  virtual void onSdpAnswerCb(AlTextMessage msg) = 0;
+  virtual void onInitCall() = 0;
 };
 //]
 

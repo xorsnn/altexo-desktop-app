@@ -22,7 +22,7 @@ public:
   void roomClose();
   void roomEnter();
   void roomLeave();
-  void roomOffer();
+  void roomOffer(AlTextMessage offerSdp);
 
   void onRoomIceCandidate();
   void offer();
@@ -31,6 +31,7 @@ public:
   // TODO: message from server endpoint
   void onMessage(AlTextMessage msg);
 
+  void sendSdpOffer(AlTextMessage msg);
   void sendSdpAnswer(AlTextMessage msg);
   void sendIceCandidate(AlTextMessage msg);
 

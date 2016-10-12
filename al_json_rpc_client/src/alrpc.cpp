@@ -3,6 +3,9 @@
 #include <iostream>
 #include <jsoncpp/json/json.h>
 
+// TODO: move room name to UI
+std::string ROOM_NAME = "12345678";
+
 template <typename T>
 std::vector<T> as_vector(boost::property_tree::ptree const &pt,
                          boost::property_tree::ptree::key_type const &key) {
@@ -54,7 +57,7 @@ void AlRpc::roomOpen() {
 
   boost::property_tree::ptree params;
   boost::property_tree::ptree nameVal;
-  nameVal.put("", "12345");
+  nameVal.put("", ROOM_NAME);
   boost::property_tree::ptree p2pVal;
   p2pVal.put("", true);
   params.push_back(std::make_pair("", nameVal));
@@ -76,7 +79,7 @@ void AlRpc::roomEnter() {
   boost::property_tree::ptree ptRoomOpen;
   ptRoomOpen.put("jsonrpc", "2.0");
   ptRoomOpen.put("method", "room/enter");
-  ptRoomOpen.put("params", "12345");
+  ptRoomOpen.put("params", ROOM_NAME);
   ptRoomOpen.put("id", reqId);
   boost::property_tree::write_json(stream, ptRoomOpen, false);
   std::string strJson = stream.str();
@@ -84,7 +87,29 @@ void AlRpc::roomEnter() {
   sendMessage(msgToSend);
 }
 void AlRpc::roomLeave() {}
-void AlRpc::roomOffer() {}
+
+void AlRpc::roomOffer(AlTextMessage offerSdp) {
+  // room/offer [ offerSdp ] -> answerSdp отправление SDP
+  // предложения и получение SDP отклика в результате.
+  long reqId = getMsgId();
+  m_requests[reqId] = AlRpcRequest::SERVER_MESSAGE_TYPE::ROOM_OFFER;
+  std::ostringstream stream;
+  boost::property_tree::ptree ptRoomOffer;
+  ptRoomOffer.put("jsonrpc", "2.0");
+  ptRoomOffer.put("method", "room/offer");
+
+  boost::property_tree::ptree params;
+  boost::property_tree::ptree offerVal;
+  offerVal.put("", offerSdp.toString());
+  params.push_back(std::make_pair("", offerVal));
+
+  ptRoomOffer.add_child("params", params);
+  ptRoomOffer.put("id", reqId);
+  boost::property_tree::write_json(stream, ptRoomOffer, false);
+  std::string strJson = stream.str();
+  AlTextMessage msgToSend(strJson);
+  sendMessage(msgToSend);
+}
 
 void AlRpc::onRoomIceCandidate() {}
 void AlRpc::offer() {}
@@ -104,13 +129,25 @@ void AlRpc::onMessage(AlTextMessage msg) {
 
   // offer notification
   if (method == "offer") {
-    msgType = AlRpcRequest::SERVER_MESSAGE_TYPE::ROOM_OFFER;
+    std::cout << "*******offer notification*********" << std::endl;
+    // msgType = AlRpcRequest::SERVER_MESSAGE_TYPE::ROOM_OFFER;
     m_sdpOfferId = msgId;
+    sdpOfferSignal(msg);
   }
+  // // TODO: remove
+  // // answer notification
+  // else if (method == "answer") {
+  //   // TODO: debugging messages
+  //   std::cout << "*******answer notification*********" << std::endl;
+  // }
   // ice-cadidate notification
   else if (method == "ice-candidate") {
     msgType = AlRpcRequest::SERVER_MESSAGE_TYPE::ROOM_ICE_CANDIDATE;
   } else {
+    // TODO: debugging messages
+    std::cout << "*******custom message*********" << std::endl;
+    std::cout << msg.toString() << std::endl;
+
     std::map<long, int>::iterator it = m_requests.find(msgId);
     if (it != m_requests.end()) {
       msgType = m_requests[msgId];
@@ -126,13 +163,23 @@ void AlRpc::onMessage(AlTextMessage msg) {
     }
   } break;
   case AlRpcRequest::SERVER_MESSAGE_TYPE::ROOM_OPEN: {
-    bool result = pt.get<bool>("result");
-    // if (result) {
-    //   roomEnter();
-    // }
+    // TODO: catch errors globally
+    boost::optional<boost::property_tree::ptree &> err =
+        pt.get_child_optional("error");
+    if (!err) {
+      bool result = pt.get<bool>("result");
+    } else {
+      // TODO: handle error code
+      // NOTE: consider room exists, let's enter
+      roomEnter();
+    }
+  } break;
+  case AlRpcRequest::SERVER_MESSAGE_TYPE::ROOM_ENTER: {
+    initCallSignal();
   } break;
   case AlRpcRequest::SERVER_MESSAGE_TYPE::ROOM_OFFER: {
-    sdpSignal(msg);
+    std::cout << "*********ROOM_OFFER*************" << std::endl;
+    sdpAnswerSignal(msg);
   } break;
   case AlRpcRequest::SERVER_MESSAGE_TYPE::ROOM_ICE_CANDIDATE: {
     BOOST_FOREACH (boost::property_tree::ptree::value_type &v,
@@ -151,7 +198,31 @@ void AlRpc::onMessage(AlTextMessage msg) {
   }
 }
 
+void AlRpc::sendSdpOffer(AlTextMessage msg) {
+
+  // NOTE: preparing message to the right format
+  // TODO: can be avoided
+  boost::property_tree::ptree pt;
+  std::stringstream ss(msg.toString());
+  boost::property_tree::read_json(ss, pt);
+
+  std::ostringstream stream;
+  Json::Value docVal(Json::objectValue), resVal(Json::arrayValue);
+
+  // resVal.append(pt.get<std::string>("sdp"));
+  // roomOffer(msg);
+
+  roomOffer(AlTextMessage(pt.get<std::string>("sdp")));
+}
+
 void AlRpc::sendSdpAnswer(AlTextMessage msg) {
+  std::cout << "********************" << std::endl;
+  std::cout << "********************" << std::endl;
+  std::cout << "********************" << std::endl;
+  std::cout << "********************" << std::endl;
+  std::cout << "********************" << std::endl;
+  std::cout << "********************" << std::endl;
+
   boost::property_tree::ptree pt;
   std::stringstream ss(msg.toString());
   boost::property_tree::read_json(ss, pt);
@@ -164,6 +235,7 @@ void AlRpc::sendSdpAnswer(AlTextMessage msg) {
   docVal["jsonrpc"] = "2.0";
   stream << docVal;
 
+  std::cout << stream.str() << std::endl;
   sendMessage(AlTextMessage(stream.str()));
 }
 
