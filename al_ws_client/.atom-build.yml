@@ -1,1 +1,0 @@
-cmd: cd build && make clean && echo `pwd` && cmake ../ && make

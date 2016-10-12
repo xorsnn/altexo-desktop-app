@@ -1,8 +1,8 @@
 #ifndef MANAGER_H
 #define MANAGER_H
 
-#include "AL_API/sdk_api.hpp"
 #include "AL_API/al_plugin_test_api.hpp"
+#include "AL_API/sdk_api.hpp"
 #include "AL_API/sensor_api.hpp"
 #include "AL_API/ws_client_api.hpp"
 #include "AL_CB/al_sdk_cb.hpp"
@@ -26,12 +26,13 @@ public:
   void initSdk();
 
   // ws cb
-  void onMessageCb(std::vector<char> peerId, std::vector<char> msg) {}
-  void onWsMessageCb(std::vector<char> msg);
+  void onWsMessageCb(AlTextMessage msg);
+  void onIceCandidateCb(AlTextMessage msg);
+  void onSdpCb(AlTextMessage msg);
 
   // sdk cb
-  void onSdp(std::vector<char> sdp);
-  void onCandidate(std::vector<char> candidate);
+  void onLocalSdpCb(AlTextMessage sdp);
+  void onLocalIceCandidateCb(AlTextMessage candidate);
   void onDevicesListChangedCb(std::vector<AlTextMessage> deviceNames);
   void updateFrameCb(const uint8_t *image, int width, int height); // REMOTE
   void updateLocalFrameCb(const uint8_t *image, int width, int height); // LOCAL
@@ -78,6 +79,10 @@ private:
   boost::signals2::signal<void(int, int)> updateResolutionSignal;
 
   SceneRenderer *m_holoRenderer;
+
+  // TODO: temorary solution
+  bool m_beenCalled;
+  bool m_processingCandidates;
 
   // TODO move mode selection to UI
   int WIDTH = 320;

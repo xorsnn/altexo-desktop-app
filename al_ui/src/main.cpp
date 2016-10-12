@@ -51,9 +51,9 @@ int main(int, char **) {
   // manager.initSensor(&(sceneRenderer.m_sensorDataFboRenderer));
   manager.initSdk();
 
-  #ifndef _WIN32
+#ifndef _WIN32
   manager.initWsConnection(&manager);
-  #endif
+#endif
   // ~ local init
 
   // Load Fonts
@@ -208,6 +208,8 @@ int main(int, char **) {
 
     ImGui::Render();
     SDL_GL_SwapWindow(window);
+
+    // NOTE: redraw delay
     SDL_Delay(1000 / 30);
   }
 

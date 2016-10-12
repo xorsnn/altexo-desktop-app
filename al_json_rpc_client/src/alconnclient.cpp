@@ -51,9 +51,8 @@ void AlConnClient::handleHttpResponse(cpr::Response r, int responseType) {
     break;
   }
   case HTTP_ME: {
-    std::cout << "ws conn" << std::endl;
-
     if (m_debug) {
+      std::cout << "ws conn" << std::endl;
       std::cout << r.text << std::endl;
     }
 
@@ -62,7 +61,7 @@ void AlConnClient::handleHttpResponse(cpr::Response r, int responseType) {
     boost::property_tree::read_json(ss, pt);
 
     // TODO: using hardcoded link
-    m_wssLink = SERVER_WS_LINK + "/chat";
+    m_wssLink = SERVER_WS_LINK + "/al_chat";
 
     if (m_debug) {
       std::cout << m_wssLink << std::endl;
@@ -74,31 +73,7 @@ void AlConnClient::handleHttpResponse(cpr::Response r, int responseType) {
     // **
     // * Sending authenticate
     // *
-    std::ostringstream stream;
-    boost::property_tree::ptree ptAuth;
-    // boost::property_tree::ptree dataNode;
-    // authenticate [ token ] -> boolean
-    ptAuth.put("jsonrpc", "2.0");
-    ptAuth.put("method", "authenticate");
-    ptAuth.put("params", m_token);
-    ptAuth.put("id", "2");
-    boost::property_tree::write_json(stream, ptAuth, false);
-    std::string strJson = stream.str();
-    AlTextMessage msgToSend(strJson);
-    m_wsCl.sendMessage(msgToSend);
-
-    // std::ostringstream stream1;
-    // boost::property_tree::ptree ptAuth1;
-    // // boost::property_tree::ptree dataNode;
-    // // authenticate [ token ] -> boolean
-    // ptAuth1.put("jsonrpc", "2.0");
-    // ptAuth1.put("method", "room/open");
-    // ptAuth1.put("params", "[\"test111\", \"true\"]");
-    // ptAuth1.put("id", "3");
-    // boost::property_tree::write_json(stream1, ptAuth1, false);
-    // std::string strJson1 = stream1.str();
-    // AlTextMessage msgToSend1(strJson1);
-    // m_wsCl.sendMessage(msgToSend1);
+    m_wsCl.authenticate(m_token);
 
   } break;
   default:

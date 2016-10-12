@@ -18,8 +18,13 @@ public:
 
   // api
   void init(AlWsCb *alWsCb);
+
+  // TODO: deprecated
   void sendMessageToPeer(AlTextMessage peerId, AlTextMessage msg);
   void sendMessage(AlTextMessage msg);
+
+  void sendSdpAnswer(AlTextMessage msg);
+  void sendIceCandidate(AlTextMessage msg);
 
   void threadMain();
 
@@ -27,10 +32,15 @@ private:
   AlConnClient *m_connClient;
   boost::thread m_internalThread;
 
+  // TODO: deprecated
   boost::signals2::signal<void(std::vector<char>, std::vector<char>)>
       sendWsMessageToPeerSignal;
 
+  // TODO: deprecated
   boost::signals2::signal<void(AlTextMessage)> sendWsMessageSignal;
+
+  boost::signals2::signal<void(AlTextMessage)> sendSdpAnswerSignal;
+  boost::signals2::signal<void(AlTextMessage)> sendIceCandidateSignal;
 };
 
 extern "C" BOOST_SYMBOL_EXPORT AlWsPlugin plugin;

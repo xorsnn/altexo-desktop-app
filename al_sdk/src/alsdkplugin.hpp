@@ -5,10 +5,14 @@
 #include "AL_CB/al_sdk_cb.hpp"
 #include "alcallback.h"
 #include "altextmessage.hpp"
+
+#ifdef _WIN32
+#include "boost/dll/alias.hpp"
+#endif
+
+#include "boost/make_shared.hpp"
 #include "boost/thread.hpp"
 #include <boost/config.hpp>
-#include "boost/dll/alias.hpp"
-#include "boost/make_shared.hpp"
 #include <boost/signals2/signal.hpp>
 #include <queue>
 #include <string>
@@ -19,10 +23,13 @@ class AlSdkPlugin : public AlSdkAPI, public AlCallback {
 public:
   AlSdkPlugin();
   ~AlSdkPlugin();
+
+#ifdef _WIN32
   // Factory method
   static boost::shared_ptr<AlSdkAPI> create() {
     return boost::make_shared<AlSdkPlugin>();
   }
+#endif
 
   void init(AlSDKCb *alSdkCb);
   // AlWsCb *getWsCb();
@@ -47,13 +54,13 @@ public:
   void threadMain();
 
   void onSdpCb(const std::string &message) {
-    std::vector<char> msg(message.begin(), message.end());
-    m_sdkCb->onSdp(msg);
+    AlTextMessage msg(message);
+    m_sdkCb->onLocalSdpCb(msg);
   }
 
   void onCandidateCb(const std::string &message) {
-    std::vector<char> msg(message.begin(), message.end());
-    m_sdkCb->onCandidate(msg);
+    AlTextMessage msg(message);
+    m_sdkCb->onLocalIceCandidateCb(msg);
   }
 
   void sendHangUpCb(std::string peer_id) {
@@ -172,13 +179,13 @@ private:
   int HEIGHT;
 };
 
-// #ifdef _WIN32
+#ifdef _WIN32
 BOOST_DLL_ALIAS(AlSdkPlugin::create, // <-- this function is exported with...
                 create_plugin        // <-- ...this alias name
                 )
-// #else
-// extern "C" BOOST_SYMBOL_EXPORT AlSdkPlugin plugin;
-// AlSdkPlugin plugin;
-// #endif
+#else
+extern "C" BOOST_SYMBOL_EXPORT AlSdkPlugin plugin;
+AlSdkPlugin plugin;
+#endif
 
 #endif // ALSDKPLUGIN_H

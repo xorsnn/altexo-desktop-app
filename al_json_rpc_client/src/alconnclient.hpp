@@ -6,27 +6,24 @@
 #include <vector>
 
 #include "AL_CB/al_ws_cb.hpp"
-#include "alwsclient.hpp"
+#include "alrpc.hpp"
 #include "boost/thread.hpp"
 
-class AlConnClient : public AlWsCb {
+class AlConnClient {
 public:
   AlConnClient(AlWsCb *alWsCb);
   ~AlConnClient();
 
-  // AlWsCb
-  void onMessageCb(std::vector<char> peerId, std::vector<char> msg) {}
-  void onWsMessageCb(std::vector<char> msg) {}
-
   enum HTTP_RESPONSE_TYPE {
     HTTP_LOGIN = 1,
     HTTP_ME,
-    HTTP_INIT_WS_CONN,
+    // TODO: remove, not used any more
+    // HTTP_INIT_WS_CONN,
   };
 
   void login(std::string login, std::string password);
 
-  AlWsClient *getWsClientRef() { return &m_wsCl; };
+  AlRpc *getWsClientRef() { return &m_wsCl; };
 
 private:
   void handleHttpResponse(cpr::Response r, int responseType);
@@ -37,7 +34,7 @@ private:
   std::string m_wssLink;
   std::string m_peerId;
 
-  AlWsClient m_wsCl;
+  AlRpc m_wsCl;
   // boost::thread m_internalThread;
   AlWsCb *m_alWsCb;
 };

@@ -1,8 +1,8 @@
+#include "manager.hpp"
 #include "allog.hpp"
 #include "boost/dll/import.hpp"
 #include "boost/function.hpp"
 #include "boost/shared_ptr.hpp"
-#include "manager.hpp"
 #include <boost/dll/import.hpp>
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
@@ -11,9 +11,20 @@
 namespace boostfs = boost::filesystem;
 namespace boostdll = boost::dll;
 
+// TODO: repeated over multiple files, move to a separate lib
+template <typename T>
+std::vector<T> as_vector(boost::property_tree::ptree const &pt,
+                         boost::property_tree::ptree::key_type const &key) {
+  std::vector<T> r;
+  for (auto &item : pt.get_child(key))
+    r.push_back(item.second.get_value<T>());
+  return r;
+}
+
 Manager::Manager()
     : m_sdk(NULL), m_wsClient(NULL), m_sensor(NULL), m_frameThread(NULL),
-      m_id(""), m_peerId("-1"), m_videoDeviceName(""), m_videoDeviceType(-1) {
+      m_id(""), m_peerId("-1"), m_videoDeviceName(""), m_videoDeviceType(-1),
+      m_beenCalled(false), m_processingCandidates(false) {
   alLog("Manager constructor");
   sensorList.push_back(AlTextMessage("Kinect"));
 }
@@ -79,6 +90,7 @@ void Manager::frameThread() {
 void Manager::initWsConnection(AlWsCb *alWsCb) {
   boost::filesystem::path lib_path("");
   std::cout << "Loading ws plugin" << std::endl;
+// TODO: remove when migrate to json rpc
 // #ifdef __APPLE__
 //   m_wsClient =
 //       boost::dll::import<AlWsAPI>(lib_path / "libws_client.dylib", "plugin",
@@ -147,28 +159,60 @@ void Manager::initSdk() {
   updateResolutionSignal(WIDTH, HEIGHT);
 }
 
-void Manager::onWsMessageCb(std::vector<char> msg) {
-  std::string msgStr(msg.begin(), msg.end());
+void Manager::onWsMessageCb(AlTextMessage msg) {
+  // TODO: seemms deprecated
+  // std::string msgStr = msg.toString();
+  // boost::property_tree::ptree pt;
+  // std::stringstream ss(msgStr);
+  // boost::property_tree::read_json(ss, pt);
+  // std::string action = pt.get<std::string>("action");
+  // if (action == "logged_in") {
+  //   m_id = pt.get<std::string>("data.id");
+  // } else if (action == "update_user_list") {
+  //   // updating contact list
+  //   contactList.clear();
+  //   for (auto &item : pt.get_child("data")) {
+  //     CONTACT ct;
+  //     ct.name = item.second.get<std::string>("name");
+  //     ct.id = item.second.get<std::string>("id");
+  //     if (ct.id != m_id) {
+  //       contactList.push_back(ct);
+  //     }
+  //   }
+  // } else if (action == "message_from_peer") {
+  //   onMessageFromPeer(pt);
+  // }
+}
+
+void Manager::onIceCandidateCb(AlTextMessage msg) {
+  // std::cout << "Manager::onIceCandidateCb" << std::endl;
+  // std::cout << msg.toString() << std::endl;
+  m_remoteCandidates.push(msg.toString());
+  handleMessages();
+}
+
+void Manager::onSdpCb(AlTextMessage msg) {
+  std::cout << "Manager::onSdpCb" << std::endl;
+  std::cout << msg.toString() << std::endl;
+  // **
+  // TODO: this is temprorary solution, we make messages similar to what we used
+  // before
   boost::property_tree::ptree pt;
-  std::stringstream ss(msgStr);
+  std::stringstream ss(msg.toString());
   boost::property_tree::read_json(ss, pt);
-  std::string action = pt.get<std::string>("action");
-  if (action == "logged_in") {
-    m_id = pt.get<std::string>("data.id");
-  } else if (action == "update_user_list") {
-    // updating contact list
-    contactList.clear();
-    for (auto &item : pt.get_child("data")) {
-      CONTACT ct;
-      ct.name = item.second.get<std::string>("name");
-      ct.id = item.second.get<std::string>("id");
-      if (ct.id != m_id) {
-        contactList.push_back(ct);
-      }
-    }
-  } else if (action == "message_from_peer") {
-    onMessageFromPeer(pt);
+  std::string sdpBody;
+  for (auto i : as_vector<std::string>(pt, "params")) {
+    sdpBody = i;
   }
+  std::ostringstream streamRes;
+  boost::property_tree::ptree ptRes;
+  ptRes.put("sdp", sdpBody);
+  ptRes.put("type", "offer");
+  boost::property_tree::write_json(streamRes, ptRes, false);
+
+  m_remoteSdp = streamRes.str();
+
+  handleMessages();
 }
 
 void Manager::initConnection(std::string peerId) {
@@ -226,6 +270,10 @@ void Manager::onMessageFromPeer(boost::property_tree::ptree msgPt) {
     m_sdk->initializePeerConnection();
   } else if (isCall) {
     alLog("isCall");
+
+    // TODO make it more consistent
+    _initVideoDevice();
+
     // TODO implement accept call functionality
     std::ostringstream stream;
     boost::property_tree::ptree msgToSendPt;
@@ -251,21 +299,23 @@ void Manager::onMessageFromPeer(boost::property_tree::ptree msgPt) {
   }
 }
 
-void Manager::onSdp(std::vector<char> sdp) {
-  alLog("Manager::onSdp");
-  m_localSdp = std::string(sdp.begin(), sdp.end());
+void Manager::onLocalSdpCb(AlTextMessage sdp) {
+  alLog("Manager::onLocalSdpCb");
+  std::cout << sdp.toString() << std::endl;
+  // m_localSdp = std::string(sdp.begin(), sdp.end());
+  m_localSdp = sdp.toString();
   handleMessages();
 }
-void Manager::onCandidate(std::vector<char> candidate) {
-  alLog("Manager::onCandidate");
-  m_localCandidates.push(std::string(candidate.begin(), candidate.end()));
+void Manager::onLocalIceCandidateCb(AlTextMessage candidate) {
+  alLog("Manager::onLocalIceCandidateCb");
+  // std::cout << candidate.toString() << std::endl;
+  m_localCandidates.push(candidate.toString());
   handleMessages();
 }
 
 void Manager::handleMessages() {
   if (!m_sentLocalSdp && m_localSdp != "") {
-    m_wsClient->sendMessageToPeer(AlTextMessage(m_peerId),
-                                  AlTextMessage(m_localSdp));
+    m_wsClient->sendSdpAnswer(AlTextMessage(m_localSdp));
     m_sentLocalSdp = true;
   }
   if (!m_sentRemoteSdp && m_remoteSdp != "") {
@@ -273,19 +323,22 @@ void Manager::handleMessages() {
     m_sdk->setRemoteSdp(remoteSdpVec);
     m_sentRemoteSdp = true;
   }
-  if (m_sentLocalSdp && m_sentRemoteSdp) {
+  if (m_sentLocalSdp && m_sentRemoteSdp && !m_processingCandidates) {
+    m_processingCandidates = true;
     while (!m_localCandidates.empty()) {
       std::string candidate = m_localCandidates.front();
       m_localCandidates.pop();
-      m_wsClient->sendMessageToPeer(AlTextMessage(m_peerId),
-                                    AlTextMessage(candidate));
+      std::cout << candidate << std::endl;
+      m_wsClient->sendIceCandidate(AlTextMessage(candidate));
     }
     while (!m_remoteCandidates.empty()) {
       std::string candidate = m_remoteCandidates.front();
       m_remoteCandidates.pop();
       std::vector<char> candidateVec(candidate.begin(), candidate.end());
+      // TODO: migrate to AlTextMessage
       m_sdk->setRemoteIceCandidate(candidateVec);
     }
+    m_processingCandidates = false;
   }
   if (m_sentLocalSdp && m_sentRemoteSdp && m_localCandidates.empty() &&
       m_remoteCandidates.empty() && !connectionInitialized) {
@@ -319,11 +372,14 @@ void Manager::setDeviceName(AlTextMessage deviceName, int deviceType) {
   default:
     break;
   }
+  // TODO init it once
+  _initVideoDevice();
 }
 
 void Manager::callToPeer(std::string peerId) { initConnection(peerId); }
 
 void Manager::_initVideoDevice() {
+  std::cout << "Manager::_initVideoDevice" << std::endl;
   switch (m_videoDeviceType) {
   case AlSdkAPI::DesiredVideoSource::CAMERA: {
     m_sdk->setDesiredDataSource(m_videoDeviceType);

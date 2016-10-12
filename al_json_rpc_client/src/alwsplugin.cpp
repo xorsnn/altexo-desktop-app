@@ -16,10 +16,18 @@ AlWsPlugin::~AlWsPlugin() {
 
 void AlWsPlugin::init(AlWsCb *alWsCb) {
   m_connClient = new AlConnClient(alWsCb);
+
+  // TODO: deprecated
   sendWsMessageToPeerSignal.connect(boost::bind(
       &AlWsClient::sendMessageToPeer, m_connClient->getWsClientRef(), _1, _2));
   sendWsMessageSignal.connect(boost::bind(&AlWsClient::sendMessage,
                                           m_connClient->getWsClientRef(), _1));
+
+  sendSdpAnswerSignal.connect(
+      boost::bind(&AlRpc::sendSdpAnswer, m_connClient->getWsClientRef(), _1));
+  sendIceCandidateSignal.connect(boost::bind(
+      &AlRpc::sendIceCandidate, m_connClient->getWsClientRef(), _1));
+
   m_internalThread = boost::thread(&AlWsPlugin::threadMain, this);
 }
 
@@ -32,3 +40,13 @@ void AlWsPlugin::sendMessageToPeer(AlTextMessage peerId, AlTextMessage msg) {
 }
 
 void AlWsPlugin::sendMessage(AlTextMessage msg) { sendWsMessageSignal(msg); }
+
+void AlWsPlugin::sendSdpAnswer(AlTextMessage msg) {
+  sendSdpAnswerSignal(msg);
+  // std::cout << "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS" << std::endl;
+}
+
+void AlWsPlugin::sendIceCandidate(AlTextMessage msg) {
+  sendIceCandidateSignal(msg);
+  // std::cout << "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS" << std::endl;
+}

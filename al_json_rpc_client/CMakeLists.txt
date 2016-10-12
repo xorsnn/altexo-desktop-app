@@ -50,6 +50,9 @@ include_directories(../include/)
 find_package( Boost COMPONENTS system thread REQUIRED )
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 
+include(./cmake/FindJsoncpp.cmake)
+INCLUDE_DIRECTORIES( ${JSONCPP_INCLUDE_DIR} )
+
 # add_executable(${PROJECT_NAME} ${SRC_LIST})
 add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
 
@@ -59,5 +62,6 @@ target_link_libraries(${PROJECT_NAME}
   -lwebsockets
   ${Boost_SYSTEM_LIBRARY}
   ${Boost_THREAD_LIBRARY}
+  ${JSONCPP_LIBRARY}
 )
 # install(TARGETS ${PROJECT_NAME} RUNTIME DESTINATION ${BIN_DIR})
