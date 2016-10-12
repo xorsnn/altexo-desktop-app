@@ -51,9 +51,8 @@ void AlConnClient::handleHttpResponse(cpr::Response r, int responseType) {
     break;
   }
   case HTTP_ME: {
-    std::cout << "ws conn" << std::endl;
-
     if (m_debug) {
+      std::cout << "ws conn" << std::endl;
       std::cout << r.text << std::endl;
     }
 
@@ -62,7 +61,7 @@ void AlConnClient::handleHttpResponse(cpr::Response r, int responseType) {
     boost::property_tree::read_json(ss, pt);
 
     // TODO: using hardcoded link
-    m_wssLink = SERVER_WS_LINK + "/chat";
+    m_wssLink = SERVER_WS_LINK + "/al_chat";
 
     if (m_debug) {
       std::cout << m_wssLink << std::endl;

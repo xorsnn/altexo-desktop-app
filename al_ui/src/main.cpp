@@ -208,6 +208,8 @@ int main(int, char **) {
 
     ImGui::Render();
     SDL_GL_SwapWindow(window);
+
+    // NOTE: redraw delay
     SDL_Delay(1000 / 30);
   }
 

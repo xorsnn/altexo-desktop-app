@@ -54,7 +54,7 @@ void AlRpc::roomOpen() {
 
   boost::property_tree::ptree params;
   boost::property_tree::ptree nameVal;
-  nameVal.put("", "1234");
+  nameVal.put("", "12345");
   boost::property_tree::ptree p2pVal;
   p2pVal.put("", true);
   params.push_back(std::make_pair("", nameVal));
@@ -76,7 +76,7 @@ void AlRpc::roomEnter() {
   boost::property_tree::ptree ptRoomOpen;
   ptRoomOpen.put("jsonrpc", "2.0");
   ptRoomOpen.put("method", "room/enter");
-  ptRoomOpen.put("params", "1234");
+  ptRoomOpen.put("params", "12345");
   ptRoomOpen.put("id", reqId);
   boost::property_tree::write_json(stream, ptRoomOpen, false);
   std::string strJson = stream.str();

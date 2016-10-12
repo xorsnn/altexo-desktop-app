@@ -204,7 +204,6 @@ void Manager::onSdpCb(AlTextMessage msg) {
   for (auto i : as_vector<std::string>(pt, "params")) {
     sdpBody = i;
   }
-
   std::ostringstream streamRes;
   boost::property_tree::ptree ptRes;
   ptRes.put("sdp", sdpBody);
@@ -271,6 +270,10 @@ void Manager::onMessageFromPeer(boost::property_tree::ptree msgPt) {
     m_sdk->initializePeerConnection();
   } else if (isCall) {
     alLog("isCall");
+
+    // TODO make it more consistent
+    _initVideoDevice();
+
     // TODO implement accept call functionality
     std::ostringstream stream;
     boost::property_tree::ptree msgToSendPt;
@@ -369,11 +372,14 @@ void Manager::setDeviceName(AlTextMessage deviceName, int deviceType) {
   default:
     break;
   }
+  // TODO init it once
+  _initVideoDevice();
 }
 
 void Manager::callToPeer(std::string peerId) { initConnection(peerId); }
 
 void Manager::_initVideoDevice() {
+  std::cout << "Manager::_initVideoDevice" << std::endl;
   switch (m_videoDeviceType) {
   case AlSdkAPI::DesiredVideoSource::CAMERA: {
     m_sdk->setDesiredDataSource(m_videoDeviceType);
