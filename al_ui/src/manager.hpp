@@ -28,7 +28,9 @@ public:
   // ws cb
   void onWsMessageCb(AlTextMessage msg);
   void onIceCandidateCb(AlTextMessage msg);
-  void onSdpCb(AlTextMessage msg);
+  void onSdpAnswerCb(AlTextMessage msg);
+  void onSdpOfferCb(AlTextMessage msg);
+  void onInitCall();
 
   // sdk cb
   void onLocalSdpCb(AlTextMessage sdp);
@@ -89,6 +91,7 @@ private:
   int HEIGHT = 240;
   // int WIDTH = 640;
   // int HEIGHT = 480;
+  bool m_calling;
 };
 
 #endif // MANAGER_H

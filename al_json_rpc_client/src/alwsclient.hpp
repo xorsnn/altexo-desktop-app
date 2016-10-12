@@ -28,7 +28,9 @@ public:
     m_cb = cb;
     newMessageSignal.connect(boost::bind(&AlWsCb::onWsMessageCb, cb, _1));
     iceCandidateSignal.connect(boost::bind(&AlWsCb::onIceCandidateCb, cb, _1));
-    sdpSignal.connect(boost::bind(&AlWsCb::onSdpCb, cb, _1));
+    sdpOfferSignal.connect(boost::bind(&AlWsCb::onSdpOfferCb, cb, _1));
+    sdpAnswerSignal.connect(boost::bind(&AlWsCb::onSdpAnswerCb, cb, _1));
+    initCallSignal.connect(boost::bind(&AlWsCb::onInitCall, cb));
     return 1;
   }
 
@@ -47,7 +49,9 @@ public:
 protected:
   boost::signals2::signal<void(AlTextMessage)> newMessageSignal;
   boost::signals2::signal<void(AlTextMessage)> iceCandidateSignal;
-  boost::signals2::signal<void(AlTextMessage)> sdpSignal;
+  boost::signals2::signal<void(AlTextMessage)> sdpOfferSignal;
+  boost::signals2::signal<void(AlTextMessage)> sdpAnswerSignal;
+  boost::signals2::signal<void()> initCallSignal;
 
 private:
   int threadMain();

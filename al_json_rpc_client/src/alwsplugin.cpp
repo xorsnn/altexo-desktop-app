@@ -25,6 +25,8 @@ void AlWsPlugin::init(AlWsCb *alWsCb) {
 
   sendSdpAnswerSignal.connect(
       boost::bind(&AlRpc::sendSdpAnswer, m_connClient->getWsClientRef(), _1));
+  sendSdpOfferSignal.connect(
+      boost::bind(&AlRpc::sendSdpOffer, m_connClient->getWsClientRef(), _1));
   sendIceCandidateSignal.connect(boost::bind(
       &AlRpc::sendIceCandidate, m_connClient->getWsClientRef(), _1));
 
@@ -41,10 +43,9 @@ void AlWsPlugin::sendMessageToPeer(AlTextMessage peerId, AlTextMessage msg) {
 
 void AlWsPlugin::sendMessage(AlTextMessage msg) { sendWsMessageSignal(msg); }
 
-void AlWsPlugin::sendSdpAnswer(AlTextMessage msg) {
-  sendSdpAnswerSignal(msg);
-  // std::cout << "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS" << std::endl;
-}
+void AlWsPlugin::sendSdpOffer(AlTextMessage msg) { sendSdpOfferSignal(msg); }
+
+void AlWsPlugin::sendSdpAnswer(AlTextMessage msg) { sendSdpAnswerSignal(msg); }
 
 void AlWsPlugin::sendIceCandidate(AlTextMessage msg) {
   sendIceCandidateSignal(msg);

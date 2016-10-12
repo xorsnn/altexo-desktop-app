@@ -24,7 +24,7 @@ std::vector<T> as_vector(boost::property_tree::ptree const &pt,
 Manager::Manager()
     : m_sdk(NULL), m_wsClient(NULL), m_sensor(NULL), m_frameThread(NULL),
       m_id(""), m_peerId("-1"), m_videoDeviceName(""), m_videoDeviceType(-1),
-      m_beenCalled(false), m_processingCandidates(false) {
+      m_beenCalled(false), m_processingCandidates(false), m_calling(false) {
   alLog("Manager constructor");
   sensorList.push_back(AlTextMessage("Kinect"));
 }
@@ -191,8 +191,30 @@ void Manager::onIceCandidateCb(AlTextMessage msg) {
   handleMessages();
 }
 
-void Manager::onSdpCb(AlTextMessage msg) {
-  std::cout << "Manager::onSdpCb" << std::endl;
+void Manager::onSdpAnswerCb(AlTextMessage msg) {
+  std::cout << "Manager::onSdpAnswerCb" << std::endl;
+  std::cout << msg.toString() << std::endl;
+
+  boost::property_tree::ptree pt;
+  std::stringstream ss(msg.toString());
+  boost::property_tree::read_json(ss, pt);
+  std::string sdpBody;
+  for (auto i : as_vector<std::string>(pt, "result")) {
+    sdpBody = i;
+  }
+  std::ostringstream streamRes;
+  boost::property_tree::ptree ptRes;
+  ptRes.put("sdp", sdpBody);
+  ptRes.put("type", "answer");
+  boost::property_tree::write_json(streamRes, ptRes, false);
+
+  m_remoteSdp = streamRes.str();
+
+  handleMessages();
+}
+
+void Manager::onSdpOfferCb(AlTextMessage msg) {
+  std::cout << "Manager::onSdpOfferCb" << std::endl;
   std::cout << msg.toString() << std::endl;
   // **
   // TODO: this is temprorary solution, we make messages similar to what we used
@@ -213,6 +235,12 @@ void Manager::onSdpCb(AlTextMessage msg) {
   m_remoteSdp = streamRes.str();
 
   handleMessages();
+}
+
+void Manager::onInitCall() {
+  m_calling = true;
+  _initVideoDevice();
+  m_sdk->initializePeerConnection();
 }
 
 void Manager::initConnection(std::string peerId) {
@@ -315,7 +343,13 @@ void Manager::onLocalIceCandidateCb(AlTextMessage candidate) {
 
 void Manager::handleMessages() {
   if (!m_sentLocalSdp && m_localSdp != "") {
-    m_wsClient->sendSdpAnswer(AlTextMessage(m_localSdp));
+    if (!m_calling) {
+      std::cout << "*******ANSWER********" << std::endl;
+      m_wsClient->sendSdpAnswer(AlTextMessage(m_localSdp));
+    } else {
+      std::cout << "*******OFFER*********" << std::endl;
+      m_wsClient->sendSdpOffer(AlTextMessage(m_localSdp));
+    }
     m_sentLocalSdp = true;
   }
   if (!m_sentRemoteSdp && m_remoteSdp != "") {
