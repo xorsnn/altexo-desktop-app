@@ -26,7 +26,6 @@ public:
   void initSdk();
 
   // ws cb
-  void onWsMessageCb(AlTextMessage msg);
   void onIceCandidateCb(AlTextMessage msg);
   void onSdpAnswerCb(AlTextMessage msg);
   void onSdpOfferCb(AlTextMessage msg);

@@ -159,31 +159,6 @@ void Manager::initSdk() {
   updateResolutionSignal(WIDTH, HEIGHT);
 }
 
-void Manager::onWsMessageCb(AlTextMessage msg) {
-  // TODO: seemms deprecated
-  // std::string msgStr = msg.toString();
-  // boost::property_tree::ptree pt;
-  // std::stringstream ss(msgStr);
-  // boost::property_tree::read_json(ss, pt);
-  // std::string action = pt.get<std::string>("action");
-  // if (action == "logged_in") {
-  //   m_id = pt.get<std::string>("data.id");
-  // } else if (action == "update_user_list") {
-  //   // updating contact list
-  //   contactList.clear();
-  //   for (auto &item : pt.get_child("data")) {
-  //     CONTACT ct;
-  //     ct.name = item.second.get<std::string>("name");
-  //     ct.id = item.second.get<std::string>("id");
-  //     if (ct.id != m_id) {
-  //       contactList.push_back(ct);
-  //     }
-  //   }
-  // } else if (action == "message_from_peer") {
-  //   onMessageFromPeer(pt);
-  // }
-}
-
 void Manager::onIceCandidateCb(AlTextMessage msg) {
   // std::cout << "Manager::onIceCandidateCb" << std::endl;
   // std::cout << msg.toString() << std::endl;
@@ -344,10 +319,8 @@ void Manager::onLocalIceCandidateCb(AlTextMessage candidate) {
 void Manager::handleMessages() {
   if (!m_sentLocalSdp && m_localSdp != "") {
     if (!m_calling) {
-      std::cout << "*******ANSWER********" << std::endl;
       m_wsClient->sendSdpAnswer(AlTextMessage(m_localSdp));
     } else {
-      std::cout << "*******OFFER*********" << std::endl;
       m_wsClient->sendSdpOffer(AlTextMessage(m_localSdp));
     }
     m_sentLocalSdp = true;
