@@ -21,6 +21,7 @@ public:
 
   void frameThread();
 
+  // plugins init
   void initSensor(AlSensorCb *sensorCb);
   void initWsConnection(AlWsCb *alWsCb);
   void initSdk();
@@ -40,15 +41,12 @@ public:
 
   void initConnection(std::string peerId);
   void setConnectionMode(std::string mode);
-  void onMessageFromPeer(boost::property_tree::ptree msgPt);
 
   void handleMessages();
   void initHoloRenderer(SceneRenderer *holoRenderer);
 
   void setDeviceName(AlTextMessage deviceNama, int deviceType);
   int getDeviceType() { return m_videoDeviceType; }
-
-  void callToPeer(std::string peerId);
 
   boost::shared_ptr<AlSdkAPI> m_sdk;
   boost::shared_ptr<AlPluginTestAPI> m_plugin_test;

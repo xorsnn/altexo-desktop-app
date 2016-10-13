@@ -250,67 +250,9 @@ void Manager::setConnectionMode(std::string mode) {
   }
 }
 
-void Manager::onMessageFromPeer(boost::property_tree::ptree msgPt) {
-
-  std::string senderIdStr = msgPt.get<std::string>("data.sender_id");
-  std::string messageStr = msgPt.get<std::string>("data.message");
-
-  boost::property_tree::ptree jsonMsg;
-  std::stringstream ss(messageStr);
-  boost::property_tree::read_json(ss, jsonMsg);
-
-  boost::optional<bool> callAccepted =
-      jsonMsg.get_optional<bool>("callAccepted");
-
-  boost::optional<bool> isCall = jsonMsg.get_optional<bool>("call");
-
-  boost::optional<std::string> mode = jsonMsg.get_optional<std::string>("mode");
-
-  // this is the very first contact we will store peer id
-  if (m_peerId == "-1") {
-    m_peerId = senderIdStr;
-    _initVideoDevice();
-  }
-
-  if (callAccepted) {
-    alLog("callAccepted");
-    _initVideoDevice();
-    m_sdk->initializePeerConnection();
-  } else if (isCall) {
-    alLog("isCall");
-
-    // TODO make it more consistent
-    _initVideoDevice();
-
-    // TODO implement accept call functionality
-    std::ostringstream stream;
-    boost::property_tree::ptree msgToSendPt;
-    msgToSendPt.put("callAccepted", true);
-    boost::property_tree::write_json(stream, msgToSendPt, false);
-    std::string strJson = stream.str();
-    m_wsClient->sendMessageToPeer(AlTextMessage(m_peerId),
-                                  AlTextMessage(strJson));
-  } else if (mode) {
-    if (mode.get() == "audio+video") {
-      m_holoRenderer->setRemoteStreamMode(SceneRenderer::AUDIO_VIDEO);
-    } else if (mode.get() == "hologram") {
-      m_holoRenderer->setRemoteStreamMode(SceneRenderer::HOLOGRAM);
-    }
-  } else {
-    boost::optional<std::string> sdp = jsonMsg.get_optional<std::string>("sdp");
-    if (sdp) {
-      m_remoteSdp = messageStr;
-    } else {
-      m_remoteCandidates.push(messageStr);
-    }
-    handleMessages();
-  }
-}
-
 void Manager::onLocalSdpCb(AlTextMessage sdp) {
   alLog("Manager::onLocalSdpCb");
   std::cout << sdp.toString() << std::endl;
-  // m_localSdp = std::string(sdp.begin(), sdp.end());
   m_localSdp = sdp.toString();
   handleMessages();
 }
@@ -397,8 +339,6 @@ void Manager::setDeviceName(AlTextMessage deviceName, int deviceType) {
   // TODO init it once
   _initVideoDevice();
 }
-
-void Manager::callToPeer(std::string peerId) { initConnection(peerId); }
 
 void Manager::_initVideoDevice() {
   std::cout << "Manager::_initVideoDevice" << std::endl;

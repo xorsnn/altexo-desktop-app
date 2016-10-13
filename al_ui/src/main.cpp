@@ -125,36 +125,37 @@ int main(int, char **) {
 
     ImGui_ImplSdlGL3_NewFrame(window);
 
-    // 1. Show a simple window
-    // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears
-    // in
-    // a window automatically called "Debug"
+    // TODO reimplement contact list later
+    // // 1. Show a simple window
+    // // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears
+    // // in
+    // // a window automatically called "Debug"
+    // {
+    //   ImGui::SetNextWindowSize(ImVec2(100, 400), ImGuiSetCond_Once);
+    //   ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiSetCond_Once);
+    //   ImGui::Begin("Contacts", NULL);
+    //   static int selected = 0;
+    //   ImGui::BeginChild("left pane", ImVec2(-1, 0), true);
+    //   for (int i = 0; i < manager.contactList.size(); i++) {
+    //     std::string lb =
+    //         manager.contactList[i].name + "-" + manager.contactList[i].id;
+    //     // const char *label = manager.contactList[i].name.c_str();
+    //     const char *label = lb.c_str();
+    //     if (ImGui::Selectable(label, selected == i)) {
+    //       selected = i;
+    //       manager.callToPeer(manager.contactList[i].id);
+    //     }
+    //   }
+    //   ImGui::EndChild();
+    //   ImGui::End();
+    // }
+
     {
       ImGui::SetNextWindowSize(ImVec2(100, 400), ImGuiSetCond_Once);
       ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiSetCond_Once);
-      ImGui::Begin("Contacts", NULL);
-      static int selected = 0;
-      ImGui::BeginChild("left pane", ImVec2(-1, 0), true);
-      for (int i = 0; i < manager.contactList.size(); i++) {
-        std::string lb =
-            manager.contactList[i].name + "-" + manager.contactList[i].id;
-        // const char *label = manager.contactList[i].name.c_str();
-        const char *label = lb.c_str();
-        if (ImGui::Selectable(label, selected == i)) {
-          selected = i;
-          manager.callToPeer(manager.contactList[i].id);
-        }
-      }
-      ImGui::EndChild();
-      ImGui::End();
-    }
-
-    {
-      ImGui::SetNextWindowSize(ImVec2(100, 100), ImGuiSetCond_Once);
-      ImGui::SetNextWindowPos(ImVec2(10, 420), ImGuiSetCond_Once);
       ImGui::Begin("Input", NULL);
       static int selected = 0;
-      ImGui::BeginChild("webcam list", ImVec2(-1, 50), true);
+      ImGui::BeginChild("webcam list", ImVec2(-1, 180), true);
       for (int i = 0; i < manager.webcamList.size(); i++) {
         std::string devName = manager.webcamList[i].getText();
         const char *label = devName.c_str();
@@ -166,7 +167,7 @@ int main(int, char **) {
         }
       }
       ImGui::EndChild();
-      ImGui::BeginChild("sensor list", ImVec2(-1, 50), true);
+      ImGui::BeginChild("sensor list", ImVec2(-1, 180), true);
       for (int i = 0; i < manager.sensorList.size(); i++) {
         std::string devName = manager.sensorList[i].getText();
         const char *label = devName.c_str();
