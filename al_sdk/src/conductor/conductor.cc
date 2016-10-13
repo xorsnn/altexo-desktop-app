@@ -344,6 +344,7 @@ void Conductor::OnMessageFromPeer(std::string peer_id,
       LOG(WARNING) << "Can't parse received session description message.";
       std::cout << "Can't parse received session description message."
                 << std::endl;
+
       return;
     }
     webrtc::SdpParseError error;
@@ -400,7 +401,7 @@ void Conductor::OnMessageFromPeer(std::string peer_id,
       std::cout << "Failed to apply the received candidate" << std::endl;
       return;
     } else {
-      std::cout << "AAAA, candidate!" << std::endl;
+      std::cout << "remote candidate applied" << std::endl;
       std::cout << jmessage << std::endl;
     }
     // LOG(INFO) << " Received candidate :" << message;

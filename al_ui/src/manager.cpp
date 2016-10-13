@@ -24,7 +24,8 @@ std::vector<T> as_vector(boost::property_tree::ptree const &pt,
 Manager::Manager()
     : m_sdk(NULL), m_wsClient(NULL), m_sensor(NULL), m_frameThread(NULL),
       m_id(""), m_peerId("-1"), m_videoDeviceName(""), m_videoDeviceType(-1),
-      m_beenCalled(false), m_processingCandidates(false), m_calling(false) {
+      m_beenCalled(false), m_processingCandidates(false), m_calling(false),
+      m_localCandidatesCounter(0), m_remoteCandidatesCounter(0) {
   alLog("Manager constructor");
   sensorList.push_back(AlTextMessage("Kinect"));
 }
@@ -160,8 +161,9 @@ void Manager::initSdk() {
 }
 
 void Manager::onIceCandidateCb(AlTextMessage msg) {
-  // std::cout << "Manager::onIceCandidateCb" << std::endl;
-  // std::cout << msg.toString() << std::endl;
+  std::cout << "Manager::onIceCandidateCb" << std::endl;
+  std::cout << msg.toString() << std::endl;
+
   m_remoteCandidates.push(msg.toString());
   handleMessages();
 }
@@ -173,10 +175,13 @@ void Manager::onSdpAnswerCb(AlTextMessage msg) {
   boost::property_tree::ptree pt;
   std::stringstream ss(msg.toString());
   boost::property_tree::read_json(ss, pt);
-  std::string sdpBody;
-  for (auto i : as_vector<std::string>(pt, "result")) {
-    sdpBody = i;
+  std::string sdpBody = pt.get<std::string>("result");
+  if (sdpBody == "") {
+    for (auto i : as_vector<std::string>(pt, "result")) {
+      sdpBody = i;
+    }
   }
+
   std::ostringstream streamRes;
   boost::property_tree::ptree ptRes;
   ptRes.put("sdp", sdpBody);
@@ -232,6 +237,7 @@ void Manager::initConnection(std::string peerId) {
   }
 }
 
+// TODO: reimplement for new rpc
 void Manager::setConnectionMode(std::string mode) {
   if (m_wsClient != NULL) {
     std::ostringstream stream;
@@ -245,14 +251,13 @@ void Manager::setConnectionMode(std::string mode) {
 }
 
 void Manager::onMessageFromPeer(boost::property_tree::ptree msgPt) {
+
   std::string senderIdStr = msgPt.get<std::string>("data.sender_id");
   std::string messageStr = msgPt.get<std::string>("data.message");
 
   boost::property_tree::ptree jsonMsg;
   std::stringstream ss(messageStr);
   boost::property_tree::read_json(ss, jsonMsg);
-
-  // alLog(messageStr);
 
   boost::optional<bool> callAccepted =
       jsonMsg.get_optional<bool>("callAccepted");
@@ -333,12 +338,20 @@ void Manager::handleMessages() {
   if (m_sentLocalSdp && m_sentRemoteSdp && !m_processingCandidates) {
     m_processingCandidates = true;
     while (!m_localCandidates.empty()) {
+      m_localCandidatesCounter++;
+      std::cout << "local candidates: " << std::endl;
+      std::cout << m_localCandidatesCounter << std::endl;
+
       std::string candidate = m_localCandidates.front();
       m_localCandidates.pop();
       std::cout << candidate << std::endl;
       m_wsClient->sendIceCandidate(AlTextMessage(candidate));
     }
     while (!m_remoteCandidates.empty()) {
+      m_remoteCandidatesCounter++;
+      std::cout << "remote candidates: " << std::endl;
+      std::cout << m_remoteCandidatesCounter << std::endl;
+
       std::string candidate = m_remoteCandidates.front();
       m_remoteCandidates.pop();
       std::vector<char> candidateVec(candidate.begin(), candidate.end());
@@ -354,8 +367,10 @@ void Manager::handleMessages() {
 }
 
 void Manager::onDevicesListChangedCb(std::vector<AlTextMessage> deviceNames) {
-  alLog("Manager::onDevicesListChangedCb");
   webcamList = deviceNames;
+  // NOTE: setting default cam
+  // TODO: remember last choice
+  setDeviceName(webcamList[0], AlSdkAPI::DesiredVideoSource::CAMERA);
 }
 
 void Manager::updateFrameCb(const uint8_t *image, int width, int height) {

@@ -4,7 +4,7 @@
 #include <jsoncpp/json/json.h>
 
 // TODO: move room name to UI
-std::string ROOM_NAME = "12345678";
+std::string ROOM_NAME = "122";
 
 template <typename T>
 std::vector<T> as_vector(boost::property_tree::ptree const &pt,
@@ -157,8 +157,9 @@ void AlRpc::onMessage(AlTextMessage msg) {
 
   switch (msgType) {
   case AlRpcRequest::SERVER_MESSAGE_TYPE::AUTHENTICATE: {
-    bool result = pt.get<bool>("result");
-    if (result) {
+    boost::optional<boost::property_tree::ptree &> err =
+        pt.get_child_optional("error");
+    if (!err) {
       roomOpen();
     }
   } break;
@@ -166,16 +167,18 @@ void AlRpc::onMessage(AlTextMessage msg) {
     // TODO: catch errors globally
     boost::optional<boost::property_tree::ptree &> err =
         pt.get_child_optional("error");
-    if (!err) {
-      bool result = pt.get<bool>("result");
-    } else {
+    if (!!err) {
       // TODO: handle error code
       // NOTE: consider room exists, let's enter
       roomEnter();
     }
   } break;
   case AlRpcRequest::SERVER_MESSAGE_TYPE::ROOM_ENTER: {
-    initCallSignal();
+    boost::optional<boost::property_tree::ptree &> err =
+        pt.get_child_optional("error");
+    if (!err) {
+      initCallSignal();
+    }
   } break;
   case AlRpcRequest::SERVER_MESSAGE_TYPE::ROOM_OFFER: {
     std::cout << "*********ROOM_OFFER*************" << std::endl;
@@ -230,7 +233,9 @@ void AlRpc::sendSdpAnswer(AlTextMessage msg) {
   std::ostringstream stream;
   Json::Value docVal(Json::objectValue), resVal(Json::arrayValue);
   resVal.append(pt.get<std::string>("sdp"));
-  docVal["result"] = resVal;
+  // docVal["result"] = resVal;
+  // TODO: getting familiar with protocol
+  docVal["result"] = pt.get<std::string>("sdp");
   docVal["id"] = int(m_sdpOfferId);
   docVal["jsonrpc"] = "2.0";
   stream << docVal;

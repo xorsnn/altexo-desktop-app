@@ -77,6 +77,10 @@ private:
   bool m_sentRemoteSdp = false;
   std::queue<std::string> m_remoteCandidates;
 
+  // NOTE: counters
+  int m_localCandidatesCounter;
+  int m_remoteCandidatesCounter;
+
   boost::signals2::signal<void(int, int)> updateResolutionSignal;
 
   SceneRenderer *m_holoRenderer;
