@@ -1,5 +1,4 @@
 #include "manager.hpp"
-#include "allog.hpp"
 #include "boost/dll/import.hpp"
 #include "boost/function.hpp"
 #include "boost/shared_ptr.hpp"
@@ -10,6 +9,9 @@
 
 namespace boostfs = boost::filesystem;
 namespace boostdll = boost::dll;
+
+using namespace boost::log::trivial;
+boost::log::sources::severity_logger<severity_level> lg;
 
 // TODO: repeated over multiple files, move to a separate lib
 template <typename T>
@@ -26,7 +28,7 @@ Manager::Manager()
       m_id(""), m_peerId("-1"), m_videoDeviceName(""), m_videoDeviceType(-1),
       m_beenCalled(false), m_processingCandidates(false), m_calling(false),
       m_localCandidatesCounter(0), m_remoteCandidatesCounter(0) {
-  alLog("Manager constructor");
+  BOOST_LOG_SEV(lg, debug) << "Manager constructor";
   sensorList.push_back(AlTextMessage("Kinect"));
 }
 
@@ -60,7 +62,7 @@ void Manager::initHoloRenderer(SceneRenderer *holoRenderer) {
 
 void Manager::initSensor(AlSensorCb *sensorCb) {
   boost::filesystem::path lib_path("");
-  std::cout << "Loading sensor plugin" << std::endl;
+  BOOST_LOG_SEV(lg, debug) << "Loading sensor plugin";
 #ifdef __APPLE__
   m_sensor = boost::dll::import<AlSensorAPI>(
       lib_path / "libal_kinect_1.dylib", "plugin",
@@ -90,7 +92,8 @@ void Manager::frameThread() {
 
 void Manager::initWsConnection(AlWsCb *alWsCb) {
   boost::filesystem::path lib_path("");
-  std::cout << "Loading ws plugin" << std::endl;
+  BOOST_LOG_SEV(lg, debug) << "Loading ws plugin";
+
 // TODO: remove when migrate to json rpc
 // #ifdef __APPLE__
 //   m_wsClient =
@@ -118,14 +121,14 @@ void Manager::initWsConnection(AlWsCb *alWsCb) {
 
 void Manager::initSdk() {
   boost::filesystem::path lib_path("");
-  std::cout << "Loading sdk plugin" << std::endl;
+  BOOST_LOG_SEV(lg, debug) << "Loading sdk plugin";
 #ifdef __APPLE__
   m_sdk =
       boost::dll::import<AlSdkAPI>(lib_path / "libaltexo_sdk.dylib", "plugin",
                                    boost::dll::load_mode::append_decorations);
 #else
 #ifdef _WIN32
-  std::cout << "Boost DLL testing ..." << std::endl;
+  BOOST_LOG_SEV(lg, debug) << "Boost DLL testing ...";
 
   /* Load the plugin from current working path
    * (e.g. The plugin on Windows is ${CWD}/ProgPlug.dll )
@@ -133,7 +136,7 @@ void Manager::initSdk() {
   boostfs::path pluginPath = boostfs::current_path() /
                              boostfs::path("Release") /
                              boostfs::path("altexo_sdk");
-  std::cout << "Load Plugin from " << pluginPath << std::endl;
+  BOOST_LOG_SEV(lg, debug) << "Load Plugin from " << pluginPath;
 
   typedef boost::shared_ptr<AlSdkAPI>(PluginCreate)();
   boost::function<PluginCreate> pluginCreator;
@@ -141,8 +144,8 @@ void Manager::initSdk() {
     pluginCreator = boostdll::import_alias<PluginCreate>(
         pluginPath, "create_plugin", boostdll::load_mode::append_decorations);
   } catch (const boost::system::system_error &err) {
-    std::cerr << "Cannot load Plugin from " << pluginPath << std::endl;
-    std::cerr << err.what() << std::endl;
+    BOOST_LOG_SEV(lg, error) << "Cannot load Plugin from " << pluginPath;
+    BOOST_LOG_SEV(lg, error) << err.what();
     return;
   }
   /* create the plugin */
@@ -161,16 +164,16 @@ void Manager::initSdk() {
 }
 
 void Manager::onIceCandidateCb(AlTextMessage msg) {
-  std::cout << "Manager::onIceCandidateCb" << std::endl;
-  std::cout << msg.toString() << std::endl;
+  BOOST_LOG_SEV(lg, debug) << "Manager::onIceCandidateCb";
+  BOOST_LOG_SEV(lg, debug) << msg.toString();
 
   m_remoteCandidates.push(msg.toString());
   handleMessages();
 }
 
 void Manager::onSdpAnswerCb(AlTextMessage msg) {
-  std::cout << "Manager::onSdpAnswerCb" << std::endl;
-  std::cout << msg.toString() << std::endl;
+  BOOST_LOG_SEV(lg, debug) << "Manager::onSdpAnswerCb";
+  BOOST_LOG_SEV(lg, debug) << msg.toString();
 
   boost::property_tree::ptree pt;
   std::stringstream ss(msg.toString());
@@ -194,8 +197,9 @@ void Manager::onSdpAnswerCb(AlTextMessage msg) {
 }
 
 void Manager::onSdpOfferCb(AlTextMessage msg) {
-  std::cout << "Manager::onSdpOfferCb" << std::endl;
-  std::cout << msg.toString() << std::endl;
+  BOOST_LOG_SEV(lg, debug) << "Manager::onSdpOfferCb";
+  BOOST_LOG_SEV(lg, debug) << msg.toString();
+
   // **
   // TODO: this is temprorary solution, we make messages similar to what we used
   // before
@@ -251,14 +255,15 @@ void Manager::setConnectionMode(std::string mode) {
 }
 
 void Manager::onLocalSdpCb(AlTextMessage sdp) {
-  alLog("Manager::onLocalSdpCb");
-  std::cout << sdp.toString() << std::endl;
+  BOOST_LOG_SEV(lg, debug) << "Manager::onLocalSdpCb";
+  BOOST_LOG_SEV(lg, debug) << sdp.toString();
+
   m_localSdp = sdp.toString();
   handleMessages();
 }
 void Manager::onLocalIceCandidateCb(AlTextMessage candidate) {
-  alLog("Manager::onLocalIceCandidateCb");
-  // std::cout << candidate.toString() << std::endl;
+  BOOST_LOG_SEV(lg, debug) << "Manager::onLocalIceCandidateCb";
+
   m_localCandidates.push(candidate.toString());
   handleMessages();
 }
@@ -281,18 +286,17 @@ void Manager::handleMessages() {
     m_processingCandidates = true;
     while (!m_localCandidates.empty()) {
       m_localCandidatesCounter++;
-      std::cout << "local candidates: " << std::endl;
-      std::cout << m_localCandidatesCounter << std::endl;
+      BOOST_LOG_SEV(lg, debug) << "local candidates: "
+                               << m_localCandidatesCounter;
 
       std::string candidate = m_localCandidates.front();
       m_localCandidates.pop();
-      std::cout << candidate << std::endl;
       m_wsClient->sendIceCandidate(AlTextMessage(candidate));
     }
     while (!m_remoteCandidates.empty()) {
       m_remoteCandidatesCounter++;
-      std::cout << "remote candidates: " << std::endl;
-      std::cout << m_remoteCandidatesCounter << std::endl;
+      BOOST_LOG_SEV(lg, debug) << "remote candidates: "
+                               << m_remoteCandidatesCounter;
 
       std::string candidate = m_remoteCandidates.front();
       m_remoteCandidates.pop();
@@ -341,7 +345,8 @@ void Manager::setDeviceName(AlTextMessage deviceName, int deviceType) {
 }
 
 void Manager::_initVideoDevice() {
-  std::cout << "Manager::_initVideoDevice" << std::endl;
+  BOOST_LOG_SEV(lg, debug) << "Manager::_initVideoDevice";
+
   switch (m_videoDeviceType) {
   case AlSdkAPI::DesiredVideoSource::CAMERA: {
     m_sdk->setDesiredDataSource(m_videoDeviceType);
