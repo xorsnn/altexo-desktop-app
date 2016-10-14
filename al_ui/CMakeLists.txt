@@ -29,7 +29,7 @@ set(CMAKE_AUTOMOC ON)
 endif()
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -std=c++11")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -std=c++11 -DBOOST_LOG_DYN_LINK")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG} -g")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE} -O2")
 elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
@@ -63,7 +63,7 @@ FIND_PACKAGE( GLEW REQUIRED )
 FIND_PACKAGE( PNG REQUIRED )
 endif()
 
-FIND_PACKAGE( Boost COMPONENTS system filesystem thread REQUIRED )
+FIND_PACKAGE( Boost COMPONENTS system filesystem thread log REQUIRED )
 
 if (APPLE)
   FIND_PACKAGE( OpenGL REQUIRED )
@@ -105,12 +105,14 @@ endif()
 
 set(progdll_dbg_libs
   ${Boost_SYSTEM_LIBRARY_DEBUG}
-  ${Boost_FILESYSTEM_LIBRARY_DEBUG})
+  ${Boost_FILESYSTEM_LIBRARY_DEBUG}
+  ${Boost_LOG_LIBRARY_DEBUG})
   # "${Boost_THREAD_LIBRARY_DEBUG}")
 
 set(progdll_opt_libs
   ${Boost_SYSTEM_LIBRARY_RELEASE}
-  ${Boost_FILESYSTEM_LIBRARY_RELEASE})
+  ${Boost_FILESYSTEM_LIBRARY_RELEASE}
+  ${Boost_LOG_LIBRARY_RELEASE})
   # "${Boost_THREAD_LIBRARY_RELEASE}")
 
 message(${progdll_opt_libs})
@@ -133,6 +135,8 @@ elseif(UNIX)
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_SYSTEM_LIBRARY}
     ${Boost_THREAD_LIBRARY}
+    ${Boost_LOG_LIBRARY}
+    -lboost_log_setup
     -lpng
     -ldl)
 elseif(WIN32)

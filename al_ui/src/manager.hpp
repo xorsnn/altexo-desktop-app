@@ -9,6 +9,7 @@
 #include "contact.hpp"
 #include "scenerenderer.hpp"
 #include <boost/dll/import.hpp>
+#include <boost/log/trivial.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/signals2/signal.hpp>
 #include <boost/thread.hpp>

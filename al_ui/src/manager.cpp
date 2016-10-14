@@ -1,5 +1,4 @@
 #include "manager.hpp"
-#include "allog.hpp"
 #include "boost/dll/import.hpp"
 #include "boost/function.hpp"
 #include "boost/shared_ptr.hpp"
@@ -10,6 +9,9 @@
 
 namespace boostfs = boost::filesystem;
 namespace boostdll = boost::dll;
+
+using namespace boost::log::trivial;
+boost::log::sources::severity_logger<severity_level> lg;
 
 // TODO: repeated over multiple files, move to a separate lib
 template <typename T>
@@ -26,7 +28,7 @@ Manager::Manager()
       m_id(""), m_peerId("-1"), m_videoDeviceName(""), m_videoDeviceType(-1),
       m_beenCalled(false), m_processingCandidates(false), m_calling(false),
       m_localCandidatesCounter(0), m_remoteCandidatesCounter(0) {
-  alLog("Manager constructor");
+  BOOST_LOG_SEV(lg, debug) << "Manager constructor";
   sensorList.push_back(AlTextMessage("Kinect"));
 }
 
@@ -251,13 +253,14 @@ void Manager::setConnectionMode(std::string mode) {
 }
 
 void Manager::onLocalSdpCb(AlTextMessage sdp) {
-  alLog("Manager::onLocalSdpCb");
+  BOOST_LOG_SEV(lg, debug) << "Manager::onLocalSdpCb";
+
   std::cout << sdp.toString() << std::endl;
   m_localSdp = sdp.toString();
   handleMessages();
 }
 void Manager::onLocalIceCandidateCb(AlTextMessage candidate) {
-  alLog("Manager::onLocalIceCandidateCb");
+  BOOST_LOG_SEV(lg, debug) << "Manager::onLocalIceCandidateCb";
   // std::cout << candidate.toString() << std::endl;
   m_localCandidates.push(candidate.toString());
   handleMessages();
