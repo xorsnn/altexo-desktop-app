@@ -24,7 +24,8 @@ std::vector<T> as_vector(boost::property_tree::ptree const &pt,
 Manager::Manager()
     : m_sdk(NULL), m_wsClient(NULL), m_sensor(NULL), m_frameThread(NULL),
       m_id(""), m_peerId("-1"), m_videoDeviceName(""), m_videoDeviceType(-1),
-      m_beenCalled(false), m_processingCandidates(false), m_calling(false) {
+      m_beenCalled(false), m_processingCandidates(false), m_calling(false),
+      m_localCandidatesCounter(0), m_remoteCandidatesCounter(0) {
   alLog("Manager constructor");
   sensorList.push_back(AlTextMessage("Kinect"));
 }
@@ -159,34 +160,10 @@ void Manager::initSdk() {
   updateResolutionSignal(WIDTH, HEIGHT);
 }
 
-void Manager::onWsMessageCb(AlTextMessage msg) {
-  // TODO: seemms deprecated
-  // std::string msgStr = msg.toString();
-  // boost::property_tree::ptree pt;
-  // std::stringstream ss(msgStr);
-  // boost::property_tree::read_json(ss, pt);
-  // std::string action = pt.get<std::string>("action");
-  // if (action == "logged_in") {
-  //   m_id = pt.get<std::string>("data.id");
-  // } else if (action == "update_user_list") {
-  //   // updating contact list
-  //   contactList.clear();
-  //   for (auto &item : pt.get_child("data")) {
-  //     CONTACT ct;
-  //     ct.name = item.second.get<std::string>("name");
-  //     ct.id = item.second.get<std::string>("id");
-  //     if (ct.id != m_id) {
-  //       contactList.push_back(ct);
-  //     }
-  //   }
-  // } else if (action == "message_from_peer") {
-  //   onMessageFromPeer(pt);
-  // }
-}
-
 void Manager::onIceCandidateCb(AlTextMessage msg) {
-  // std::cout << "Manager::onIceCandidateCb" << std::endl;
-  // std::cout << msg.toString() << std::endl;
+  std::cout << "Manager::onIceCandidateCb" << std::endl;
+  std::cout << msg.toString() << std::endl;
+
   m_remoteCandidates.push(msg.toString());
   handleMessages();
 }
@@ -198,10 +175,13 @@ void Manager::onSdpAnswerCb(AlTextMessage msg) {
   boost::property_tree::ptree pt;
   std::stringstream ss(msg.toString());
   boost::property_tree::read_json(ss, pt);
-  std::string sdpBody;
-  for (auto i : as_vector<std::string>(pt, "result")) {
-    sdpBody = i;
+  std::string sdpBody = pt.get<std::string>("result");
+  if (sdpBody == "") {
+    for (auto i : as_vector<std::string>(pt, "result")) {
+      sdpBody = i;
+    }
   }
+
   std::ostringstream streamRes;
   boost::property_tree::ptree ptRes;
   ptRes.put("sdp", sdpBody);
@@ -257,6 +237,7 @@ void Manager::initConnection(std::string peerId) {
   }
 }
 
+// TODO: reimplement for new rpc
 void Manager::setConnectionMode(std::string mode) {
   if (m_wsClient != NULL) {
     std::ostringstream stream;
@@ -269,68 +250,9 @@ void Manager::setConnectionMode(std::string mode) {
   }
 }
 
-void Manager::onMessageFromPeer(boost::property_tree::ptree msgPt) {
-  std::string senderIdStr = msgPt.get<std::string>("data.sender_id");
-  std::string messageStr = msgPt.get<std::string>("data.message");
-
-  boost::property_tree::ptree jsonMsg;
-  std::stringstream ss(messageStr);
-  boost::property_tree::read_json(ss, jsonMsg);
-
-  // alLog(messageStr);
-
-  boost::optional<bool> callAccepted =
-      jsonMsg.get_optional<bool>("callAccepted");
-
-  boost::optional<bool> isCall = jsonMsg.get_optional<bool>("call");
-
-  boost::optional<std::string> mode = jsonMsg.get_optional<std::string>("mode");
-
-  // this is the very first contact we will store peer id
-  if (m_peerId == "-1") {
-    m_peerId = senderIdStr;
-    _initVideoDevice();
-  }
-
-  if (callAccepted) {
-    alLog("callAccepted");
-    _initVideoDevice();
-    m_sdk->initializePeerConnection();
-  } else if (isCall) {
-    alLog("isCall");
-
-    // TODO make it more consistent
-    _initVideoDevice();
-
-    // TODO implement accept call functionality
-    std::ostringstream stream;
-    boost::property_tree::ptree msgToSendPt;
-    msgToSendPt.put("callAccepted", true);
-    boost::property_tree::write_json(stream, msgToSendPt, false);
-    std::string strJson = stream.str();
-    m_wsClient->sendMessageToPeer(AlTextMessage(m_peerId),
-                                  AlTextMessage(strJson));
-  } else if (mode) {
-    if (mode.get() == "audio+video") {
-      m_holoRenderer->setRemoteStreamMode(SceneRenderer::AUDIO_VIDEO);
-    } else if (mode.get() == "hologram") {
-      m_holoRenderer->setRemoteStreamMode(SceneRenderer::HOLOGRAM);
-    }
-  } else {
-    boost::optional<std::string> sdp = jsonMsg.get_optional<std::string>("sdp");
-    if (sdp) {
-      m_remoteSdp = messageStr;
-    } else {
-      m_remoteCandidates.push(messageStr);
-    }
-    handleMessages();
-  }
-}
-
 void Manager::onLocalSdpCb(AlTextMessage sdp) {
   alLog("Manager::onLocalSdpCb");
   std::cout << sdp.toString() << std::endl;
-  // m_localSdp = std::string(sdp.begin(), sdp.end());
   m_localSdp = sdp.toString();
   handleMessages();
 }
@@ -344,10 +266,8 @@ void Manager::onLocalIceCandidateCb(AlTextMessage candidate) {
 void Manager::handleMessages() {
   if (!m_sentLocalSdp && m_localSdp != "") {
     if (!m_calling) {
-      std::cout << "*******ANSWER********" << std::endl;
       m_wsClient->sendSdpAnswer(AlTextMessage(m_localSdp));
     } else {
-      std::cout << "*******OFFER*********" << std::endl;
       m_wsClient->sendSdpOffer(AlTextMessage(m_localSdp));
     }
     m_sentLocalSdp = true;
@@ -360,12 +280,20 @@ void Manager::handleMessages() {
   if (m_sentLocalSdp && m_sentRemoteSdp && !m_processingCandidates) {
     m_processingCandidates = true;
     while (!m_localCandidates.empty()) {
+      m_localCandidatesCounter++;
+      std::cout << "local candidates: " << std::endl;
+      std::cout << m_localCandidatesCounter << std::endl;
+
       std::string candidate = m_localCandidates.front();
       m_localCandidates.pop();
       std::cout << candidate << std::endl;
       m_wsClient->sendIceCandidate(AlTextMessage(candidate));
     }
     while (!m_remoteCandidates.empty()) {
+      m_remoteCandidatesCounter++;
+      std::cout << "remote candidates: " << std::endl;
+      std::cout << m_remoteCandidatesCounter << std::endl;
+
       std::string candidate = m_remoteCandidates.front();
       m_remoteCandidates.pop();
       std::vector<char> candidateVec(candidate.begin(), candidate.end());
@@ -381,8 +309,10 @@ void Manager::handleMessages() {
 }
 
 void Manager::onDevicesListChangedCb(std::vector<AlTextMessage> deviceNames) {
-  alLog("Manager::onDevicesListChangedCb");
   webcamList = deviceNames;
+  // NOTE: setting default cam
+  // TODO: remember last choice
+  setDeviceName(webcamList[0], AlSdkAPI::DesiredVideoSource::CAMERA);
 }
 
 void Manager::updateFrameCb(const uint8_t *image, int width, int height) {
@@ -409,8 +339,6 @@ void Manager::setDeviceName(AlTextMessage deviceName, int deviceType) {
   // TODO init it once
   _initVideoDevice();
 }
-
-void Manager::callToPeer(std::string peerId) { initConnection(peerId); }
 
 void Manager::_initVideoDevice() {
   std::cout << "Manager::_initVideoDevice" << std::endl;

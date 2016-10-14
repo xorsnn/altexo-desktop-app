@@ -26,7 +26,6 @@ public:
   int init(std::string path, AlWsCb *cb) {
     m_path = path;
     m_cb = cb;
-    newMessageSignal.connect(boost::bind(&AlWsCb::onWsMessageCb, cb, _1));
     iceCandidateSignal.connect(boost::bind(&AlWsCb::onIceCandidateCb, cb, _1));
     sdpOfferSignal.connect(boost::bind(&AlWsCb::onSdpOfferCb, cb, _1));
     sdpAnswerSignal.connect(boost::bind(&AlWsCb::onSdpAnswerCb, cb, _1));
@@ -47,7 +46,6 @@ public:
   virtual void onMessage(AlTextMessage msg) = 0;
 
 protected:
-  boost::signals2::signal<void(AlTextMessage)> newMessageSignal;
   boost::signals2::signal<void(AlTextMessage)> iceCandidateSignal;
   boost::signals2::signal<void(AlTextMessage)> sdpOfferSignal;
   boost::signals2::signal<void(AlTextMessage)> sdpAnswerSignal;

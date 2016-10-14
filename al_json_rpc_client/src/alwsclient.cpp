@@ -265,7 +265,4 @@ void AlWsClient::sendMessage(AlTextMessage msg) {
   m_messageQueue.push(msg);
 }
 
-void AlWsClient::_onMessageReceived(AlTextMessage msg) {
-  onMessage(msg);
-  // newMessageSignal(msgVec);
-}
+void AlWsClient::_onMessageReceived(AlTextMessage msg) { onMessage(msg); }

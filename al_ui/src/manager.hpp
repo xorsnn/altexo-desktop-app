@@ -21,12 +21,12 @@ public:
 
   void frameThread();
 
+  // plugins init
   void initSensor(AlSensorCb *sensorCb);
   void initWsConnection(AlWsCb *alWsCb);
   void initSdk();
 
   // ws cb
-  void onWsMessageCb(AlTextMessage msg);
   void onIceCandidateCb(AlTextMessage msg);
   void onSdpAnswerCb(AlTextMessage msg);
   void onSdpOfferCb(AlTextMessage msg);
@@ -41,15 +41,12 @@ public:
 
   void initConnection(std::string peerId);
   void setConnectionMode(std::string mode);
-  void onMessageFromPeer(boost::property_tree::ptree msgPt);
 
   void handleMessages();
   void initHoloRenderer(SceneRenderer *holoRenderer);
 
   void setDeviceName(AlTextMessage deviceNama, int deviceType);
   int getDeviceType() { return m_videoDeviceType; }
-
-  void callToPeer(std::string peerId);
 
   boost::shared_ptr<AlSdkAPI> m_sdk;
   boost::shared_ptr<AlPluginTestAPI> m_plugin_test;
@@ -77,6 +74,10 @@ private:
   std::string m_remoteSdp = "";
   bool m_sentRemoteSdp = false;
   std::queue<std::string> m_remoteCandidates;
+
+  // NOTE: counters
+  int m_localCandidatesCounter;
+  int m_remoteCandidatesCounter;
 
   boost::signals2::signal<void(int, int)> updateResolutionSignal;
 
