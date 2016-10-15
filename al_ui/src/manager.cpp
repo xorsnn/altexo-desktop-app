@@ -11,7 +11,10 @@ namespace boostfs = boost::filesystem;
 namespace boostdll = boost::dll;
 
 using namespace boost::log::trivial;
-boost::log::sources::severity_logger<severity_level> lg;
+// boost::log::sources::severity_logger<severity_level> lg;
+BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(
+    al_logger, boost::log::sources::severity_logger<severity_level>);
+boost::log::sources::severity_logger<severity_level> &lg = al_logger::get();
 
 // TODO: repeated over multiple files, move to a separate lib
 template <typename T>

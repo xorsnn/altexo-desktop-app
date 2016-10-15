@@ -8,6 +8,7 @@
 #include <boost/log/core.hpp>
 #include <boost/log/expressions.hpp>
 #include <boost/log/sinks/text_file_backend.hpp>
+#include <boost/log/sources/global_logger_storage.hpp>
 #include <boost/log/sources/record_ostream.hpp>
 #include <boost/log/sources/severity_logger.hpp>
 #include <boost/log/trivial.hpp>
@@ -25,6 +26,10 @@ namespace logging = boost::log;
 namespace src = boost::log::sources;
 namespace sinks = boost::log::sinks;
 namespace keywords = boost::log::keywords;
+using namespace boost::log::trivial;
+
+BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(
+    al_logger, boost::log::sources::severity_logger<severity_level>);
 
 void initLogging() {
   logging::add_file_log(keywords::file_name = "_sample_%N.log",
@@ -41,12 +46,11 @@ void initLogging() {
 int main(int, char **) {
   initLogging();
   logging::add_common_attributes();
+  boost::log::sources::severity_logger<severity_level> &lg = al_logger::get();
 
   // TODO move it to stored settings
   int winWidth = 1280;
   int winHeight = 720;
-
-  std::cout << "< 1" << std::endl;
 
   // Setup SDL
   if (SDL_Init(SDL_INIT_VIDEO | SDL_INIT_TIMER) != 0) {
@@ -100,7 +104,7 @@ int main(int, char **) {
   // io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f,
   // NULL, io.Fonts->GetGlyphRangesJapanese());
 
-  std::cout << glGetString(GL_VERSION) << std::endl;
+  BOOST_LOG_SEV(lg, debug) << glGetString(GL_VERSION);
 
   bool show_test_window = true;
 
@@ -251,6 +255,6 @@ int main(int, char **) {
   SDL_DestroyWindow(window);
   SDL_Quit();
 
-  std::cout << "FIN!" << std::endl;
+  BOOST_LOG_SEV(lg, debug) << "FIN!";
   return 0;
 }
