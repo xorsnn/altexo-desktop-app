@@ -4,9 +4,11 @@ cmake_minimum_required(VERSION 2.8)
 file(GLOB SRC_LIST
   src/*.cpp
   src/*.h
+  src/*.hpp
   src/*.cc
   src/**/*.cpp
   src/**/*.h
+  src/**/*.hpp
   src/**/*.cc
   src/**/*.c
 )
