@@ -30,10 +30,15 @@ void AlWsPlugin::init(AlWsCb *alWsCb) {
   sendIceCandidateSignal.connect(boost::bind(
       &AlRpc::sendIceCandidate, m_connClient->getWsClientRef(), _1));
 
+  // json-rpc
+  roomOpenSignal.connect(
+      boost::bind(&AlRpc::roomOpen, m_connClient->getWsClientRef(), _1));
+
   m_internalThread = boost::thread(&AlWsPlugin::threadMain, this);
 }
 
 void AlWsPlugin::threadMain() {
+  // TODO remove for now
   m_connClient->login("Galya", "ujnm567"); // TODO: move to GUI
 }
 
@@ -49,5 +54,7 @@ void AlWsPlugin::sendSdpAnswer(AlTextMessage msg) { sendSdpAnswerSignal(msg); }
 
 void AlWsPlugin::sendIceCandidate(AlTextMessage msg) {
   sendIceCandidateSignal(msg);
-  // std::cout << "SSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSSS" << std::endl;
 }
+
+// json-rpc
+void AlWsPlugin::roomOpen(AlTextMessage msg) { roomOpenSignal(msg); }

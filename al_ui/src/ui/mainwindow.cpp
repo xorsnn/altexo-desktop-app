@@ -262,19 +262,25 @@ void MainWindow::_drawContactList() {
 }
 
 void MainWindow::_drawRoomSelectDialog() {
-  ImGui::SetNextWindowSize(ImVec2(200, 100), ImGuiSetCond_Once);
-  ImGui::SetNextWindowPos(ImVec2(m_winWidth / 2, m_winHeight / 2),
+  int dialogWidth = 200;
+  int dialogHeight = 100;
+  ImGui::SetNextWindowSize(ImVec2(dialogWidth, dialogHeight),
+                           ImGuiSetCond_Once);
+  ImGui::SetNextWindowPos(ImVec2(m_winWidth / 2 - dialogWidth / 2,
+                                 m_winHeight / 2 - dialogHeight / 2),
                           ImGuiSetCond_Once);
   ImGui::Begin("Enter room name", NULL,
                ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
                    ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
   ImGui::BeginChild("left pane", ImVec2(-1, 0), true);
   ImGui::InputText("room", m_room, MAX_ROOM_NAME_SIZE);
-  if (ImGui::Button("Button")) {
+  if (ImGui::Button("enter")) {
     AlSettings st;
     std::string roomStr(m_room);
     st.set("last_used_room", roomStr);
     // TODO: run entering room
+    m_manager->m_wsClient.get()->roomOpen(AlTextMessage(roomStr));
+    m_showRoomSelectDialog = false;
   }
   ImGui::EndChild();
   ImGui::End();

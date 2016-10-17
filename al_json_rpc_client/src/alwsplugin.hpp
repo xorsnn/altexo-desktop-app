@@ -27,6 +27,9 @@ public:
   void sendSdpAnswer(AlTextMessage msg);
   void sendIceCandidate(AlTextMessage msg);
 
+  // json-rpc
+  void roomOpen(AlTextMessage msg);
+
   void threadMain();
 
 private:
@@ -43,6 +46,9 @@ private:
   boost::signals2::signal<void(AlTextMessage)> sendSdpOfferSignal;
   boost::signals2::signal<void(AlTextMessage)> sendSdpAnswerSignal;
   boost::signals2::signal<void(AlTextMessage)> sendIceCandidateSignal;
+
+  // json-rpc
+  boost::signals2::signal<void(AlTextMessage)> roomOpenSignal;
 };
 
 extern "C" BOOST_SYMBOL_EXPORT AlWsPlugin plugin;
