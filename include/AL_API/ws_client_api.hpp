@@ -17,6 +17,9 @@ public:
   virtual void sendSdpAnswer(AlTextMessage msg) = 0;
   virtual void sendSdpOffer(AlTextMessage msg) = 0;
   virtual void sendIceCandidate(AlTextMessage msg) = 0;
+
+  // json-rpc
+  virtual void roomOpen(AlTextMessage msg) = 0;
 };
 //]
 

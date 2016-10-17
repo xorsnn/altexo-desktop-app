@@ -92,6 +92,7 @@ endif()
 
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 
+INCLUDE_DIRECTORIES( ../al_utils/src )
 INCLUDE_DIRECTORIES( ./src/ )
 INCLUDE_DIRECTORIES( ./src )
 INCLUDE_DIRECTORIES( include )
@@ -119,6 +120,8 @@ set(progdll_opt_libs
 
 message(${progdll_opt_libs})
 
+link_directories(${CMAKE_BINARY_DIR})
+
 add_executable(${PROJECT_NAME} ${SRC_LIST})
 
 if (APPLE)
@@ -138,6 +141,7 @@ elseif(UNIX)
     ${Boost_SYSTEM_LIBRARY}
     ${Boost_THREAD_LIBRARY}
     ${Boost_LOG_LIBRARY}
+    -lal_utils
     -lboost_log_setup
     -lpng
     -ldl)

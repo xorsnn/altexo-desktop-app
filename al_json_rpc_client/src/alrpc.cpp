@@ -3,9 +3,6 @@
 #include <iostream>
 #include <jsoncpp/json/json.h>
 
-// TODO: move room name to UI
-std::string ROOM_NAME = "122";
-
 template <typename T>
 std::vector<T> as_vector(boost::property_tree::ptree const &pt,
                          boost::property_tree::ptree::key_type const &key) {
@@ -15,7 +12,7 @@ std::vector<T> as_vector(boost::property_tree::ptree const &pt,
   return r;
 }
 
-AlRpc::AlRpc() : m_sessionMsgCounter(0) {}
+AlRpc::AlRpc() : m_sessionMsgCounter(0) { m_curRoomName = ""; }
 
 AlRpc::~AlRpc() {}
 
@@ -46,8 +43,10 @@ void AlRpc::authenticate(std::string token) {
   sendMessage(msgToSend);
 }
 
-void AlRpc::roomOpen() {
+void AlRpc::roomOpen(AlTextMessage roomName) {
   // room/open [ name, p2p ] -> boolean
+  m_curRoomName = roomName.toString();
+
   long reqId = getMsgId();
   m_requests[reqId] = AlRpcRequest::SERVER_MESSAGE_TYPE::ROOM_OPEN;
   std::ostringstream stream;
@@ -57,7 +56,7 @@ void AlRpc::roomOpen() {
 
   boost::property_tree::ptree params;
   boost::property_tree::ptree nameVal;
-  nameVal.put("", ROOM_NAME);
+  nameVal.put("", m_curRoomName);
   boost::property_tree::ptree p2pVal;
   p2pVal.put("", true);
   params.push_back(std::make_pair("", nameVal));
@@ -67,6 +66,8 @@ void AlRpc::roomOpen() {
   boost::property_tree::write_json(stream, ptRoomOpen, true);
   std::string strJson = stream.str();
   AlTextMessage msgToSend(strJson);
+
+  std::cout << msgToSend.toString() << std::endl;
   sendMessage(msgToSend);
 }
 
@@ -79,7 +80,7 @@ void AlRpc::roomEnter() {
   boost::property_tree::ptree ptRoomOpen;
   ptRoomOpen.put("jsonrpc", "2.0");
   ptRoomOpen.put("method", "room/enter");
-  ptRoomOpen.put("params", ROOM_NAME);
+  ptRoomOpen.put("params", m_curRoomName);
   ptRoomOpen.put("id", reqId);
   boost::property_tree::write_json(stream, ptRoomOpen, false);
   std::string strJson = stream.str();
@@ -116,8 +117,8 @@ void AlRpc::offer() {}
 void AlRpc::onIceCandidate() {}
 
 void AlRpc::onMessage(AlTextMessage msg) {
-  // std::cout << "AlRpc::onMessage" << std::endl;
-  // std::cout << msg.toString() << std::endl;
+  std::cout << "AlRpc::onMessage" << std::endl;
+  std::cout << msg.toString() << std::endl;
 
   boost::property_tree::ptree pt;
   std::stringstream ss(msg.toString());
@@ -160,7 +161,8 @@ void AlRpc::onMessage(AlTextMessage msg) {
     boost::optional<boost::property_tree::ptree &> err =
         pt.get_child_optional("error");
     if (!err) {
-      roomOpen();
+      // NOTE: room opening only by request
+      // roomOpen();
     }
   } break;
   case AlRpcRequest::SERVER_MESSAGE_TYPE::ROOM_OPEN: {
@@ -219,13 +221,6 @@ void AlRpc::sendSdpOffer(AlTextMessage msg) {
 }
 
 void AlRpc::sendSdpAnswer(AlTextMessage msg) {
-  std::cout << "********************" << std::endl;
-  std::cout << "********************" << std::endl;
-  std::cout << "********************" << std::endl;
-  std::cout << "********************" << std::endl;
-  std::cout << "********************" << std::endl;
-  std::cout << "********************" << std::endl;
-
   boost::property_tree::ptree pt;
   std::stringstream ss(msg.toString());
   boost::property_tree::read_json(ss, pt);

@@ -18,7 +18,7 @@ public:
   long getMsgId();
 
   void authenticate(std::string token);
-  void roomOpen();
+  void roomOpen(AlTextMessage roomName);
   void roomClose();
   void roomEnter();
   void roomLeave();
@@ -39,6 +39,8 @@ private:
   long m_sessionMsgCounter;
   std::map<long, int> m_requests;
   long m_sdpOfferId;
+
+  std::string m_curRoomName;
 };
 
 #endif // ALRPC_H

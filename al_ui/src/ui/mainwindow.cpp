@@ -1,13 +1,24 @@
 #include "mainwindow.hpp"
 
+// #include "allogger.hpp"
+#include "alsettings.hpp"
+
 BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(
     al_logger, boost::log::sources::severity_logger<severity_level>);
 
 MainWindow::MainWindow()
     : m_glcontext(NULL), m_window(NULL), m_mouseButtonPressed(-1),
-      m_done(false), m_showTestWindow(true) {
+      m_done(false), m_showTestWindow(true), m_showRoomSelectDialog(true),
+      MAX_ROOM_NAME_SIZE(256), m_room(NULL) {
 
-  m_lg = al_logger::get();
+  // m_lg = al_logger::get();
+  // m_room = new char[256];
+  m_room = (char *)malloc(MAX_ROOM_NAME_SIZE);
+
+  AlSettings st;
+  std::string roomStr = st.get("last_used_room");
+  std::copy(roomStr.begin(), roomStr.end(), m_room);
+  m_room[roomStr.size()] = '\0';
 
   // TODO move it to stored settings
   m_winWidth = 1280;
@@ -21,6 +32,9 @@ MainWindow::MainWindow()
 
 MainWindow::~MainWindow() {
   BOOST_LOG_SEV(m_lg, debug) << "Desctucting main window!";
+
+  // delete[] m_room;
+  free(m_room);
 
   if (m_sceneRenderer != NULL) {
     delete m_sceneRenderer;
@@ -108,6 +122,9 @@ void MainWindow::_render() {
 
   _drawContactList();
   _drawDeviceList();
+  if (m_showRoomSelectDialog) {
+    _drawRoomSelectDialog();
+  }
 
   // 3. Show the ImGui test window. Most of the sample code is in
   // ImGui::ShowTestWindow()
@@ -242,4 +259,29 @@ void MainWindow::_drawContactList() {
   //   ImGui::EndChild();
   //   ImGui::End();
   // }
+}
+
+void MainWindow::_drawRoomSelectDialog() {
+  int dialogWidth = 200;
+  int dialogHeight = 100;
+  ImGui::SetNextWindowSize(ImVec2(dialogWidth, dialogHeight),
+                           ImGuiSetCond_Once);
+  ImGui::SetNextWindowPos(ImVec2(m_winWidth / 2 - dialogWidth / 2,
+                                 m_winHeight / 2 - dialogHeight / 2),
+                          ImGuiSetCond_Once);
+  ImGui::Begin("Enter room name", NULL,
+               ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+                   ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+  ImGui::BeginChild("left pane", ImVec2(-1, 0), true);
+  ImGui::InputText("room", m_room, MAX_ROOM_NAME_SIZE);
+  if (ImGui::Button("enter")) {
+    AlSettings st;
+    std::string roomStr(m_room);
+    st.set("last_used_room", roomStr);
+    // TODO: run entering room
+    m_manager->m_wsClient.get()->roomOpen(AlTextMessage(roomStr));
+    m_showRoomSelectDialog = false;
+  }
+  ImGui::EndChild();
+  ImGui::End();
 }
