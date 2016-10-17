@@ -30,6 +30,9 @@ private:
   // drawing sections
   void _drawDeviceList();
   void _drawContactList();
+  void _drawRoomSelectDialog();
+
+  bool m_showRoomSelectDialog;
 
   SDL_GLContext m_glcontext;
   SDL_Window *m_window;
@@ -38,6 +41,9 @@ private:
   bool m_done;
   bool m_showTestWindow;
   ImVec4 m_clearColor;
+
+  int MAX_ROOM_NAME_SIZE;
+  char *m_room;
 
   int m_winWidth;
   int m_winHeight;
