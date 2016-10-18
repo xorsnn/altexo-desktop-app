@@ -23,10 +23,15 @@ void AlKinectPlugin::init(AlSensorCb *alSensorCb) {
 }
 
 void AlKinectPlugin::threadMain() {
-  m_freenect = new Freenect::Freenect();
-  this->m_device = &(m_freenect->createDevice<ALFreenectDevice>(0));
-  this->start();
-  m_initFinished = true;
+  try {
+    m_freenect = new Freenect::Freenect();
+    this->m_device = &(m_freenect->createDevice<ALFreenectDevice>(0));
+    this->start();
+    m_initFinished = true;
+  } catch (std::exception &e) {
+    std::cout << "\n";
+    std::cout << "Error: " << e.what() << "\n";
+  }
 }
 
 void AlKinectPlugin::requestNewFrame() {

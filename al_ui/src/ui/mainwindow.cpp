@@ -226,7 +226,6 @@ void MainWindow::_drawDeviceList() {
                                AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS);
       // TODO: be sure init once
       m_manager->initSensor(&(m_sceneRenderer->m_sensorDataFboRenderer));
-      std::cout << selected << std::endl;
     }
   }
   ImGui::EndChild();

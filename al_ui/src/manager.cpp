@@ -66,6 +66,7 @@ void Manager::initHoloRenderer(SceneRenderer *holoRenderer) {
 void Manager::initSensor(AlSensorCb *sensorCb) {
   boost::filesystem::path lib_path("");
   BOOST_LOG_SEV(lg, debug) << "Loading sensor plugin";
+
 #ifdef __APPLE__
   m_sensor = boost::dll::import<AlSensorAPI>(
       lib_path / "libal_kinect_1.dylib", "plugin",
