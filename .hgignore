@@ -11,3 +11,6 @@ build-*
 al_sdk/build/
 al_ui/build/
 build/
+
+helper_scripts/compile/libs/
+helper_scripts/composing/out/
