@@ -1,9 +1,28 @@
 
+import os
+
+DIRECTORY = 'out'
+WEBRTC_DIR = '/home/xors/workspace/lib/webrtc-checkout/src/out/Default'
+
 def main():
     libs = []
-    fOut = open('out.txt', 'w')
-    f = open('in.txt', 'r')
-    for line in f.readlines():
+    lines = []
+    if not os.path.exists(DIRECTORY):
+        os.makedirs(DIRECTORY)
+
+
+    for root, dirs, files in os.walk(WEBRTC_DIR):
+        for file in files:
+            if file.endswith(".a"):
+                # print(os.path.join(root, file))
+                # print(file)
+                filePath = os.path.join(root, file)
+                lines.append('${WEBRTCBUILD}' + filePath.replace(WEBRTC_DIR, ''))
+
+    fOut = open(DIRECTORY + '/out.cmake', 'w')
+    # f = open(DIRECTORY + '/in.txt', 'r')
+    #
+    for line in lines:
         pathArray = line.strip().split('/')
         libName = pathArray[len(pathArray)-1].split('.')[0].upper()
 
@@ -23,11 +42,11 @@ def main():
         fOut.write(resLine)
 
         libs.append(libName)
-
-    f.close()
-
+    #
+    # f.close()
+    #
     # for libName in libs:
-    fOut.write('TARGET_LINK_LIBRARIES(${PROJECT_NAME}\n')
+    fOut.write('SET (WEBRTC_LIBS\n')
     # fOut.write("\n  PRIVATE ".join(libs))
     # fOut.write("\n  PRIVATE ".join(libs))
     fOut.write("\n  PUBLIC ".join(libs))
