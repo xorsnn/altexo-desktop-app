@@ -41,7 +41,7 @@ if (APPLE)
   include_directories(/Volumes/MAC/workspace/libwebsockets/lib)
   link_directories(/Volumes/MAC/workspace/libwebsockets/build/lib )
 elseif(UNIX)
-  set(LIB_CPR_PATH "/home/xors/workspace/ALTEXO/cpr")
+  set(LIB_CPR_PATH "/home/xors/workspace/ALTEXO/altexo/helper_scripts/compile/libs/cpr")
 endif()
 
 include_directories("${LIB_CPR_PATH}/include")
@@ -57,7 +57,7 @@ INCLUDE_DIRECTORIES( ${JSONCPP_INCLUDE_DIR} )
 add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
 
 target_link_libraries(${PROJECT_NAME}
-  ${LIB_CPR_PATH}/build/lib/libcpr.a
+  ${LIB_CPR_PATH}/../build/lib/libcpr.a
   -lpthread -lssl -lcrypto -lcurl
   -lwebsockets
   ${Boost_SYSTEM_LIBRARY}

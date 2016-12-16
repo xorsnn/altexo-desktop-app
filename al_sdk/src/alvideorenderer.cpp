@@ -1,4 +1,5 @@
 #include "alvideorenderer.h"
+#include "libyuv/convert_from.h"
 #include <iostream>
 
 AlVideoRenderer::AlVideoRenderer(const int nameReceiver,
@@ -21,14 +22,25 @@ void AlVideoRenderer::SetSize(int width, int height) {
   m_image.reset(new uint8_t[width * height * 4]);
 }
 
-void AlVideoRenderer::OnFrame(const cricket::VideoFrame &video_frame) {
-  const cricket::VideoFrame *frame = video_frame.GetCopyWithRotationApplied();
-  SetSize(frame->width(), frame->height());
-  int size = m_width * m_height * 4;
-  //  // TODO(henrike): Convert directly to RGBA
-  frame->ConvertToRgbBuffer(cricket::FOURCC_ARGB, m_image.get(), size,
-                            m_width * 4);
-  m_alCallback->updateFrameCb(image(), width(), height());
+void AlVideoRenderer::OnFrame(const webrtc::VideoFrame &video_frame) {
+  // const cricket::VideoFrame *frame =
+  // video_frame.GetCopyWithRotationApplied();
+  // SetSize(frame->width(), frame->height());
+  // int size = m_width * m_height * 4;
+  // //  // TODO(henrike): Convert directly to RGBA
+  // frame->ConvertToRgbBuffer(cricket::FOURCC_ARGB, m_image.get(), size,
+  //                           m_width * 4);
+  rtc::scoped_refptr<webrtc::VideoFrameBuffer> buffer(
+      webrtc::I420Buffer::Rotate(video_frame.video_frame_buffer(),
+                                 video_frame.rotation()));
+
+  SetSize(buffer->width(), buffer->height());
+
+  libyuv::I420ToRGBA(buffer->DataY(), buffer->StrideY(), buffer->DataU(),
+                     buffer->StrideU(), buffer->DataV(), buffer->StrideV(),
+                     m_image.get(), m_width * 4, buffer->width(),
+                     buffer->height());
+  handleCallback();
   //  // Convert the B,G,R,A frame to R,G,B,A, which is accepted by GTK.
   //  // The 'A' is just padding for GTK, so we can use it as temp.
   //  uint8_t* pix = image_.get();
@@ -40,4 +52,9 @@ void AlVideoRenderer::OnFrame(const cricket::VideoFrame &video_frame) {
   //    pix[3] = 0xFF;     // Fixed Alpha.
   //    pix += 4;
   //  }
+}
+
+void AlVideoRenderer::handleCallback() {
+  m_alCallback->updateFrameCb(image(), width(), height());
+  m_alCallback->updateLocalFrameCb(image(), width(), height());
 }

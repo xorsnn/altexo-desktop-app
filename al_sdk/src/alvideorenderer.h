@@ -7,7 +7,7 @@
 
 #include "alcallback.h"
 
-class AlVideoRenderer : public rtc::VideoSinkInterface<cricket::VideoFrame> {
+class AlVideoRenderer : public rtc::VideoSinkInterface<webrtc::VideoFrame> {
 public:
   AlVideoRenderer(const int target,
                   webrtc::VideoTrackInterface *track_to_render,
@@ -15,13 +15,14 @@ public:
   virtual ~AlVideoRenderer();
 
   // VideoSinkInterface implementation
-  void OnFrame(const cricket::VideoFrame &frame) override;
+  void OnFrame(const webrtc::VideoFrame &frame) override;
   const uint8_t *image() const { return m_image.get(); }
   int width() const { return m_width; }
   int height() const { return m_height; }
 
 protected:
   void SetSize(int width, int height);
+  void handleCallback();
   google_breakpad::scoped_ptr<uint8_t> m_image;
   int m_width;
   int m_height;

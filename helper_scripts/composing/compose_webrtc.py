@@ -29,7 +29,8 @@ def main():
     # for libName in libs:
     fOut.write('TARGET_LINK_LIBRARIES(${PROJECT_NAME}\n')
     # fOut.write("\n  PRIVATE ".join(libs))
-    fOut.write("\n  PRIVATE ".join(libs))
+    # fOut.write("\n  PRIVATE ".join(libs))
+    fOut.write("\n  PUBLIC ".join(libs))
     fOut.write(')\n')
     fOut.close()
 

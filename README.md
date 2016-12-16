@@ -16,6 +16,8 @@ windows:
 1) cpr
   cmake ..\ -DUSE_SYSTEM_CURL=ON -DBUILD_CPR_TESTS=OFF -DUSE_SYSTEM_GTEST=OFF -DCURL_LIBRARY=D:\WORKSPACE\BUILD_ALTEXO\curl\build\lib\Release\ -DCURL_INCLUDE_DIR="D:\WORKSPACE\BUILD_ALTEXO\curl\build\include"
 
+  UNIX: add "set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")"
+
 1.2) curl (copy include to build)
   https://github.com/curl/curl.git
   cmake ..\ -DBUILD_TESTING=OFF -DBUILD_CURL_EXE=OFF
@@ -31,7 +33,10 @@ windows:
 
   set SDL2DIR="D:\\WORKSPACE\\BUILD_ALTEXO\\SDL2-2.0.4\\"
 
-
+UNIX:
+- webrtc:
+gn gen out/Default --args='is_debug=false libyuv_include_tests=false rtc_include_tests=false'
+ninja -C out/Default
 
 MAC:
 - webrrtc:

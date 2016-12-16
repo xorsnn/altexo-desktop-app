@@ -1,6 +1,10 @@
 #ifndef ALVIDEOCAPTURER_H
 #define ALVIDEOCAPTURER_H
 
+#include "webrtc/base/nethelpers.h"
+#include "webrtc/base/physicalsocketserver.h"
+#include "webrtc/base/signalthread.h"
+#include "webrtc/base/sigslot.h"
 #include "webrtc/media/base/videocapturer.h"
 #include <boost/thread.hpp>
 #include <boost/thread/mutex.hpp>

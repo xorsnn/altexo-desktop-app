@@ -153,7 +153,6 @@ void Manager::initSdk() {
     return;
   }
   /* create the plugin */
-  // auto plugin = pluginCreator();
   m_sdk = pluginCreator();
 #else
   m_sdk =
@@ -161,10 +160,10 @@ void Manager::initSdk() {
                                    boost::dll::load_mode::append_decorations);
 #endif
 #endif
-  m_sdk->init(this);
-  updateResolutionSignal.connect(
-      boost::bind(&AlSdkAPI::updateResolution, m_sdk, _1, _2));
-  updateResolutionSignal(WIDTH, HEIGHT);
+  // m_sdk->init(this);
+  // updateResolutionSignal.connect(
+  //     boost::bind(&AlSdkAPI::updateResolution, m_sdk, _1, _2));
+  // updateResolutionSignal(WIDTH, HEIGHT);
 }
 
 void Manager::onIceCandidateCb(AlTextMessage msg) {

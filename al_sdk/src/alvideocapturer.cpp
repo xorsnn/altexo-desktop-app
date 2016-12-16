@@ -75,27 +75,28 @@ void AlVideoCapturer::threadMain() {
     bool stopped = false;
     uint64_t prevTimestamp = 0;
     while (!stopped) {
-      cricket::CapturedFrame frame;
-      frame.time_stamp = prevTimestamp;
-      prevTimestamp += 33333333;
-
-      m_imageMutex.lock();
-      if (m_pImageBytes && m_imageDataLen > 0 && m_width > 0 && m_height > 0) {
-        frame.data = m_pImageBytes;
-        frame.width = m_width;
-        frame.height = m_height;
-        frame.fourcc = cricket::FOURCC_RAW;
-        frame.data_size = m_imageDataLen;
-
-        if (frame.width * frame.height * 3 != m_imageDataLen)
-          std::cout << "AlVideoCapturerThread: with and height don't match "
-                       "size for ABGR data, skipping frame"
-                    << std::endl;
-        else {
-          SignalFrameCaptured(this, &frame);
-        }
-      }
-      m_imageMutex.unlock();
+      // webrtc::VideoFrame frame;
+      // frame.time_stamp = prevTimestamp;
+      // prevTimestamp += 33333333;
+      //
+      // m_imageMutex.lock();
+      // if (m_pImageBytes && m_imageDataLen > 0 && m_width > 0 && m_height > 0)
+      // {
+      //   frame.data = m_pImageBytes;
+      //   frame.width = m_width;
+      //   frame.height = m_height;
+      //   frame.fourcc = cricket::FOURCC_RAW;
+      //   frame.data_size = m_imageDataLen;
+      //
+      //   if (frame.width * frame.height * 3 != m_imageDataLen)
+      //     std::cout << "AlVideoCapturerThread: with and height don't match "
+      //                  "size for ABGR data, skipping frame"
+      //               << std::endl;
+      //   else {
+      //     SignalFrameCaptured(this, &frame);
+      //   }
+      // }
+      // m_imageMutex.unlock();
 
       boost::this_thread::sleep(boost::posix_time::milliseconds(33));
 
