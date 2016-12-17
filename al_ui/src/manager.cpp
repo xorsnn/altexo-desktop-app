@@ -156,7 +156,7 @@ void Manager::initSdk() {
   m_sdk = pluginCreator();
 #else
   m_sdk =
-      boost::dll::import<AlSdkAPI>(lib_path / "libaltexo_sdk.so", "plugin",
+      boost::dll::import<AlSdkAPI>(lib_path / "libaltexo_sdk_2_0.so", "plugin",
                                    boost::dll::load_mode::append_decorations);
 #endif
 #endif
