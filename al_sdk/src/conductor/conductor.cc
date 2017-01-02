@@ -166,15 +166,19 @@ void Conductor::DeletePeerConnection() {
   }
   m_peerConnection = NULL;
   m_activeStreams.clear();
+
   m_alCallback->stopLocalRendererCb();
   m_alCallback->stopRemoteRendererCb();
+
   peer_connection_factory_ = NULL;
   loopback_ = false;
 }
 
+// TODO: remove method
 void Conductor::EnsureStreamingUI() {
   ASSERT(m_peerConnection.get() != NULL);
-  m_alCallback->ensureStreamingUICb();
+  // TODO: remove
+  // m_alCallback->ensureStreamingUICb();
   //    if (m_alCallback->IsWindow()) {
   //        if (m_alCallback->current_ui() != MainWnd::STREAMING)
   //            m_alCallback->SwitchToStreamingUI();

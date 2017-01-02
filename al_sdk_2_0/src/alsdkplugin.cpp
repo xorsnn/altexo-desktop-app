@@ -1,5 +1,6 @@
 #include "alsdkplugin.hpp"
 #include "alcallback.h"
+#include "almanager.h"
 #include <iostream>
 
 using namespace std;
@@ -8,13 +9,12 @@ AlSdkPlugin::AlSdkPlugin()
     : m_internalThread(NULL), m_debug(true), m_videoDeviceName(""), WIDTH(0),
       HEIGHT(0) {
 
-  std::cout << "1111111111111111111111111111" << std::endl;
-  std::cout << "1111111111111111111111111111" << std::endl;
-  std::cout << "1111111111111111111111111111" << std::endl;
-  if (m_debug) {
-    std::cout << "AlSdkPlugin::AlSdkPlugin()" << std::endl;
-  }
-  // m_manager = new AlManager();
+  // if (m_debug) {
+  //   std::cout << "AlSdkPlugin::AlSdkPlugin()" << std::endl;
+  // }
+  // m_sdk = new AlSdk();
+  // m_sdk->run();
+  m_manager = new AlManager();
 }
 
 AlSdkPlugin::~AlSdkPlugin() {
@@ -32,19 +32,26 @@ AlSdkPlugin::~AlSdkPlugin() {
     // }
     delete m_internalThread;
     m_internalThread = NULL;
+    // delete m_manager;
+    // m_manager = NULL;
     std::cout << "AlSdkPlugin::~AlSdkPlugin 2" << std::endl;
   }
 }
 
 void AlSdkPlugin::init(AlSDKCb *alSdkCb) {
+
   m_sdkCb = alSdkCb;
   // TODO debug, checking init thread
   m_internalThread = new boost::thread(&AlSdkPlugin::threadMain, this);
 }
 
-void AlSdkPlugin::threadMain() {}
+void AlSdkPlugin::threadMain() {
+  m_manager->init(this);
+  m_manager->run();
+}
 
 void AlSdkPlugin::initializePeerConnection() {
+  std::cout << "AlSdkPlugin::initializePeerConnection" << std::endl;
   boost::lock_guard<boost::mutex> guard(m_mtx);
   std::pair<int, std::vector<char>> msg(AlCallback::SdkMessageType::INIT_SM,
                                         std::vector<char>());
@@ -53,8 +60,9 @@ void AlSdkPlugin::initializePeerConnection() {
 
 void AlSdkPlugin::setDesiredDataSource(int dataSource) {}
 
-void AlSdkPlugin::setRemoteSdp(std::vector<char> sdp) {
+void AlSdkPlugin::setRemoteSdp(const char *cSdp) {
   boost::lock_guard<boost::mutex> guard(m_mtx);
+  std::vector<char> sdp = AlTextMessage::cStrToMsg(cSdp);
   std::pair<int, std::vector<char>> msg(AlCallback::SdkMessageType::SDP_SM,
                                         sdp);
   m_messageQueue.push(msg);
@@ -85,13 +93,9 @@ void AlSdkPlugin::updateResolution(int width, int height) {
   m_messageQueue.push(msg);
 }
 
-void AlSdkPlugin::setDesiredVideDeviceName(AlTextMessage deviceName) {
-  if (m_debug) {
-    std::cout << "222222222222222222222222222222222" << std::endl;
-    std::cout << deviceName.getText() << std::endl;
-  }
-
-  m_videoDeviceName = deviceName.getText();
+void AlSdkPlugin::setDesiredVideDeviceName(const char *deviceName) {
+  std::cout << "AlSdkPlugin::setDesiredVideDeviceName" << std::endl;
+  m_videoDeviceName = AlTextMessage::cStrToString(deviceName);
 }
 
 void AlSdkPlugin::updateFrameCb(const uint8_t *image, int width, int height) {

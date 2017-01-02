@@ -1,6 +1,7 @@
 #ifndef ALCALLBACK_H
 #define ALCALLBACK_H
 
+#include "altextmessage.hpp"
 #include <map>
 #include <vector>
 
@@ -22,21 +23,20 @@ public:
   virtual void onSdpCb(const std::string &message) = 0;
   virtual void onCandidateCb(const std::string &message) = 0;
 
-  virtual void sendHangUpCb(std::string peer_id) = 0;
-  virtual void dequeueMessagesFromPeerCb() = 0;
+  // virtual void sendHangUpCb(std::string peer_id) = 0;
+  // virtual void dequeueMessagesFromPeerCb() = 0;
   virtual void stopLocalRendererCb() = 0;
   virtual void stopRemoteRendererCb() = 0;
-  virtual void ensureStreamingUICb() = 0;
+  // virtual void ensureStreamingUICb() = 0;
   //    virtual void startRemoteRendererCb(webrtc::VideoTrackInterface*) = 0;
   //    virtual void startLocalRendererCb(webrtc::VideoTrackInterface*) = 0;
-  virtual void queueUIThreadCallbackCb(int msg_id, void *data) = 0;
-  virtual void switchToPeerListCb(const Peers &peers) = 0;
-  virtual void onDisconnectedCb() = 0;
-  virtual void processUiEventsCb() = 0;
-  virtual void SwitchToStreamingUI() = 0; // ????
+  // virtual void queueUIThreadCallbackCb(int msg_id, void *data) = 0;
+  // virtual void switchToPeerListCb(const Peers &peers) = 0;
+  // virtual void onDisconnectedCb() = 0;
+  // virtual void processUiEventsCb() = 0;
+  // virtual void SwitchToStreamingUI() = 0; // ????
 
-  virtual void
-  onDevicesListChangedCb(std::vector<std::string> device_names) = 0;
+  virtual void onDevicesListChangedCb(std::vector<alMsg> device_names) = 0;
 
   virtual void updateFrameCb(const uint8_t *image, int width, int height) = 0;
   virtual void updateLocalFrameCb(const uint8_t *image, int width,

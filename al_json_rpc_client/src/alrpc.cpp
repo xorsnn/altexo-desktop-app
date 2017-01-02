@@ -117,6 +117,11 @@ void AlRpc::offer() {}
 void AlRpc::onIceCandidate() {}
 
 void AlRpc::onMessage(AlTextMessage msg) {
+  std::string strMsg = msg.toString();
+  char *cMsg = new char[strMsg.length() + 1];
+  cMsg[strMsg.length()] = '\n';
+  std::strcpy(cMsg, strMsg.c_str());
+
   std::cout << "AlRpc::onMessage" << std::endl;
   std::cout << msg.toString() << std::endl;
 
@@ -133,7 +138,7 @@ void AlRpc::onMessage(AlTextMessage msg) {
     std::cout << "*******offer notification*********" << std::endl;
     // msgType = AlRpcRequest::SERVER_MESSAGE_TYPE::ROOM_OFFER;
     m_sdpOfferId = msgId;
-    sdpOfferSignal(msg);
+    sdpOfferSignal(cMsg);
   }
   // // TODO: remove
   // // answer notification
@@ -201,6 +206,7 @@ void AlRpc::onMessage(AlTextMessage msg) {
     std::cout << msg.toString() << std::endl;
   }
   }
+  delete[] cMsg;
 }
 
 void AlRpc::sendSdpOffer(AlTextMessage msg) {

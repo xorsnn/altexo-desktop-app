@@ -1,5 +1,7 @@
 #include "allogger.hpp"
 
-AlLogger::AlLogger() { std::cout << "AlLogger::AlLogger" << std::endl; }
-AlLogger::~AlLogger() { std::cout << "AlLogger::~AlLogger" << std::endl; }
-void AlLogger::test() { std::cout << "test" << std::endl; }
+AlLogger::AlLogger() {}
+
+AlLogger::~AlLogger() {}
+
+void AlLogger::operator<<(std::string msg) { std::cout << msg << std::endl; }

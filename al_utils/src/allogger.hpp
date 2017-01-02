@@ -10,7 +10,12 @@ public:
   AlLogger();
   ~AlLogger();
 
-  void test();
+  void operator<<(std::string msg);
+};
+
+static AlLogger alLogger() {
+  AlLogger lg;
+  return lg;
 };
 
 #endif // ALLOGGER_H

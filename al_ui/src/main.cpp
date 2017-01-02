@@ -14,6 +14,8 @@
 #include <iostream>
 #include <stdio.h>
 
+#include "allogger.hpp"
+
 #include "ui/mainwindow.hpp"
 
 namespace logging = boost::log;

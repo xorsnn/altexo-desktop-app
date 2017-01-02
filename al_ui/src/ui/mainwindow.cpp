@@ -206,7 +206,7 @@ void MainWindow::_drawDeviceList() {
   static int selected = 0;
   ImGui::BeginChild("webcam list", ImVec2(-1, 180), true);
   for (int i = 0; i < m_manager->webcamList.size(); i++) {
-    std::string devName = m_manager->webcamList[i].getText();
+    std::string devName = AlTextMessage::msgToString(m_manager->webcamList[i]);
     const char *label = devName.c_str();
     if (ImGui::Selectable(label, selected == i)) {
       selected = i;
@@ -218,7 +218,7 @@ void MainWindow::_drawDeviceList() {
   ImGui::EndChild();
   ImGui::BeginChild("sensor list", ImVec2(-1, 180), true);
   for (int i = 0; i < m_manager->sensorList.size(); i++) {
-    std::string devName = m_manager->sensorList[i].getText();
+    std::string devName = AlTextMessage::msgToString(m_manager->sensorList[i]);
     const char *label = devName.c_str();
     if (ImGui::Selectable(label, selected == i)) {
       selected = i;

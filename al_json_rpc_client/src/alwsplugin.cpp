@@ -48,7 +48,10 @@ void AlWsPlugin::sendMessageToPeer(AlTextMessage peerId, AlTextMessage msg) {
 
 void AlWsPlugin::sendMessage(AlTextMessage msg) { sendWsMessageSignal(msg); }
 
-void AlWsPlugin::sendSdpOffer(AlTextMessage msg) { sendSdpOfferSignal(msg); }
+void AlWsPlugin::sendSdpOffer(const char *cMsg) {
+  AlTextMessage msg = AlTextMessage::cStrToMsg(cMsg);
+  sendSdpOfferSignal(msg);
+}
 
 void AlWsPlugin::sendSdpAnswer(AlTextMessage msg) { sendSdpAnswerSignal(msg); }
 

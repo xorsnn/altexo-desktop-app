@@ -33,7 +33,7 @@ public:
 
   void init(AlSDKCb *alSdkCb);
   void initializePeerConnection();
-  void setRemoteSdp(std::vector<char> sdp);
+  void setRemoteSdp(const char *cSdp);
   void setRemoteIceCandidate(std::vector<char> candidate);
   void setImageData(std::vector<unsigned char> imageBytes, int width,
                     int height);
@@ -52,17 +52,17 @@ public:
     m_sdkCb->onLocalIceCandidateCb(msg);
   }
 
-  void sendHangUpCb(std::string peer_id) {
-    if (m_debug) {
-      std::cout << "sendHangUpCb" << std::endl;
-    }
-  }
-
-  void dequeueMessagesFromPeerCb() {
-    if (m_debug) {
-      std::cout << "dequeueMessagesFromPeerCb" << std::endl;
-    }
-  }
+  // void sendHangUpCb(std::string peer_id) {
+  //   if (m_debug) {
+  //     std::cout << "sendHangUpCb" << std::endl;
+  //   }
+  // }
+  //
+  // void dequeueMessagesFromPeerCb() {
+  //   if (m_debug) {
+  //     std::cout << "dequeueMessagesFromPeerCb" << std::endl;
+  //   }
+  // }
   void stopLocalRendererCb() {
     if (m_debug) {
       std::cout << "stopLocalRendererCb" << std::endl;
@@ -73,47 +73,51 @@ public:
       std::cout << "stopRemoteRendererCb" << std::endl;
     }
   }
-  void ensureStreamingUICb() {
-    if (m_debug) {
-      std::cout << "ensureStreamingUICb" << std::endl;
-    }
-  }
-  void queueUIThreadCallbackCb(int msg_id, void *data) {
-    if (m_debug) {
-      std::cout << "queueUIThreadCallbackCb" << std::endl;
-    }
-  }
-  void switchToPeerListCb(const Peers &peers) {
-    if (m_debug) {
-      std::cout << "switchToPeerListCb" << std::endl;
-    }
-  }
-  void onDisconnectedCb() {
-    if (m_debug) {
-      std::cout << "onDisconnectedCb" << std::endl;
-    }
-  }
-  void processUiEventsCb() {
-    // if (m_debug) {
-    // std::cout << "processUiEventsCb" << std::endl;
-    // }
-  }
-  void SwitchToStreamingUI() {} // ????
-  void onDevicesListChangedCb(std::vector<std::string> deviceNames) {
+  // void ensureStreamingUICb() {
+  //   if (m_debug) {
+  //     std::cout << "ensureStreamingUICb" << std::endl;
+  //   }
+  // }
+  // void queueUIThreadCallbackCb(int msg_id, void *data) {
+  //   if (m_debug) {
+  //     std::cout << "queueUIThreadCallbackCb" << std::endl;
+  //   }
+  // }
+  // void switchToPeerListCb(const Peers &peers) {
+  //   if (m_debug) {
+  //     std::cout << "switchToPeerListCb" << std::endl;
+  //   }
+  // }
+  // void onDisconnectedCb() {
+  //   if (m_debug) {
+  //     std::cout << "onDisconnectedCb" << std::endl;
+  //   }
+  // }
+  // void processUiEventsCb() {
+  //   // if (m_debug) {
+  //   // std::cout << "processUiEventsCb" << std::endl;
+  //   // }
+  // }
+  // void SwitchToStreamingUI() {} // ????
+  void onDevicesListChangedCb(std::vector<alMsg> deviceNames) {
     if (m_debug) {
       std::cout << "onDevicesListChangedCb" << std::endl;
+      std::cout << deviceNames.size() << std::endl;
     }
-    std::vector<AlTextMessage> deviceNamesMsg;
     for (int i = 0; i < deviceNames.size(); i++) {
-      AlTextMessage newMsg(deviceNames[i]);
-      deviceNamesMsg.push_back(newMsg);
+      AlTextMessage msg(deviceNames[i]);
+      std::string msgStr = msg.toString();
+      char *cstr = new char[msgStr.length() + 1];
+      cstr[msgStr.length()] = '\n';
+      std::strcpy(cstr, msgStr.c_str());
+      m_sdkCb->onNewCaptureDeciceCb(cstr);
+      delete[] cstr;
     }
-    m_sdkCb->onDevicesListChangedCb(deviceNamesMsg);
   }
 
   void updateFrameCb(const uint8_t *image, int width, int height);
   void updateLocalFrameCb(const uint8_t *image, int width, int height);
-  void setDesiredVideDeviceName(AlTextMessage deviceName);
+  void setDesiredVideDeviceName(const char *deviceName);
 
   //  TODO move to AlManager
   std::string getVideoDeviceName() {
@@ -148,6 +152,8 @@ public:
   }
 
 private:
+  // AlSdk *m_sdk;
+  AlManager *m_manager;
   AlSDKCb *m_sdkCb;
   boost::thread *m_internalThread;
 

@@ -32,7 +32,7 @@ Manager::Manager()
       m_beenCalled(false), m_processingCandidates(false), m_calling(false),
       m_localCandidatesCounter(0), m_remoteCandidatesCounter(0) {
   BOOST_LOG_SEV(lg, debug) << "Manager constructor";
-  sensorList.push_back(AlTextMessage("Kinect"));
+  sensorList.push_back(AlTextMessage::stringToMsg("Kinect"));
 }
 
 Manager::~Manager() {
@@ -155,12 +155,13 @@ void Manager::initSdk() {
   /* create the plugin */
   m_sdk = pluginCreator();
 #else
-  m_sdk =
-      boost::dll::import<AlSdkAPI>(lib_path / "libaltexo_sdk_2_0.so", "plugin",
-                                   boost::dll::load_mode::append_decorations);
+  m_sdk = boost::dll::import<AlSdkAPI>(
+      lib_path / "libaltexo_sdk_2_0.so", "plugin",
+      //  boost::dll::load_mode::append_decorations);
+      boost::dll::load_mode::default_mode);
 #endif
 #endif
-  // m_sdk->init(this);
+  m_sdk->init(this);
   // updateResolutionSignal.connect(
   //     boost::bind(&AlSdkAPI::updateResolution, m_sdk, _1, _2));
   // updateResolutionSignal(WIDTH, HEIGHT);
@@ -199,9 +200,11 @@ void Manager::onSdpAnswerCb(AlTextMessage msg) {
   handleMessages();
 }
 
-void Manager::onSdpOfferCb(AlTextMessage msg) {
-  BOOST_LOG_SEV(lg, debug) << "Manager::onSdpOfferCb";
-  BOOST_LOG_SEV(lg, debug) << msg.toString();
+void Manager::onSdpOfferCb(const char *cMsg) {
+  alLogger() << "Manager::onSdpOfferCb";
+  AlTextMessage msg = AlTextMessage::cStrToMsg(cMsg);
+  // BOOST_LOG_SEV(lg, debug) << "Manager::onSdpOfferCb";
+  // BOOST_LOG_SEV(lg, debug) << msg.toString();
 
   // **
   // TODO: this is temprorary solution, we make messages similar to what we used
@@ -221,7 +224,9 @@ void Manager::onSdpOfferCb(AlTextMessage msg) {
 
   m_remoteSdp = streamRes.str();
 
+  alLogger() << "> Manager::onSdpOfferCb end!";
   handleMessages();
+  alLogger() << "> Manager::onSdpOfferCb end! 2";
 }
 
 void Manager::onInitCall() {
@@ -272,17 +277,28 @@ void Manager::onLocalIceCandidateCb(AlTextMessage candidate) {
 }
 
 void Manager::handleMessages() {
+  alLogger() << "Manager::handleMessages";
   if (!m_sentLocalSdp && m_localSdp != "") {
     if (!m_calling) {
+      alLogger() << "> 2";
       m_wsClient->sendSdpAnswer(AlTextMessage(m_localSdp));
     } else {
-      m_wsClient->sendSdpOffer(AlTextMessage(m_localSdp));
+      char *cstr = new char[m_localSdp.length() + 1];
+      cstr[m_localSdp.length()] = '\n';
+      std::strcpy(cstr, m_localSdp.c_str());
+      m_wsClient->sendSdpOffer(cstr);
+      delete[] cstr;
     }
     m_sentLocalSdp = true;
   }
   if (!m_sentRemoteSdp && m_remoteSdp != "") {
-    std::vector<char> remoteSdpVec(m_remoteSdp.begin(), m_remoteSdp.end());
-    m_sdk->setRemoteSdp(remoteSdpVec);
+    alLogger() << "> 3";
+    // std::vector<char> remoteSdpVec(m_remoteSdp.begin(), m_remoteSdp.end());
+    char *cstr = new char[m_remoteSdp.length() + 1];
+    cstr[m_remoteSdp.length()] = '\n';
+    std::strcpy(cstr, m_remoteSdp.c_str());
+    m_sdk->setRemoteSdp(cstr);
+    delete[] cstr;
     m_sentRemoteSdp = true;
   }
   if (m_sentLocalSdp && m_sentRemoteSdp && !m_processingCandidates) {
@@ -315,11 +331,14 @@ void Manager::handleMessages() {
   }
 }
 
-void Manager::onDevicesListChangedCb(std::vector<AlTextMessage> deviceNames) {
-  webcamList = deviceNames;
-  // NOTE: setting default cam
-  // TODO: remember last choice
-  setDeviceName(webcamList[0], AlSdkAPI::DesiredVideoSource::CAMERA);
+void Manager::onNewCaptureDeciceCb(const char *newDeviceName) {
+  webcamList.push_back(AlTextMessage::cStrToMsg(newDeviceName));
+
+  // NOTE: set device name if not already set (firs is default)
+  if (m_videoDeviceName == "") {
+    setDeviceName(AlTextMessage::cStrToMsg(newDeviceName),
+                  AlSdkAPI::DesiredVideoSource::CAMERA);
+  }
 }
 
 void Manager::updateFrameCb(const uint8_t *image, int width, int height) {
@@ -330,8 +349,10 @@ void Manager::updateLocalFrameCb(const uint8_t *image, int width, int height) {
   m_holoRenderer->updateLocalFrame(image, width, height);
 }
 
-void Manager::setDeviceName(AlTextMessage deviceName, int deviceType) {
-  m_videoDeviceName = deviceName.getText();
+void Manager::setDeviceName(alMsg deviceName, int deviceType) {
+  alLogger() << "Manager::setDeviceName";
+  alLogger() << "*************************";
+  m_videoDeviceName = AlTextMessage::msgToString(deviceName);
   m_videoDeviceType = deviceType;
   switch (m_videoDeviceType) {
   case AlSdkAPI::DesiredVideoSource::CAMERA: {
@@ -348,12 +369,18 @@ void Manager::setDeviceName(AlTextMessage deviceName, int deviceType) {
 }
 
 void Manager::_initVideoDevice() {
-  BOOST_LOG_SEV(lg, debug) << "Manager::_initVideoDevice";
+  alLogger() << "Manager::_initVideoDevice";
 
   switch (m_videoDeviceType) {
   case AlSdkAPI::DesiredVideoSource::CAMERA: {
     m_sdk->setDesiredDataSource(m_videoDeviceType);
-    m_sdk->setDesiredVideDeviceName(m_videoDeviceName);
+
+    char *cstr = new char[m_videoDeviceName.length() + 1];
+    cstr[m_videoDeviceName.length()] = '\n';
+    std::strcpy(cstr, m_videoDeviceName.c_str());
+    m_sdk->setDesiredVideDeviceName(cstr);
+    delete[] cstr;
+
     setConnectionMode("audio+video");
   } break;
   case AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS: {

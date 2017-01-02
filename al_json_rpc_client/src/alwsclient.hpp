@@ -47,7 +47,7 @@ public:
 
 protected:
   boost::signals2::signal<void(AlTextMessage)> iceCandidateSignal;
-  boost::signals2::signal<void(AlTextMessage)> sdpOfferSignal;
+  boost::signals2::signal<void(const char *)> sdpOfferSignal;
   boost::signals2::signal<void(AlTextMessage)> sdpAnswerSignal;
   boost::signals2::signal<void()> initCallSignal;
 

@@ -6,6 +6,7 @@
 #include "AL_API/sensor_api.hpp"
 #include "AL_API/ws_client_api.hpp"
 #include "AL_CB/al_sdk_cb.hpp"
+#include "allogger.hpp"
 #include "contact.hpp"
 #include "scenerenderer.hpp"
 #include <boost/dll/import.hpp>
@@ -31,13 +32,13 @@ public:
   // ws cb
   void onIceCandidateCb(AlTextMessage msg);
   void onSdpAnswerCb(AlTextMessage msg);
-  void onSdpOfferCb(AlTextMessage msg);
+  void onSdpOfferCb(const char *msg);
   void onInitCall();
 
   // sdk cb
   void onLocalSdpCb(AlTextMessage sdp);
   void onLocalIceCandidateCb(AlTextMessage candidate);
-  void onDevicesListChangedCb(std::vector<AlTextMessage> deviceNames);
+  void onNewCaptureDeciceCb(const char *newDeviceName);
   void updateFrameCb(const uint8_t *image, int width, int height); // REMOTE
   void updateLocalFrameCb(const uint8_t *image, int width, int height); // LOCAL
 
@@ -47,7 +48,7 @@ public:
   void handleMessages();
   void initHoloRenderer(SceneRenderer *holoRenderer);
 
-  void setDeviceName(AlTextMessage deviceNama, int deviceType);
+  void setDeviceName(alMsg deviceNama, int deviceType);
   int getDeviceType() { return m_videoDeviceType; }
 
   boost::shared_ptr<AlSdkAPI> m_sdk;
@@ -56,8 +57,8 @@ public:
   boost::shared_ptr<AlPluginTestAPI> m_plugin_test;
 
   std::vector<CONTACT> contactList;
-  std::vector<AlTextMessage> webcamList;
-  std::vector<AlTextMessage> sensorList;
+  std::vector<alMsg> webcamList;
+  std::vector<alMsg> sensorList;
 
   bool connectionInitialized = false;
 

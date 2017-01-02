@@ -5,9 +5,10 @@ if(APPLE)
   # set(CMAKE_C_COMPILER "/Volumes/MAC/workspace/WEBRTC/webrtc/src/chromium/src/third_party/llvm-build/Release+Asserts/bin/clang")
   # set(CMAKE_CXX_COMPILER "/Volumes/MAC/workspace/WEBRTC/webrtc/src/chromium/src/third_party/llvm-build/Release+Asserts/bin/clang++")
 elseif(UNIX)
-  # set(CMAKE_C_COMPILER "/usr/bin/clang")
-  # set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+  set(CMAKE_C_COMPILER "/usr/bin/clang")
+  set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 endif()
+
 add_definitions(-DAL_DEBUG)
 
 set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
