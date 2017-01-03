@@ -15,12 +15,13 @@
 #include "webrtc/base/common.h"
 #include "webrtc/base/json.h"
 #include "webrtc/base/logging.h"
+// #include "webrtc/examples/peerconnection/client/defaults.h"
+#include "conductor/defaults.h"
 #include "webrtc/media/engine/webrtcvideocapturerfactory.h"
 #include "webrtc/modules/video_capture/video_capture_factory.h"
 #include <iostream>
 #include <utility>
 #include <vector>
-//#include "webrtc/examples/peerconnection/client/defaults.h"
 
 // Names used for a IceCandidate JSON object.
 const char kCandidateSdpMidName[] = "sdpMid";
@@ -108,13 +109,13 @@ void Conductor::Close() {
 }
 
 bool Conductor::InitializePeerConnection() {
-  // if (m_debug) {
-  //   std::cout << "Conductor::InitializePeerConnection" << std::endl;
-  // }
-  // ASSERT(peer_connection_factory_.get() == NULL);
-  // ASSERT(m_peerConnection.get() == NULL);
-  //
-  // peer_connection_factory_ = webrtc::CreatePeerConnectionFactory();
+  if (m_debug) {
+    std::cout << "Conductor::InitializePeerConnection" << std::endl;
+  }
+  ASSERT(peer_connection_factory_.get() == NULL);
+  ASSERT(m_peerConnection.get() == NULL);
+
+  peer_connection_factory_ = webrtc::CreatePeerConnectionFactory();
   //
   // if (!peer_connection_factory_.get()) {
   //   std::cout << "Error, Failed to initialize PeerConnectionFactory"
@@ -134,6 +135,9 @@ bool Conductor::InitializePeerConnection() {
   //   // std::cout << (m_peerConnection.get() != NULL) << std::endl;
   // }
   // return m_peerConnection.get() != NULL;
+
+  // TODO: remove
+  return false;
 }
 
 bool Conductor::ReinitializePeerConnectionForLoopback() {

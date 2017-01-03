@@ -34,6 +34,7 @@ public:
       int msgType = msg.first;
       switch (msgType) {
       case AlCallback::SdkMessageType::INIT_SM: {
+        std::cout << "AlCallback::SdkMessageType::INIT_SM" << std::endl;
         if (m_conductor->InitializePeerConnection()) {
           if (m_debug) {
             std::cout << "CustomSocketServer CreateOffer" << std::endl;

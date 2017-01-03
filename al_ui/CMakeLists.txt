@@ -1,6 +1,10 @@
 project(al_ui.run)
 cmake_minimum_required(VERSION 2.8)
 
+message("***************************")
+message("***** bulding UI **********")
+message("***************************")
+
 file(GLOB SRC_LIST
   src/*.cpp
   src/*.h
@@ -27,6 +31,10 @@ file( COPY res/cto_intro.png DESTINATION . )
 
 # shaders
 file( COPY ${SHADERS_LIST} DESTINATION ./shaders )
+
+# definitions
+# add_definitions(-mavx2)
+# add_definitions(-mavx)
 
 if (WIN32)
 else()

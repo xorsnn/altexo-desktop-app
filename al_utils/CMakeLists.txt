@@ -1,6 +1,10 @@
 project(al_utils)
 cmake_minimum_required(VERSION 2.8)
 
+message("***************************")
+message("***** bulding utils *******")
+message("***************************")
+
 file(GLOB SRC_LIST
   src/*.cpp
   src/*.h

@@ -1,6 +1,10 @@
 project(json_rpc_client)
 cmake_minimum_required(VERSION 2.8)
 
+message("********************************")
+message("***** bulding RPC client *******")
+message("********************************")
+
 file(GLOB SRC_LIST
   src/*.cpp
   src/*.h

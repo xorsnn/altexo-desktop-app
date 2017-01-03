@@ -1,6 +1,10 @@
 project(al_kinect_1)
 cmake_minimum_required(VERSION 2.8)
 
+message("************************************")
+message("***** bulding kinect adapted *******")
+message("************************************")
+
 file(GLOB SRC_LIST
   src/*.cpp
   src/*.h

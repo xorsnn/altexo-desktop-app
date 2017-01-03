@@ -1,6 +1,10 @@
 project(altexo_sdk_2_0)
 cmake_minimum_required(VERSION 2.8)
 
+message("***************************")
+message("***** bulding SDK 2 *******")
+message("***************************")
+
 file(GLOB SRC_LIST
   src/*.cpp
   src/*.h
@@ -81,6 +85,8 @@ else()
   add_definitions(-DWEBRTC_POSIX)
   add_definitions(-DWEBRTC_LINUX)
   add_definitions(-DWEBRTC_BUILD_LIBEVENT)
+
+  # add_definitions(-mavx2)
 endif()
 
 if (UNIX)
@@ -119,10 +125,23 @@ set(Boost_USE_STATIC_LIBS ON)
 set(Boost_USE_MULTITHREADED ON)
 set(Boost_USE_STATIC_RUNTIME ON)
 
+##
+# LIBRARIES
+#
+if (APPLE)
+  include(al-webrtc-deps-mac.cmake)
+elseif(UNIX)
+  include(al-webrtc-deps.cmake)
+  include(al-webrtc-obj-deps.cmake)
+elseif (WIN32)
+  include(al-webrtc-deps-win.cmake)
+endif()
 
-
+##
+# Creating library
+#
 if (UNIX)
-  add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
+  add_library(${PROJECT_NAME} SHARED ${SRC_LIST} ${OBJ_DEPS})
 else()
   # seems like only static is allowed for win
   add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
@@ -155,16 +174,6 @@ include_directories(${WEBRTCTRUNK}/chromium/src/third_party/libyuv/include)
 # include_directories(${WEBRTCTRUNK}/chromium/src/third_party/protobuf/conformance)
 include_directories(../include/)
 
-##
-# LIBRARIES
-#
-if (APPLE)
-  include(al-webrtc-deps-mac.cmake)
-elseif(UNIX)
-  include(al-webrtc-deps.cmake)
-elseif (WIN32)
-  include(al-webrtc-deps-win.cmake)
-endif()
 
 if(UNIX)
   FIND_PACKAGE( Boost COMPONENTS system filesystem thread REQUIRED )
@@ -190,6 +199,7 @@ elseif(UNIX)
     -Wl,--start-group
     ${WEBRTC_LIBS}
     -Wl,--end-group
+    # ${OBJ_DEPS}
     -lpthread
     -lX11
     # -lXfixes
@@ -204,7 +214,7 @@ elseif(UNIX)
     -lm
     -ldl
     boost_thread boost_system
-    -ljsoncpp
+    # -ljsoncpp
     "/home/xors/workspace/lib/webrtc-checkout/src/out/Default/libboringssl.so"
     "/home/xors/workspace/lib/webrtc-checkout/src/out/Default/libprotobuf_lite.so"
   )
