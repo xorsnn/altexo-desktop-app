@@ -162,8 +162,9 @@ protected:
   void SendMessage(const std::string &json_object);
 
   //    std::string peer_id_;
-  bool loopback_;
+  // bool loopback_;
 
+  rtc::scoped_refptr<webrtc::PeerConnectionInterface> m_peer_connection_;
   rtc::scoped_refptr<webrtc::PeerConnectionFactoryInterface>
       peer_connection_factory_;
   PeerConnectionClient *m_client;

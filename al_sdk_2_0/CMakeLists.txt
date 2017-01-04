@@ -173,6 +173,7 @@ include_directories(${WEBRTCTRUNK}/chromium/src/third_party/libyuv/include)
 # include_directories(${WEBRTCTRUNK}/chromium/src)
 # include_directories(${WEBRTCTRUNK}/chromium/src/third_party/protobuf/conformance)
 include_directories(../include/)
+INCLUDE_DIRECTORIES( ../al_utils/src )
 
 
 if(UNIX)
@@ -213,8 +214,9 @@ elseif(UNIX)
     # -lXrandr
     -lm
     -ldl
+    # -lal_utils
+    "/home/xors/workspace/ALTEXO/altexo/build/libal_utils.so"
     boost_thread boost_system
-    # -ljsoncpp
     "/home/xors/workspace/lib/webrtc-checkout/src/out/Default/libboringssl.so"
     "/home/xors/workspace/lib/webrtc-checkout/src/out/Default/libprotobuf_lite.so"
   )

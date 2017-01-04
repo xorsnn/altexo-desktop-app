@@ -16,6 +16,7 @@
 #include "webrtc/base/json.h"
 #include "webrtc/base/logging.h"
 // #include "webrtc/examples/peerconnection/client/defaults.h"
+#include "allogger.hpp"
 #include "conductor/defaults.h"
 #include "webrtc/media/engine/webrtcvideocapturerfactory.h"
 #include "webrtc/modules/video_capture/video_capture_factory.h"
@@ -53,8 +54,8 @@ protected:
 
 Conductor::Conductor(PeerConnectionClient *client, AlCallback *alCallback,
                      AlDataManager *alDataManager)
-    : loopback_(false), m_client(client), m_alCallback(alCallback),
-      m_debug(true), m_processingMsg(false), m_isAcceptingConnection(false) {
+    : m_client(client), m_alCallback(alCallback), m_debug(true),
+      m_processingMsg(false), m_isAcceptingConnection(false) {
 
   m_dataManager = alDataManager;
   //    m_dataManager->setConductor(this);
@@ -78,19 +79,10 @@ Conductor::Conductor(PeerConnectionClient *client, AlCallback *alCallback,
       }
     }
   }
-  std::cout << "<<<<<<<<conductor constructor<<<<<<<<<" << std::endl;
-  std::cout << m_alCallback << std::endl;
-  std::cout << deviceNames.size() << std::endl;
-  // TODO: take a look
   std::vector<std::vector<char>> deviceNamesMsg;
   for (int i = 0; i < deviceNames.size(); i++) {
-    // AlTextMessage newMsg(deviceNames[i]);
-    std::cout << deviceNames[i] << std::endl;
-    // deviceNamesMsg.push_back(newMsg.asCharVector());
     deviceNamesMsg.push_back(AlTextMessage::stringToMsg(deviceNames[i]));
   }
-  std::cout << "<<<<<<<<don't know wtf!!!<<<<<<<<<" << std::endl;
-  std::cout << deviceNames.size() << std::endl;
   m_alCallback->onDevicesListChangedCb(deviceNamesMsg);
 }
 
@@ -116,67 +108,103 @@ bool Conductor::InitializePeerConnection() {
   ASSERT(m_peerConnection.get() == NULL);
 
   peer_connection_factory_ = webrtc::CreatePeerConnectionFactory();
-  //
-  // if (!peer_connection_factory_.get()) {
-  //   std::cout << "Error, Failed to initialize PeerConnectionFactory"
-  //             << std::endl;
-  //   DeletePeerConnection();
-  //   return false;
-  // }
-  //
-  // if (!CreatePeerConnection(DTLS_ON)) {
-  //   std::cout << "Error, CreatePeerConnection failed" << std::endl;
-  //   DeletePeerConnection();
-  // }
-  // AddStreams();
-  // if (m_debug) {
-  //   std::cout << "Conductor m_peerConnection:" << std::endl;
-  //   std::cout << m_peerConnection.get() << std::endl;
-  //   // std::cout << (m_peerConnection.get() != NULL) << std::endl;
-  // }
-  // return m_peerConnection.get() != NULL;
 
-  // TODO: remove
-  return false;
+  if (!peer_connection_factory_.get()) {
+    std::cout << "Error, Failed to initialize PeerConnectionFactory"
+              << std::endl;
+    DeletePeerConnection();
+    return false;
+  }
+
+  if (!CreatePeerConnection(DTLS_ON)) {
+    std::cout << "Error, CreatePeerConnection failed" << std::endl;
+    DeletePeerConnection();
+  }
+  AddStreams();
+  if (m_debug) {
+    std::cout << "Conductor m_peerConnection:" << std::endl;
+    std::cout << m_peerConnection.get() << std::endl;
+    // std::cout << (m_peerConnection.get() != NULL) << std::endl;
+  }
+  return m_peerConnection.get() != NULL;
+
+  // // TODO: remove
+  // return false;
 }
 
-bool Conductor::ReinitializePeerConnectionForLoopback() {
-  //   loopback_ = true;
-  //   rtc::scoped_refptr<webrtc::StreamCollectionInterface> streams(
-  //       m_peerConnection->local_streams());
-  //   m_peerConnection = NULL;
-  //   if (CreatePeerConnection(DTLS_OFF)) {
-  //     for (size_t i = 0; i < streams->count(); ++i)
-  //       m_peerConnection->AddStream(streams->at(i));
-  //     m_peerConnection->CreateOffer(this, NULL);
-  //   }
-  //   return m_peerConnection.get() != NULL;
-  // }
-  //
-  // bool Conductor::CreatePeerConnection(bool dtls) {
-  //   if (m_debug) {
-  //     std::cout << "Conductor::CreatePeerConnection" << std::endl;
-  //   }
-  //   ASSERT(peer_connection_factory_.get() != NULL);
-  //   ASSERT(m_peerConnection.get() == NULL);
-  //
-  //   webrtc::PeerConnectionInterface::RTCConfiguration config;
-  //   webrtc::PeerConnectionInterface::IceServer server;
-  //   server.uri = GetPeerConnectionString();
-  //   config.servers.push_back(server);
-  //
-  //   webrtc::FakeConstraints constraints;
-  //   if (dtls) {
-  //     constraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp,
-  //                             "true");
-  //   } else {
-  //     constraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp,
-  //                             "false");
-  //   }
-  //
-  //   m_peerConnection = peer_connection_factory_->CreatePeerConnection(
-  //       config, &constraints, NULL, NULL, this);
-  //   return m_peerConnection.get() != NULL;
+// bool Conductor::ReinitializePeerConnectionForLoopback() {
+//   //   loopback_ = true;
+//   //   rtc::scoped_refptr<webrtc::StreamCollectionInterface> streams(
+//   //       m_peerConnection->local_streams());
+//   //   m_peerConnection = NULL;
+//   //   if (CreatePeerConnection(DTLS_OFF)) {
+//   //     for (size_t i = 0; i < streams->count(); ++i)
+//   //       m_peerConnection->AddStream(streams->at(i));
+//   //     m_peerConnection->CreateOffer(this, NULL);
+//   //   }
+//   //   return m_peerConnection.get() != NULL;
+//   // }
+//   //
+//   // bool Conductor::CreatePeerConnection(bool dtls) {
+//   //   if (m_debug) {
+//   //     std::cout << "Conductor::CreatePeerConnection" << std::endl;
+//   //   }
+//   //   ASSERT(peer_connection_factory_.get() != NULL);
+//   //   ASSERT(m_peerConnection.get() == NULL);
+//   //
+//   //   webrtc::PeerConnectionInterface::RTCConfiguration config;
+//   //   webrtc::PeerConnectionInterface::IceServer server;
+//   //   server.uri = GetPeerConnectionString();
+//   //   config.servers.push_back(server);
+//   //
+//   //   webrtc::FakeConstraints constraints;
+//   //   if (dtls) {
+//   //
+//   constraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp,
+//   //                             "true");
+//   //   } else {
+//   //
+//   constraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp,
+//   //                             "false");
+//   //   }
+//   //
+//   //   m_peerConnection = peer_connection_factory_->CreatePeerConnection(
+//   //       config, &constraints, NULL, NULL, this);
+//   //   return m_peerConnection.get() != NULL;
+// }
+
+bool Conductor::CreatePeerConnection(bool dtls) {
+  ASSERT(peer_connection_factory_.get() != NULL);
+  ASSERT(m_peer_connection_.get() == NULL);
+
+  alLogger() << "some 1";
+
+  webrtc::PeerConnectionInterface::RTCConfiguration config;
+  webrtc::PeerConnectionInterface::IceServer server;
+  server.uri = GetPeerConnectionString();
+  alLogger() << server.uri;
+  config.servers.push_back(server);
+
+  alLogger() << "some 2";
+
+  webrtc::FakeConstraints constraints;
+  if (dtls) {
+    constraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp,
+                            "true");
+  } else {
+    constraints.AddOptional(webrtc::MediaConstraintsInterface::kEnableDtlsSrtp,
+                            "false");
+  }
+
+  alLogger() << "some 2.5";
+  std::cout << peer_connection_factory_ << std::endl;
+
+  m_peer_connection_ = peer_connection_factory_->CreatePeerConnection(
+      config, &constraints, NULL, NULL, this);
+
+  alLogger() << "some 3";
+
+  return m_peer_connection_.get() != NULL;
 }
 
 void Conductor::DeletePeerConnection() {

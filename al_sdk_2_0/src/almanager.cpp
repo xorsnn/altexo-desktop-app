@@ -42,7 +42,9 @@ bool AlManager::hasConnections() {
   if (m_debug) {
     std::cout << "AlManager::hasConnections" << std::endl;
   }
-  return m_conductor->hasConnections();
+  // TODO: restore
+  // return m_conductor->hasConnections();
+  return false;
 }
 
 void AlManager::InitializePeerConnection() {
