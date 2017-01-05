@@ -9,8 +9,25 @@ def composeLink(line):
     ms = filter(lambda x: x <> '', map(lambda x: x.strip() if (x.strip()[-2:] == '.o') or (x.strip()[-2:] == '.a') else '', ms))
     return ms
 
+def composeStaticLibsSimple(staticLibs):
+    f = open('out/out_simple.cmake', 'w')
+
+    libs = []
+    for line in staticLibs:
+
+        libs.append(line.strip().replace('obj/', WEBRTC_DIR + '/obj/'))
+
+
+    f.write('SET (WEBRTC_LIBS_SIMPLE\n')
+
+    f.write("\n".join(map(lambda x: "\"" + x + "\"", libs)))
+
+    f.write(')\n')
+
+    f.close()
+
 def composeStaticLibs(staticLibs):
-    f = open('out.cmake', 'w')
+    f = open('out/out.cmake', 'w')
 
     libs = []
     for line in staticLibs:
@@ -34,7 +51,6 @@ def composeStaticLibs(staticLibs):
 
     f.write('SET (WEBRTC_LIBS\n')
 
-    # f.write("\n  PUBLIC ".join(libs))
     f.write("\n".join(map(lambda x: " PUBLIC " + x, libs)))
 
     f.write(')\n')
@@ -43,10 +59,8 @@ def composeStaticLibs(staticLibs):
 
 def composeObjectFiles(objectFiles):
 
-    f = open('outObj.cmake', 'w')
+    f = open('out/outObj.cmake', 'w')
     f.write("SET (OBJ_DEPS \n")
-    # for line in objectFiles:
-    #     print(line)
     f.write("\n".join(map(lambda x: x.strip().replace('obj/', '${WEBRTCBUILD}/obj/'), objectFiles)))
     f.write(')\n')
     f.close()
@@ -60,11 +74,10 @@ def main():
 
             oFiles = filter(lambda x: x[-2:] == ".o" and not "examples" in x, libs)
             composeObjectFiles(oFiles)
-            # print(oFiles)
 
             aFiles = filter(lambda x: x[-2:] == ".a", libs)
             composeStaticLibs(aFiles)
-            # print(aFiles)
+            composeStaticLibsSimple(aFiles)
 
     f.close()
 
