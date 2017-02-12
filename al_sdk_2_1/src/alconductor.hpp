@@ -25,6 +25,24 @@
 // #include "webrtc/base/arraysize.h"
 // #include "webrtc/base/common.h"
 // #include "webrtc/base/logging.h"
+#include <deque>
+#include <map>
+#include <set>
+#include <string>
+
+#include "chromium/src/breakpad/src/common/scoped_ptr.h"
+// #include "peer_connection_client.h"
+
+#include "defaults.h"
+
+#include "webrtc/base/common.h"
+#include "webrtc/base/json.h"
+#include "webrtc/base/logging.h"
+
+// #include "alcallback.h"
+#include "altextmessage.hpp"
+// #include "alvideorenderer.h"
+// #include "conductor/aldatamanager.h"
 // =============================
 //
 #include "webrtc/api/mediastreaminterface.h"

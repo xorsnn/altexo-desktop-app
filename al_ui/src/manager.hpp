@@ -52,6 +52,7 @@ public:
   int getDeviceType() { return m_videoDeviceType; }
 
   boost::shared_ptr<AlSdkAPI> m_sdk;
+  // AlSdkAPI *m_sdk;
   boost::shared_ptr<AlWsAPI> m_wsClient;
   // TODO remove I think
   boost::shared_ptr<AlPluginTestAPI> m_plugin_test;

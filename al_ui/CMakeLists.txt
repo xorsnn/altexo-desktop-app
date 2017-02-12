@@ -32,15 +32,9 @@ file( COPY res/cto_intro.png DESTINATION . )
 # shaders
 file( COPY ${SHADERS_LIST} DESTINATION ./shaders )
 
-# definitions
-# add_definitions(-mavx2)
-# add_definitions(-mavx)
-
 if (WIN32)
 else()
-# Use our modified FindSDL2* modules
-set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${${PROJECT_NAME}_SOURCE_DIR}/cmake")
-# set(CMAKE_AUTOMOC ON)
+  set(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${${PROJECT_NAME}_SOURCE_DIR}/cmake")
 endif()
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
@@ -64,21 +58,21 @@ else()
 set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 endif()
 
-# set_target_properties(${PROJECT_NAME} PROPERTIES COMPILE_FLAGS "-m64" LINK_FLAGS "-m64")
-# set_target_properties("al_ui.run" PROPERTIES COMPILE_FLAGS "-m64" LINK_FLAGS "-m64")
 if (WIN32)
   # set Boost dir
   set(BOOST_ROOT "C:\\local\\boost_1_61_0")
   set(BOOST_LIBRARYDIR "C:\\local\\boost_1_61_0\\lib32-msvc-14.0")
 else()
-if (APPLE)
-  FIND_PACKAGE( glm REQUIRED )
-  FIND_LIBRARY( QUICKTIME QTKit )
-endif()
-FIND_PACKAGE( SDL2 REQUIRED )
-FIND_PACKAGE( GLEW REQUIRED )
-# used for testing now
-FIND_PACKAGE( PNG REQUIRED )
+
+  if (APPLE)
+    FIND_PACKAGE( glm REQUIRED )
+    FIND_LIBRARY( QUICKTIME QTKit )
+  endif()
+
+  FIND_PACKAGE( SDL2 REQUIRED )
+  FIND_PACKAGE( GLEW REQUIRED )
+  # used for testing now
+  FIND_PACKAGE( PNG REQUIRED )
 endif()
 
 FIND_PACKAGE( Boost COMPONENTS system filesystem thread log REQUIRED )
@@ -90,20 +84,19 @@ elseif(UNIX)
 endif()
 
 if(UNIX)
-INCLUDE_DIRECTORIES( ${SDL2_INCLUDE_DIR} )
-INCLUDE_DIRECTORIES( ${GLM_INCLUDE_DIRS} )
-INCLUDE_DIRECTORIES( ${OPENGL_INCLUDE_DIR} )
-INCLUDE_DIRECTORIES( ${PNG_INCLUDE_DIR} )
-if (GLEW_FOUND)
-    INCLUDE_DIRECTORIES(${GLEW_INCLUDE_DIRS})
-    link_libraries(${GLEW_LIBRARIES})
-endif()
+  INCLUDE_DIRECTORIES( ${SDL2_INCLUDE_DIR} )
+  INCLUDE_DIRECTORIES( ${GLM_INCLUDE_DIRS} )
+  INCLUDE_DIRECTORIES( ${OPENGL_INCLUDE_DIR} )
+  INCLUDE_DIRECTORIES( ${PNG_INCLUDE_DIR} )
+  if (GLEW_FOUND)
+      INCLUDE_DIRECTORIES(${GLEW_INCLUDE_DIRS})
+      link_libraries(${GLEW_LIBRARIES})
+  endif()
 # win32
 else()
   INCLUDE_DIRECTORIES( "D:\\WORKSPACE\\BUILD_ALTEXO\\glew-2.0.0\\include" )
   INCLUDE_DIRECTORIES( "D:\\WORKSPACE\\BUILD_ALTEXO\\SDL2-2.0.4\\build\\include" )
   INCLUDE_DIRECTORIES( "D:\\WORKSPACE\\BUILD_ALTEXO\\glm" )
-  # INCLUDE_DIRECTORIES( "D:\\WORKSPACE\\BUILD_ALTEXO\\lpng1624\\build" )
 endif()
 
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
@@ -160,13 +153,12 @@ elseif(UNIX)
     -lal_utils
     -lboost_log_setup
     -lpng
+    "/home/xors/workspace/lib/webrtc-checkout/src/out/Default/libprotobuf_lite.so"
     -ldl)
 elseif(WIN32)
   target_link_libraries(${PROJECT_NAME}
     "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_system-vc140-mt-1_61.lib"
     "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_filesystem-vc140-mt-1_61.lib"
-    # debug "${progdll_dbg_libs}"
-    # optimized "${progdll_opt_libs}"
 
     "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_date_time-vc140-mt-1_61.lib"
     "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_chrono-vc140-mt-1_61.lib"

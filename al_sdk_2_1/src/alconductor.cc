@@ -59,7 +59,7 @@ bool AlConductor::CreatePeerConnection(bool dtls) {
   ASSERT(peer_connection_factory_.get() != NULL);
   ASSERT(peer_connection_.get() == NULL);
 
-  // webrtc::PeerConnectionInterface::RTCConfiguration config;
+  webrtc::PeerConnectionInterface::RTCConfiguration config;
   webrtc::PeerConnectionInterface::IceServer server;
   // server.uri = GetPeerConnectionString();
   // config.servers.push_back(server);

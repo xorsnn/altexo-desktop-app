@@ -1,5 +1,5 @@
 #include "manager.hpp"
-#include "boost/dll/import.hpp"
+#include "AL_API/alwebrtcpluginapi.hpp"
 #include "boost/function.hpp"
 #include "boost/shared_ptr.hpp"
 #include <boost/dll/import.hpp>
@@ -125,7 +125,8 @@ void Manager::initWsConnection(AlWsCb *alWsCb) {
 
 void Manager::initSdk() {
   boost::filesystem::path lib_path("");
-  BOOST_LOG_SEV(lg, debug) << "Loading sdk plugin";
+  alLogger() << "Loading sdk plugin";
+
 #ifdef __APPLE__
   m_sdk =
       boost::dll::import<AlSdkAPI>(lib_path / "libaltexo_sdk.dylib", "plugin",
@@ -155,10 +156,20 @@ void Manager::initSdk() {
   /* create the plugin */
   m_sdk = pluginCreator();
 #else
-  m_sdk =
-      boost::dll::import<AlSdkAPI>(lib_path / "libaltexo_sdk_2_0.so", "plugin",
-                                   boost::dll::load_mode::append_decorations);
-// boost::dll::load_mode::default_mode);
+  // m_sdk =
+  //     boost::dll::import<AlSdkAPI>(lib_path / "libaltexo_sdk_2_0.so",
+  //     "plugin",
+  //                                  boost::dll::load_mode::append_decorations);
+  boost::filesystem::path lib_path2(
+      "/home/xors/workspace/lib/webrtc-checkout/src/out/Default");
+
+  boost::shared_ptr<AlWebRtcPluginApi> plugin;
+  alLogger() << "Loading the plugin";
+
+  plugin = boost::dll::import<AlWebRtcPluginApi>(
+      lib_path2 / "libpeerconnection_2.so", "plugin",
+      boost::dll::load_mode::append_decorations);
+  m_sdk = boost::shared_ptr<AlSdkAPI>(plugin->createSdkApi());
 #endif
 #endif
   m_sdk->init(this);

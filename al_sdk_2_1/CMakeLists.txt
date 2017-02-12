@@ -1,4 +1,4 @@
-project(altexo_sdk_tester.run)
+project(altexo_sdk_tester)
 cmake_minimum_required(VERSION 2.8)
 
 message("********************************")
@@ -28,9 +28,7 @@ if (APPLE)
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -g  -pipe -fno-rtti -fPIC -D_GLIBCXX_USE_CXX11_ABI=0 -O0 -std=c++11 -Wall -W -D_REENTRANT")
   set(CMAKE_SHARED_LINKER_FLAGS "${CMAKE_SHARED_LINKER_FLAGS} -undefined dynamic_lookup")
 elseif(UNIX)
-  # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fvisibility-inlines-hidden -Wno-undefined-bool-conversion -Wno-tautological-undefined-compare -std=gnu++11 -fno-rtti -fno-exceptions -Wnon-virtual-dtor -Woverloaded-virtual")
-  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -std=c++11 -fPIC")
-
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS}  -fPIC -fvisibility-inlines-hidden -Wno-undefined-bool-conversion -Wno-tautological-undefined-compare -std=gnu++11 -fno-rtti -fno-exceptions -Wnon-virtual-dtor -Woverloaded-virtual")
   # set(CMAKE_C_FLAGS "${CMAKE_CXX_FLAGS} -fno-strict-aliasing --param=ssp-buffer-size=4 -fstack-protector -funwind-tables -fPIC -pipe  -fcolor-diagnostics  -m64 -march=x86-64 -pthread -Wall -Werror -Wextra -Wno-missing-field-initializers -Wno-unused-parameter -Wno-c++11-narrowing -Wno-covered-switch-default -Wno-deprecated-register -Wno-unneeded-internal-declaration -Wno-inconsistent-missing-override -Wno-shift-negative-value -Wno-undefined-var-template -Wno-nonportable-include-path -Wno-address-of-packed-member -O0 -fno-omit-frame-pointer -g2 -gsplit-dwarf --sysroot=../../build/linux/debian_wheezy_amd64-sysroot -fvisibility=hidden -Wheader-hygiene -Wstring-conversion -Wtautological-overlap-compare -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -Wno-strict-overflow -Wimplicit-fallthrough -Wthread-safety -Winconsistent-missing-override -Wundef -Wno-inconsistent-missing-override")
   # set(CMAKE_C_FLAGS "${CMAKE_C_FLAGS} -fno-strict-aliasing --param=ssp-buffer-size=4 -fstack-protector -funwind-tables -fPIC -pipe  -fcolor-diagnostics  -m64 -march=x86-64  -Wall -Werror -Wextra -Wno-missing-field-initializers -Wno-unused-parameter -Wno-c++11-narrowing -Wno-covered-switch-default -Wno-deprecated-register -Wno-unneeded-internal-declaration -Wno-inconsistent-missing-override -Wno-shift-negative-value -Wno-undefined-var-template -Wno-nonportable-include-path -Wno-address-of-packed-member -O0 -fno-omit-frame-pointer -g2 -gsplit-dwarf --sysroot=../../build/linux/debian_wheezy_amd64-sysroot -fvisibility=hidden -Wheader-hygiene -Wstring-conversion -Wtautological-overlap-compare -Wextra -Wno-unused-parameter -Wno-missing-field-initializers -Wno-strict-overflow -Wimplicit-fallthrough -Wthread-safety -Winconsistent-missing-override -Wundef -Wno-inconsistent-missing-override")
 endif()
@@ -55,38 +53,38 @@ if (WIN32)
   add_definitions(-DPOSIX)
   add_definitions(-DNOMINMAX)
 else()
-  # add_definitions(-DV8_DEPRECATION_WARNINGS)
-  # add_definitions(-DUSE_UDEV)
-  # add_definitions(-DUI_COMPOSITOR_IMAGE_TRANSPORT)
-  # add_definitions(-DUSE_AURA=1)
-  # add_definitions(-DUSE_PANGO=1)
-  # add_definitions(-DUSE_CAIRO=1)
-  # add_definitions(-DUSE_GLIB=1)
-  # add_definitions(-DUSE_NSS_CERTS=1)
-  # add_definitions(-DUSE_X11=1)
-  # add_definitions(-DFULL_SAFE_BROWSING)
-  # add_definitions(-DSAFE_BROWSING_CSD)
-  # add_definitions(-DSAFE_BROWSING_DB_LOCAL)
-  # add_definitions(-DCHROMIUM_BUILD)
-  # add_definitions(-DENABLE_MEDIA_ROUTER=1)
-  # add_definitions(-DFIELDTRIAL_TESTING_ENABLED)
-  # add_definitions(-DCR_CLANG_REVISION=289944-2)
-  # add_definitions(-D_FILE_OFFSET_BITS=64)
-  # add_definitions(-D_LARGEFILE_SOURCE)
-  # add_definitions(-D_LARGEFILE64_SOURCE)
-  # add_definitions(-D__STDC_CONSTANT_MACROS)
-  # add_definitions(-D__STDC_FORMAT_MACROS)
-  # add_definitions(-DCOMPONENT_BUILD)
-  # add_definitions(-D_DEBUG)
-  # add_definitions(-DDYNAMIC_ANNOTATIONS_ENABLED=1)
-  # add_definitions(-DWTF_USE_DYNAMIC_ANNOTATIONS=1)
-  # add_definitions(-D_GLIBCXX_DEBUG=1)
-  # add_definitions(-DWEBRTC_INCLUDE_INTERNAL_AUDIO_DEVICE)
-  # add_definitions(-DEXPAT_RELATIVE_PATH)
-  # add_definitions(-DHAVE_SCTP)
-  # add_definitions(-DWEBRTC_POSIX)
-  # add_definitions(-DWEBRTC_LINUX)
-  # add_definitions(-DWEBRTC_BUILD_LIBEVENT)
+  add_definitions(-DV8_DEPRECATION_WARNINGS)
+  add_definitions(-DUSE_UDEV)
+  add_definitions(-DUI_COMPOSITOR_IMAGE_TRANSPORT)
+  add_definitions(-DUSE_AURA=1)
+  add_definitions(-DUSE_PANGO=1)
+  add_definitions(-DUSE_CAIRO=1)
+  add_definitions(-DUSE_GLIB=1)
+  add_definitions(-DUSE_NSS_CERTS=1)
+  add_definitions(-DUSE_X11=1)
+  add_definitions(-DFULL_SAFE_BROWSING)
+  add_definitions(-DSAFE_BROWSING_CSD)
+  add_definitions(-DSAFE_BROWSING_DB_LOCAL)
+  add_definitions(-DCHROMIUM_BUILD)
+  add_definitions(-DENABLE_MEDIA_ROUTER=1)
+  add_definitions(-DFIELDTRIAL_TESTING_ENABLED)
+  add_definitions(-DCR_CLANG_REVISION=289944-2)
+  add_definitions(-D_FILE_OFFSET_BITS=64)
+  add_definitions(-D_LARGEFILE_SOURCE)
+  add_definitions(-D_LARGEFILE64_SOURCE)
+  add_definitions(-D__STDC_CONSTANT_MACROS)
+  add_definitions(-D__STDC_FORMAT_MACROS)
+  add_definitions(-DCOMPONENT_BUILD)
+  add_definitions(-D_DEBUG)
+  add_definitions(-DDYNAMIC_ANNOTATIONS_ENABLED=1)
+  add_definitions(-DWTF_USE_DYNAMIC_ANNOTATIONS=1)
+  add_definitions(-D_GLIBCXX_DEBUG=1)
+  add_definitions(-DWEBRTC_INCLUDE_INTERNAL_AUDIO_DEVICE)
+  add_definitions(-DEXPAT_RELATIVE_PATH)
+  add_definitions(-DHAVE_SCTP)
+  add_definitions(-DWEBRTC_POSIX)
+  add_definitions(-DWEBRTC_LINUX)
+  add_definitions(-DWEBRTC_BUILD_LIBEVENT)
 
 endif()
 
@@ -142,9 +140,8 @@ endif()
 # Creating library
 #
 if (UNIX)
-  # add_library(${PROJECT_NAME} SHARED ${SRC_LIST} ${OBJ_DEPS})
+  add_library(${PROJECT_NAME} SHARED ${SRC_LIST} ${OBJ_DEPS})
   # add_executable(${PROJECT_NAME} ${SRC_LIST} ${OBJ_DEPS})
-  add_executable(${PROJECT_NAME} ${SRC_LIST})
 else()
   # seems like only static is allowed for win
   add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
@@ -168,7 +165,6 @@ include_directories(${WEBRTCTRUNK}/third_party/jsoncpp/source/include)
 include_directories(${WEBRTCTRUNK}/chromium/src/third_party/libyuv/include)
 include_directories(../include/)
 INCLUDE_DIRECTORIES( ../al_utils/src )
-INCLUDE_DIRECTORIES( ../vendor/Boost.DLL/include/ )
 
 
 if(UNIX)
@@ -192,9 +188,9 @@ if (APPLE)
   )
 elseif(UNIX)
   TARGET_LINK_LIBRARIES(${PROJECT_NAME} PUBLIC
-    # -Wl,--start-group
-    # ${WEBRTC_LIBS_SIMPLE}
-    # -Wl,--end-group
+    -Wl,--start-group
+    ${WEBRTC_LIBS}
+    -Wl,--end-group
     -lpthread
     -lX11
     -lXcomposite
@@ -206,11 +202,7 @@ elseif(UNIX)
     -lm
     -ldl
     "/home/xors/workspace/ALTEXO/altexo/build/libal_utils.so"
-    # "/home/xors/workspace/ALTEXO/altexo/build/libaltexo_sdk_tester.so"
-    # boost_thread boost_system
-    ${Boost_FILESYSTEM_LIBRARY}
-    ${Boost_SYSTEM_LIBRARY}
-    ${Boost_THREAD_LIBRARY}
+    boost_thread boost_system
     "/home/xors/workspace/lib/webrtc-checkout/src/out/Default/libboringssl.so"
     "/home/xors/workspace/lib/webrtc-checkout/src/out/Default/libprotobuf_lite.so"
   )

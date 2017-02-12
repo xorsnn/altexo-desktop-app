@@ -3,6 +3,7 @@ import os
 
 DIRECTORY = 'out'
 WEBRTC_DIR = '/home/xors/workspace/lib/webrtc-checkout/src/out/Default'
+AL_LIB_DIR = '/home/xors/workspace/lib/webrtc-checkout/src/webrtc/examples/peerconnection_2'
 
 def composeLink(line):
     ms = line.split(' ')
@@ -65,6 +66,29 @@ def composeObjectFiles(objectFiles):
     f.write(')\n')
     f.close()
 
+def composeDefines(defs):
+    f = open('out/al-out-defines.cmake', 'w')
+    defLines = map(lambda x: "add_definitions(" + x + ")", defs)
+    f.write("\n".join(defLines))
+    f.close()
+
+def composeIncludeDirs(dirs):
+    f = open('out/al-includes.cmake', 'w')
+    defLines = map(lambda x: "INCLUDE_DIRECTORIES(" + x.replace("-I", "") + ")", dirs)
+    f.write("\n".join(defLines))
+    f.close()
+
+def composeLibFiles():
+    for root, dirs, files in os.walk(AL_LIB_DIR + "/src"):
+        for file in files:
+            # if file.endswith(".a"):
+                # print(os.path.join(root, file))
+                # print(file)
+            filePath = os.path.join(root, file)
+            print("\"" + filePath.replace(AL_LIB_DIR, "peerconnection_2") + "\",")
+                # lines.append('${WEBRTCBUILD}' + filePath.replace(WEBRTC_DIR, ''))
+    pass
+
 def main():
     f= open("out/peerconnection_client.ninja")
     for line in f.readlines():
@@ -79,7 +103,16 @@ def main():
             composeStaticLibs(aFiles)
             composeStaticLibsSimple(aFiles)
 
+        if "defines = " in line:
+            defs = line.replace("defines = ", "").split(" ")
+            composeDefines(map(lambda x: x.strip(), defs))
+
+        if "include_dirs = " in line:
+            composeIncludeDirs(line.replace("include_dirs = ", "").split(" "))
+
     f.close()
+
+    composeLibFiles()
 
 if __name__ == '__main__':
     main()

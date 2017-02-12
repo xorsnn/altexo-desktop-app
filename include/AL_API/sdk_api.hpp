@@ -19,6 +19,7 @@ public:
   virtual ~AlSdkAPI() {}
 
   virtual void init(AlSDKCb *alSdkCb) = 0;
+  virtual void init2() = 0;
   virtual void initializePeerConnection() = 0;
   virtual void setRemoteSdp(const char *sdp) = 0;
   virtual void setRemoteIceCandidate(std::vector<char> candidate) = 0;
