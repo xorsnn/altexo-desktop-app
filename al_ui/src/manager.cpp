@@ -1,5 +1,4 @@
 #include "manager.hpp"
-#include "AL_API/alwebrtcpluginapi.hpp"
 #include "boost/function.hpp"
 #include "boost/shared_ptr.hpp"
 #include <boost/dll/import.hpp>
@@ -31,7 +30,7 @@ Manager::Manager()
       m_id(""), m_peerId("-1"), m_videoDeviceName(""), m_videoDeviceType(-1),
       m_beenCalled(false), m_processingCandidates(false), m_calling(false),
       m_localCandidatesCounter(0), m_remoteCandidatesCounter(0) {
-  BOOST_LOG_SEV(lg, debug) << "Manager constructor";
+  alLogger() << "Manager constructor";
   sensorList.push_back(AlTextMessage::stringToMsg("Kinect"));
 }
 
@@ -65,7 +64,7 @@ void Manager::initHoloRenderer(SceneRenderer *holoRenderer) {
 
 void Manager::initSensor(AlSensorCb *sensorCb) {
   boost::filesystem::path lib_path("");
-  BOOST_LOG_SEV(lg, debug) << "Loading sensor plugin";
+  alLogger() << "Loading sensor plugin";
 
 #ifdef __APPLE__
   m_sensor = boost::dll::import<AlSensorAPI>(
@@ -94,20 +93,25 @@ void Manager::frameThread() {
   }
 }
 
+/*
+ * Serving separate thread for webrtc plugin
+ */
+void Manager::sdkThread() {
+  if (m_sdk) {
+    alLogger() << "start!";
+    m_sdk->init(this);
+    std::cout << m_sdk << std::endl;
+    alLogger() << "end!";
+  }
+}
+
+/*
+ * Init websocket connection
+ */
 void Manager::initWsConnection(AlWsCb *alWsCb) {
   boost::filesystem::path lib_path("");
-  BOOST_LOG_SEV(lg, debug) << "Loading ws plugin";
+  alLogger() << "Loading ws plugin";
 
-// TODO: remove when migrate to json rpc
-// #ifdef __APPLE__
-//   m_wsClient =
-//       boost::dll::import<AlWsAPI>(lib_path / "libws_client.dylib", "plugin",
-//                                   boost::dll::load_mode::append_decorations);
-// #else
-//   m_wsClient =
-//       boost::dll::import<AlWsAPI>(lib_path / "libws_client.so", "plugin",
-//                                   boost::dll::load_mode::append_decorations);
-// #endif
 #ifdef __APPLE__
   m_wsClient = boost::dll::import<AlWsAPI>(
       lib_path / "libjson_rpc_client.dylib", "plugin",
@@ -118,11 +122,11 @@ void Manager::initWsConnection(AlWsCb *alWsCb) {
                                   boost::dll::load_mode::append_decorations);
 #endif
   m_wsClient->init(alWsCb);
-
-  // TEST
-  // m_wsClient->sendMessage(AlTextMessage("{123}"));
 }
 
+/*
+ * Init SDK
+ */
 void Manager::initSdk() {
   boost::filesystem::path lib_path("");
   alLogger() << "Loading sdk plugin";
@@ -133,7 +137,7 @@ void Manager::initSdk() {
                                    boost::dll::load_mode::append_decorations);
 #else
 #ifdef _WIN32
-  BOOST_LOG_SEV(lg, debug) << "Boost DLL testing ...";
+  alLogger() << "Boost DLL testing ...";
 
   /* Load the plugin from current working path
    * (e.g. The plugin on Windows is ${CWD}/ProgPlug.dll )
@@ -141,7 +145,7 @@ void Manager::initSdk() {
   boostfs::path pluginPath = boostfs::current_path() /
                              boostfs::path("Release") /
                              boostfs::path("altexo_sdk");
-  BOOST_LOG_SEV(lg, debug) << "Load Plugin from " << pluginPath;
+  alLogger() << "Load Plugin from " << pluginPath;
 
   typedef boost::shared_ptr<AlSdkAPI>(PluginCreate)();
   boost::function<PluginCreate> pluginCreator;
@@ -156,39 +160,35 @@ void Manager::initSdk() {
   /* create the plugin */
   m_sdk = pluginCreator();
 #else
-  // m_sdk =
-  //     boost::dll::import<AlSdkAPI>(lib_path / "libaltexo_sdk_2_0.so",
-  //     "plugin",
-  //                                  boost::dll::load_mode::append_decorations);
   boost::filesystem::path lib_path2(
       "/home/xors/workspace/lib/webrtc-checkout/src/out/Default");
 
-  boost::shared_ptr<AlWebRtcPluginApi> plugin;
   alLogger() << "Loading the plugin";
 
-  plugin = boost::dll::import<AlWebRtcPluginApi>(
-      lib_path2 / "libpeerconnection_2.so", "plugin",
+  m_sdkPlugin = boost::dll::import<AlWebRtcPluginApi>(
+      lib_path2 / "libaltexosdk.so", "plugin",
       boost::dll::load_mode::append_decorations);
-  m_sdk = boost::shared_ptr<AlSdkAPI>(plugin->createSdkApi());
+  m_sdk = boost::shared_ptr<AlSdkAPI>(m_sdkPlugin->createSdkApi());
 #endif
 #endif
-  m_sdk->init(this);
-  // updateResolutionSignal.connect(
-  //     boost::bind(&AlSdkAPI::updateResolution, m_sdk, _1, _2));
-  // updateResolutionSignal(WIDTH, HEIGHT);
+  m_sdkThread = new boost::thread(&Manager::sdkThread, this);
+
+  updateResolutionSignal.connect(
+      boost::bind(&AlSdkAPI::updateResolution, m_sdk, _1, _2));
+  updateResolutionSignal(WIDTH, HEIGHT);
 }
 
 void Manager::onIceCandidateCb(AlTextMessage msg) {
-  BOOST_LOG_SEV(lg, debug) << "Manager::onIceCandidateCb";
-  BOOST_LOG_SEV(lg, debug) << msg.toString();
+  alLogger() << "Manager::onIceCandidateCb";
+  alLogger() << msg.toString();
 
   m_remoteCandidates.push(msg.toString());
   handleMessages();
 }
 
 void Manager::onSdpAnswerCb(AlTextMessage msg) {
-  BOOST_LOG_SEV(lg, debug) << "Manager::onSdpAnswerCb";
-  BOOST_LOG_SEV(lg, debug) << msg.toString();
+  alLogger() << "Manager::onSdpAnswerCb";
+  alLogger() << msg.toString();
 
   boost::property_tree::ptree pt;
   std::stringstream ss(msg.toString());
@@ -214,8 +214,8 @@ void Manager::onSdpAnswerCb(AlTextMessage msg) {
 void Manager::onSdpOfferCb(const char *cMsg) {
   alLogger() << "Manager::onSdpOfferCb";
   AlTextMessage msg = AlTextMessage::cStrToMsg(cMsg);
-  // BOOST_LOG_SEV(lg, debug) << "Manager::onSdpOfferCb";
-  // BOOST_LOG_SEV(lg, debug) << msg.toString();
+  // alLogger() << "Manager::onSdpOfferCb";
+  // alLogger() << msg.toString();
 
   // **
   // TODO: this is temprorary solution, we make messages similar to what we used
@@ -274,14 +274,15 @@ void Manager::setConnectionMode(std::string mode) {
 }
 
 void Manager::onLocalSdpCb(AlTextMessage sdp) {
-  BOOST_LOG_SEV(lg, debug) << "Manager::onLocalSdpCb";
-  BOOST_LOG_SEV(lg, debug) << sdp.toString();
+  alLogger() << "Manager::onLocalSdpCb";
+  alLogger() << sdp.toString();
 
   m_localSdp = sdp.toString();
   handleMessages();
 }
 void Manager::onLocalIceCandidateCb(AlTextMessage candidate) {
-  BOOST_LOG_SEV(lg, debug) << "Manager::onLocalIceCandidateCb";
+  alLogger() << "Manager::onLocalIceCandidateCb";
+  alLogger() << candidate.toString();
 
   m_localCandidates.push(candidate.toString());
   handleMessages();
@@ -316,8 +317,8 @@ void Manager::handleMessages() {
     m_processingCandidates = true;
     while (!m_localCandidates.empty()) {
       m_localCandidatesCounter++;
-      BOOST_LOG_SEV(lg, debug) << "local candidates: "
-                               << m_localCandidatesCounter;
+      alLogger() << "local candidates: ";
+      std::cout << m_localCandidatesCounter << std::endl;
 
       std::string candidate = m_localCandidates.front();
       m_localCandidates.pop();
@@ -325,8 +326,8 @@ void Manager::handleMessages() {
     }
     while (!m_remoteCandidates.empty()) {
       m_remoteCandidatesCounter++;
-      BOOST_LOG_SEV(lg, debug) << "remote candidates: "
-                               << m_remoteCandidatesCounter;
+      alLogger() << "remote candidates: ";
+      std::cout << m_remoteCandidatesCounter << std::endl;
 
       std::string candidate = m_remoteCandidates.front();
       m_remoteCandidates.pop();

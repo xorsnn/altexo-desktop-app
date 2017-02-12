@@ -2,6 +2,7 @@
 #define MANAGER_H
 
 #include "AL_API/al_plugin_test_api.hpp"
+#include "AL_API/alwebrtcpluginapi.hpp"
 #include "AL_API/sdk_api.hpp"
 #include "AL_API/sensor_api.hpp"
 #include "AL_API/ws_client_api.hpp"
@@ -23,6 +24,7 @@ public:
   ~Manager();
 
   void frameThread();
+  void sdkThread();
 
   // plugins init
   void initSensor(AlSensorCb *sensorCb);
@@ -67,7 +69,11 @@ private:
   void _initVideoDevice();
 
   boost::shared_ptr<AlSensorAPI> m_sensor;
+
   boost::thread *m_frameThread;
+  boost::thread *m_sdkThread;
+
+  boost::shared_ptr<AlWebRtcPluginApi> m_sdkPlugin;
 
   std::string m_id;
   std::string m_peerId;
