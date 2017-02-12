@@ -7,6 +7,7 @@
 #include "contact.hpp"
 #include "glelements/bottomplane.hpp"
 // #include "glelements/hologramtest.hpp"
+#include "allogger.hpp"
 #include "glelements/hologram.hpp"
 #include "glelements/worldcoordinate.hpp"
 #include "sensordatafborenderer.hpp"
@@ -50,7 +51,6 @@ public:
   void filterMouseMoves(float dx, float dy);
 
   void onWinResize(int winWidth, int winHeight);
-
 
   // Plain video stream renderer
   void updateRemoteFrame(const uint8_t *image, int width, int height);

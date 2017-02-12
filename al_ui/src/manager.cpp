@@ -358,6 +358,7 @@ void Manager::updateFrameCb(const uint8_t *image, int width, int height) {
 }
 
 void Manager::updateLocalFrameCb(const uint8_t *image, int width, int height) {
+  alLogger() << "Manager::updateLocalFrameCb";
   m_holoRenderer->updateLocalFrame(image, width, height);
 }
 

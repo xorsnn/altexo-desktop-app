@@ -30,10 +30,8 @@ VideoStreamRenderer::relativeToAbsolute(Borders relativeBorders, int winWidth,
 int VideoStreamRenderer::init() {
   // GL_CHECK_ERRORS
   // load the shader
-  shader.LoadFromFile(GL_VERTEX_SHADER,
-                      "shaders/videoStreamRenderer.vert");
-  shader.LoadFromFile(GL_FRAGMENT_SHADER,
-                      "shaders/videoStreamRenderer.frag");
+  shader.LoadFromFile(GL_VERTEX_SHADER, "shaders/videoStreamRenderer.vert");
+  shader.LoadFromFile(GL_FRAGMENT_SHADER, "shaders/videoStreamRenderer.frag");
   // compile and link shader
   shader.CreateAndLinkProgram();
   shader.Use();
@@ -101,6 +99,7 @@ void VideoStreamRenderer::render() {
   }
 
   if (m_newFrame) {
+    // alLogger() << "VideoStreamRenderer::render";
     m_remoteFrameMtx.lock();
     glActiveTexture(GL_TEXTURE4);
     glBindTexture(GL_TEXTURE_2D, sensorDepthTexID);
@@ -134,6 +133,7 @@ void VideoStreamRenderer::render() {
 
 void VideoStreamRenderer::updateFrame(const uint8_t *image, int width,
                                       int height) {
+  // alLogger() << "VideoStreamRenderer::updateFrame";
   boost::lock_guard<boost::mutex> guard(m_remoteFrameMtx);
   if (m_width != width || m_height != height) {
     m_width = width;

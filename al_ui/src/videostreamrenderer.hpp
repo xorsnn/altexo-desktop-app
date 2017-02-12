@@ -4,6 +4,7 @@
 #include "AL_API/sdk_api.hpp"
 #include "AL_CB/al_sensor_cb.hpp"
 #include "GLSLShader.hpp"
+#include "allogger.hpp"
 #include "contact.hpp"
 #include "sensordatafborenderer.hpp"
 #include <boost/signals2/signal.hpp>
