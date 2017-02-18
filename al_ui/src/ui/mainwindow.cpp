@@ -1,10 +1,6 @@
 #include "mainwindow.hpp"
-
 // #include "allogger.hpp"
 #include "alsettings.hpp"
-
-BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(
-    al_logger, boost::log::sources::severity_logger<severity_level>);
 
 MainWindow::MainWindow()
     : m_glcontext(NULL), m_window(NULL), m_mouseButtonPressed(-1),
@@ -31,7 +27,6 @@ MainWindow::MainWindow()
 }
 
 MainWindow::~MainWindow() {
-  BOOST_LOG_SEV(m_lg, debug) << "Desctucting main window!";
 
   // delete[] m_room;
   free(m_room);
@@ -101,8 +96,6 @@ void MainWindow::init() {
   // io.Fonts->AddFontFromFileTTF("../../extra_fonts/ProggyTiny.ttf", 10.0f);
   // io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f,
   // NULL, io.Fonts->GetGlyphRangesJapanese());
-
-  BOOST_LOG_SEV(m_lg, debug) << glGetString(GL_VERSION);
 }
 
 void MainWindow::run() {
@@ -120,11 +113,15 @@ void MainWindow::_render() {
 
   ImGui_ImplSdlGL3_NewFrame(m_window);
 
-  _drawContactList();
   _drawDeviceList();
   if (m_showRoomSelectDialog) {
     _drawRoomSelectDialog();
   }
+
+  /*
+   * NOTE: draw this only for debug
+   */
+  _drawSetTestSourceDialog();
 
   // 3. Show the ImGui test window. Most of the sample code is in
   // ImGui::ShowTestWindow()
@@ -146,6 +143,11 @@ void MainWindow::_render() {
   if (!m_sceneRenderer->sendingFrames && m_manager->connectionInitialized &&
       m_manager->getDeviceType() ==
           AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS) {
+    alLogger() << "======================================";
+    alLogger() << "======================================";
+    alLogger() << "AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS";
+    alLogger() << "======================================";
+    alLogger() << "======================================";
     m_sceneRenderer->initFrameSending(m_manager->m_sdk.get());
   }
 
@@ -225,39 +227,12 @@ void MainWindow::_drawDeviceList() {
       m_manager->setDeviceName(m_manager->sensorList[i],
                                AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS);
       // TODO: be sure init once
-      m_manager->initSensor(&(m_sceneRenderer->m_sensorDataFboRenderer));
+      m_manager->initSensor(&(m_sceneRenderer->m_sensorDataFboRenderer),
+                            Manager::KINECT_1);
     }
   }
   ImGui::EndChild();
   ImGui::End();
-}
-
-void MainWindow::_drawContactList() {
-  // TODO reimplement contact list later
-  // // 1. Show a simple window
-  // // Tip: if we don't call ImGui::Begin()/ImGui::End() the widgets appears
-  // // in
-  // // a window automatically called "Debug"
-  // {
-  //   ImGui::SetNextWindowSize(ImVec2(100, 400), ImGuiSetCond_Once);
-  //   ImGui::SetNextWindowPos(ImVec2(10, 10), ImGuiSetCond_Once);
-  //   ImGui::Begin("Contacts", NULL);
-  //   static int selected = 0;
-  //   ImGui::BeginChild("left pane", ImVec2(-1, 0), true);
-  //   for (int i = 0; i < m_manager->contactList.size(); i++) {
-  //     std::string lb =
-  //         m_manager->contactList[i].name + "-" +
-  //         m_manager->contactList[i].id;
-  //     // const char *label = m_manager->contactList[i].name.c_str();
-  //     const char *label = lb.c_str();
-  //     if (ImGui::Selectable(label, selected == i)) {
-  //       selected = i;
-  //       m_manager->callToPeer(m_manager->contactList[i].id);
-  //     }
-  //   }
-  //   ImGui::EndChild();
-  //   ImGui::End();
-  // }
 }
 
 void MainWindow::_drawRoomSelectDialog() {
@@ -280,6 +255,29 @@ void MainWindow::_drawRoomSelectDialog() {
     // TODO: run entering room
     m_manager->m_wsClient.get()->roomOpen(AlTextMessage(roomStr));
     m_showRoomSelectDialog = false;
+  }
+  ImGui::EndChild();
+  ImGui::End();
+}
+
+void MainWindow::_drawSetTestSourceDialog() {
+  int dialogWidth = 200;
+  int dialogHeight = 100;
+  ImGui::SetNextWindowSize(ImVec2(dialogWidth, dialogHeight),
+                           ImGuiSetCond_Once);
+  ImGui::SetNextWindowPos(ImVec2(m_winWidth / 2 - dialogWidth / 2,
+                                 m_winHeight / 2 - dialogHeight / 2 + 300),
+                          ImGuiSetCond_Once);
+  ImGui::Begin("Set test source", NULL,
+               ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
+                   ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+  ImGui::BeginChild("left pane", ImVec2(-1, 0), true);
+  if (ImGui::Button("set test source")) {
+    m_manager->setDeviceName(AlTextMessage::stringToMsg("test_source"),
+                             AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS);
+    // TODO: be sure init once
+    m_manager->initSensor(&(m_sceneRenderer->m_sensorDataFboRenderer),
+                          Manager::FAKE_SENSOR);
   }
   ImGui::EndChild();
   ImGui::End();

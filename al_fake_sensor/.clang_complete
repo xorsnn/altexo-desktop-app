@@ -1,0 +1,4 @@
+-I/usr/include/
+-I./include/
+-I../include/
+-I../vendor/Boost.DLL/include/

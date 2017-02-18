@@ -62,28 +62,39 @@ void Manager::initHoloRenderer(SceneRenderer *holoRenderer) {
   updateResolutionSignal(WIDTH, HEIGHT);
 }
 
-void Manager::initSensor(AlSensorCb *sensorCb) {
+void Manager::initSensor(AlSensorCb *sensorCb, SensorType sensorType) {
   boost::filesystem::path lib_path("");
   alLogger() << "Loading sensor plugin";
 
+  switch (sensorType) {
+  case KINECT_1: {
 #ifdef __APPLE__
-  m_sensor = boost::dll::import<AlSensorAPI>(
-      lib_path / "libal_kinect_1.dylib", "plugin",
-      boost::dll::load_mode::append_decorations);
+    m_sensor = boost::dll::import<AlSensorAPI>(
+        lib_path / "libal_kinect_1.dylib", "plugin",
+        boost::dll::load_mode::append_decorations);
 #else
-  m_sensor = boost::dll::import<AlSensorAPI>(
-      lib_path / "libal_kinect_1.so", "plugin",
-      boost::dll::load_mode::append_decorations);
+    m_sensor = boost::dll::import<AlSensorAPI>(
+        lib_path / "libal_kinect_1.so", "plugin",
+        boost::dll::load_mode::append_decorations);
 #endif
-
-  // TODO move this to call initialization
-  m_sensor->init(sensorCb);
-  // sensorList.push_back(AlTextMessage("Kinect"));
-  // set sensor as default source
-  // setDeviceName(sensorList[sensorList.size() - 1],
-  //               AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS);
-  // tread requesting new sensor frame every 30 times per second
-  m_frameThread = new boost::thread(&Manager::frameThread, this);
+    // TODO move this to call initialization
+    m_sensor->init(sensorCb);
+    // sensorList.push_back(AlTextMessage("Kinect"));
+    // set sensor as default source
+    m_frameThread = new boost::thread(&Manager::frameThread, this);
+    // setDeviceName(sensorList[sensorList.size() - 1],
+    //               AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS);
+    // tread requesting new sensor frame every 30 times per second
+  } break;
+  case FAKE_SENSOR: {
+    alLogger() << "FAKE_SENSOR";
+    m_sensor = boost::dll::import<AlSensorAPI>(
+        lib_path / "libal_fake_sensor.so", "plugin",
+        boost::dll::load_mode::append_decorations);
+    m_sensor->init(sensorCb);
+    m_frameThread = new boost::thread(&Manager::frameThread, this);
+  } break;
+  default: { } break; }
 }
 
 void Manager::frameThread() {

@@ -3,17 +3,12 @@
 #define MAINWINDOW_H
 
 #include <imgui/imgui.h>
-
 #include "imgui_impl_sdl_gl3.h"
 #include <GL/gl3w.h>
 // #define SDL_MAIN_HANDLED
 #include <SDL.h>
-#include <boost/log/sources/global_logger_storage.hpp>
-#include <boost/log/trivial.hpp>
 
 #include "manager.hpp"
-
-using namespace boost::log::trivial;
 
 class MainWindow {
 public:
@@ -29,9 +24,9 @@ private:
   void _handleWindowEvents();
   // drawing sections
   void _drawDeviceList();
-  void _drawContactList();
   void _drawRoomSelectDialog();
-
+  void _drawSetTestSourceDialog();
+  
   bool m_showRoomSelectDialog;
 
   SDL_GLContext m_glcontext;
@@ -50,8 +45,6 @@ private:
 
   SceneRenderer *m_sceneRenderer;
   Manager *m_manager;
-
-  boost::log::sources::severity_logger<severity_level> m_lg;
 };
 
 #endif // MAINWINDOW_H

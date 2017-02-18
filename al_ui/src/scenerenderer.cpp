@@ -79,11 +79,18 @@ void SceneRenderer::render() {
 
   m_sensorDataFboRenderer.render(WIDTH * 2, HEIGHT);
 
+  // alLogger() << "preSendingFrames";
   if (sendingFrames) {
+    // alLogger() << "sendingFrames";
     glReadPixels(0, 0, WIDTH * 2, HEIGHT, GL_RGB, GL_UNSIGNED_BYTE,
                  &(m_outPixel[0]));
     // TODO: NOT SURE IF IT IS OK TO MULTIPLY BY 2
     newFrameSignal(m_outPixel, WIDTH * 2, HEIGHT);
+
+    // NOTE: TESTING
+    // TODO: remove
+    // updateLocalFrame(&m_outPixel[0], WIDTH * 2, HEIGHT);
+    // updateRemoteFrame(&m_outPixel[0], WIDTH * 2, HEIGHT);
   }
 
   // ============ FBO ==============
@@ -109,8 +116,10 @@ void SceneRenderer::render() {
   }
 
   if (m_localStreamMode == HOLOGRAM) {
+    // alLogger() << "HOLOGRAM";
     m_hologram.render(&MVP);
   } else if (m_localStreamMode == AUDIO_VIDEO) {
+    // alLogger() << "VIDEO";
     m_localFrameRenderer.render();
   }
 
@@ -198,9 +207,7 @@ void SceneRenderer::OnStartMouseMove(int initX, int initY) {
   oldPanY = initY;
 }
 
-void SceneRenderer::onZoom(int deltaZoom) {
-  cam.Zoom(deltaZoom * 100.0f);
-}
+void SceneRenderer::onZoom(int deltaZoom) { cam.Zoom(deltaZoom * 100.0f); }
 
 void SceneRenderer::onPan(int x, int y) {
   float dy = float(y - oldPanY) / 5.0f;
