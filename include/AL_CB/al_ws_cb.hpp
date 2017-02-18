@@ -8,7 +8,7 @@
 class AlWsCb {
 public:
   virtual void onIceCandidateCb(AlTextMessage msg) = 0;
-  virtual void onSdpOfferCb(AlTextMessage msg) = 0;
+  virtual void onSdpOfferCb(const char *msg) = 0;
   virtual void onSdpAnswerCb(AlTextMessage msg) = 0;
   virtual void onInitCall() = 0;
 };

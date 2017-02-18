@@ -23,7 +23,7 @@ public:
   void sendMessageToPeer(AlTextMessage peerId, AlTextMessage msg);
   void sendMessage(AlTextMessage msg);
 
-  void sendSdpOffer(AlTextMessage msg);
+  void sendSdpOffer(const char *cMsg);
   void sendSdpAnswer(AlTextMessage msg);
   void sendIceCandidate(AlTextMessage msg);
 

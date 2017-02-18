@@ -8,10 +8,14 @@ using namespace std;
 AlSdkPlugin::AlSdkPlugin()
     : m_debug(true), WIDTH(0), HEIGHT(0), m_videoDeviceName(""),
       m_internalThread(NULL) {
+
+  std::cout << "1111111111111111111111111111" << std::endl;
+  std::cout << "1111111111111111111111111111" << std::endl;
+  std::cout << "1111111111111111111111111111" << std::endl;
   if (m_debug) {
     std::cout << "AlSdkPlugin::AlSdkPlugin()" << std::endl;
   }
-  m_manager = new AlManager();
+  // m_manager = new AlManager();
 }
 
 AlSdkPlugin::~AlSdkPlugin() {
@@ -53,18 +57,6 @@ void AlSdkPlugin::initializePeerConnection() {
                                         std::vector<char>());
   m_messageQueue.push(msg);
 }
-
-// bool AlSdkPlugin::hasConnections() { return m_manager->hasConnections(); }
-// void AlSdkPlugin::DeletePeerConnection() { m_manager->DeletePeerConnection();
-// }
-// bool AlSdkPlugin::isClientConnected() {
-//   return m_manager->m_client.is_connected();
-// }
-// void AlSdkPlugin::clientConnect(const std::string &server, int port,
-//                                 const std::string &client_name) {
-//   m_manager->m_client.Connect(server, port, client_name);
-// }
-// void AlSdkPlugin::clientSignOut() { m_manager->m_client.SignOut(); }
 
 void AlSdkPlugin::setDesiredDataSource(int dataSource) {
   m_manager->setDesiredDataSource(dataSource);

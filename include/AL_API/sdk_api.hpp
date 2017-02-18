@@ -19,11 +19,12 @@ public:
   virtual ~AlSdkAPI() {}
 
   virtual void init(AlSDKCb *alSdkCb) = 0;
+  virtual void init2() = 0;
   virtual void initializePeerConnection() = 0;
-  virtual void setRemoteSdp(std::vector<char> sdp) = 0;
+  virtual void setRemoteSdp(const char *sdp) = 0;
   virtual void setRemoteIceCandidate(std::vector<char> candidate) = 0;
   virtual void setDesiredDataSource(int dataSource) = 0;
-  virtual void setDesiredVideDeviceName(AlTextMessage deviceName) = 0;
+  virtual void setDesiredVideDeviceName(const char *deviceName) = 0;
   virtual void setImageData(std::vector<unsigned char> imageBytes, int width,
                             int height) = 0;
   virtual void updateResolution(int widht, int height) = 0;

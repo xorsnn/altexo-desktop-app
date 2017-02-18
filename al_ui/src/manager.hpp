@@ -2,10 +2,12 @@
 #define MANAGER_H
 
 #include "AL_API/al_plugin_test_api.hpp"
+#include "AL_API/alwebrtcpluginapi.hpp"
 #include "AL_API/sdk_api.hpp"
 #include "AL_API/sensor_api.hpp"
 #include "AL_API/ws_client_api.hpp"
 #include "AL_CB/al_sdk_cb.hpp"
+#include "allogger.hpp"
 #include "contact.hpp"
 #include "scenerenderer.hpp"
 #include <boost/dll/import.hpp>
@@ -18,26 +20,32 @@
 
 class Manager : public AlWsCb, public AlSDKCb {
 public:
+  enum SensorType {
+    KINECT_1 = 1,
+    FAKE_SENSOR,
+  };
+
   Manager();
   ~Manager();
 
   void frameThread();
+  void sdkThread();
 
   // plugins init
-  void initSensor(AlSensorCb *sensorCb);
+  void initSensor(AlSensorCb *sensorCb, SensorType sensorType);
   void initWsConnection(AlWsCb *alWsCb);
   void initSdk();
 
   // ws cb
   void onIceCandidateCb(AlTextMessage msg);
   void onSdpAnswerCb(AlTextMessage msg);
-  void onSdpOfferCb(AlTextMessage msg);
+  void onSdpOfferCb(const char *msg);
   void onInitCall();
 
   // sdk cb
   void onLocalSdpCb(AlTextMessage sdp);
   void onLocalIceCandidateCb(AlTextMessage candidate);
-  void onDevicesListChangedCb(std::vector<AlTextMessage> deviceNames);
+  void onNewCaptureDeciceCb(const char *newDeviceName);
   void updateFrameCb(const uint8_t *image, int width, int height); // REMOTE
   void updateLocalFrameCb(const uint8_t *image, int width, int height); // LOCAL
 
@@ -47,7 +55,7 @@ public:
   void handleMessages();
   void initHoloRenderer(SceneRenderer *holoRenderer);
 
-  void setDeviceName(AlTextMessage deviceNama, int deviceType);
+  void setDeviceName(alMsg deviceNama, int deviceType);
   int getDeviceType() { return m_videoDeviceType; }
 
   boost::shared_ptr<AlSdkAPI> m_sdk;
@@ -56,8 +64,8 @@ public:
   boost::shared_ptr<AlPluginTestAPI> m_plugin_test;
 
   std::vector<CONTACT> contactList;
-  std::vector<AlTextMessage> webcamList;
-  std::vector<AlTextMessage> sensorList;
+  std::vector<alMsg> webcamList;
+  std::vector<alMsg> sensorList;
 
   bool connectionInitialized = false;
 
@@ -65,7 +73,11 @@ private:
   void _initVideoDevice();
 
   boost::shared_ptr<AlSensorAPI> m_sensor;
+
   boost::thread *m_frameThread;
+  boost::thread *m_sdkThread;
+
+  boost::shared_ptr<AlWebRtcPluginApi> m_sdkPlugin;
 
   std::string m_id;
   std::string m_peerId;

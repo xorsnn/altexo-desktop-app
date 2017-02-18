@@ -1,4 +1,5 @@
 #include "sensordatafborenderer.hpp"
+#include "allogger.hpp"
 
 SensorDataFboRenderer::SensorDataFboRenderer() : m_debug(true) {}
 
@@ -9,8 +10,7 @@ int SensorDataFboRenderer::init() {
   // GL_CHECK_ERRORS
   // load the shader
   shader.LoadFromFile(GL_VERTEX_SHADER, "shaders/sensorCompose.vert");
-  shader.LoadFromFile(GL_FRAGMENT_SHADER,
-                      "shaders/sensorCompose.frag");
+  shader.LoadFromFile(GL_FRAGMENT_SHADER, "shaders/sensorCompose.frag");
   // compile and link shader
   shader.CreateAndLinkProgram();
   shader.Use();
@@ -118,6 +118,7 @@ void SensorDataFboRenderer::render(int viewWidth, int viewHeight) {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIndicesID);
 
   if (m_newFrame) {
+    alLogger() << "new frame";
     // allocate texture
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, sensorRGBTexID);

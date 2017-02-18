@@ -34,11 +34,14 @@ endif()
 if (APPLE)
   set(WEBRTCTRUNK "/Volumes/MAC/workspace/WEBRTC/webrtc/src")
 elseif(UNIX)
-  set(WEBRTCTRUNK "/home/xors/workspace/ALTEXO/webrtc/src")
+  # set(WEBRTCTRUNK "/home/xors/workspace/ALTEXO/webrtc/src")
+  set(WEBRTCTRUNK "/home/xors/workspace/lib/webrtc-checkout/src")
+
 elseif (WIN32)
   set(WEBRTCTRUNK "D:\\WORKSPACE\\webrtc\\src")
 endif()
-set(WEBRTCBUILD "${WEBRTCTRUNK}/out/Release")
+# set(WEBRTCBUILD "${WEBRTCTRUNK}/out/Release")
+set(WEBRTCBUILD "${WEBRTCTRUNK}/out/Default")
 
 ##
 # DEFINES
@@ -125,6 +128,7 @@ include_directories(${WEBRTCTRUNK}/third_party/webrtc/)
 include_directories(${WEBRTCTRUNK}/webrtc/net/third_party/nss/ssl)
 include_directories(${WEBRTCTRUNK}/third_party/jsoncpp/overrides/include)
 include_directories(${WEBRTCTRUNK}/third_party/jsoncpp/source/include)
+include_directories(${WEBRTCTRUNK}/chromium/src/third_party/libyuv/include)
 include_directories(../include/)
 
 ##
@@ -162,6 +166,9 @@ elseif(UNIX)
     -Wl,--start-group
     ${WEBRTC_LIBS}
     -Wl,--end-group
+    # -Wl,--start-group
+    # ${WEBRTC_VENDOR_LIBS}
+    # -Wl,--end-group
     -lpthread
     -lX11 -lXfixes -lXi -lXcomposite -lXext -lXrender -ldl -lrt -lexpat -lXrandr -lm -ldl
     boost_thread boost_system

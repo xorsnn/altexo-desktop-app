@@ -30,7 +30,6 @@
 #include "webrtc/base/logging.h"
 
 #include "alcallback.h"
-#include "allocalvideorenderer.h"
 #include "alvideorenderer.h"
 #include "conductor/aldatamanager.h"
 
@@ -197,7 +196,7 @@ protected:
   bool m_isAcceptingConnection;
 
   // local renderer
-  google_breakpad::scoped_ptr<AlLocalVideoRenderer> m_localRenderer;
+  google_breakpad::scoped_ptr<AlVideoRenderer> m_localRenderer;
   // remote renderer
   google_breakpad::scoped_ptr<AlVideoRenderer> m_remoteRenderer;
 

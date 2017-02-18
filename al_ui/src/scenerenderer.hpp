@@ -3,12 +3,13 @@
 
 #include "AL_API/sdk_api.hpp"
 #include "AL_CB/al_sensor_cb.hpp"
-#include "GLSLShader.hpp"
+#include "allogger.hpp"
 #include "contact.hpp"
 #include "glelements/bottomplane.hpp"
-// #include "glelements/hologramtest.hpp"
 #include "glelements/hologram.hpp"
+// #include "glelements/hologramtest.hpp"
 #include "glelements/worldcoordinate.hpp"
+#include "GLSLShader.hpp"
 #include "sensordatafborenderer.hpp"
 #include "targetcamera.h"
 #include "videostreamrenderer.hpp"
@@ -50,7 +51,6 @@ public:
   void filterMouseMoves(float dx, float dy);
 
   void onWinResize(int winWidth, int winHeight);
-
 
   // Plain video stream renderer
   void updateRemoteFrame(const uint8_t *image, int width, int height);

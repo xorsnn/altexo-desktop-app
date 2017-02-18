@@ -64,7 +64,7 @@ Conductor::Conductor(PeerConnectionClient *client, AlCallback *alCallback,
   std::vector<std::string> device_names;
   {
     std::unique_ptr<webrtc::VideoCaptureModule::DeviceInfo> info(
-        webrtc::VideoCaptureFactory::CreateDeviceInfo(0));
+        webrtc::VideoCaptureFactory::CreateDeviceInfo());
     if (info) {
       int num_devices = info->NumberOfDevices();
       for (int i = 0; i < num_devices; ++i) {
@@ -166,15 +166,19 @@ void Conductor::DeletePeerConnection() {
   }
   m_peerConnection = NULL;
   m_activeStreams.clear();
+
   m_alCallback->stopLocalRendererCb();
   m_alCallback->stopRemoteRendererCb();
+
   peer_connection_factory_ = NULL;
   loopback_ = false;
 }
 
+// TODO: remove method
 void Conductor::EnsureStreamingUI() {
   ASSERT(m_peerConnection.get() != NULL);
-  m_alCallback->ensureStreamingUICb();
+  // TODO: remove
+  // m_alCallback->ensureStreamingUICb();
   //    if (m_alCallback->IsWindow()) {
   //        if (m_alCallback->current_ui() != MainWnd::STREAMING)
   //            m_alCallback->SwitchToStreamingUI();
@@ -466,7 +470,7 @@ cricket::VideoCapturer *Conductor::OpenVideoCaptureDevice() {
     std::vector<std::string> device_names;
     {
       std::unique_ptr<webrtc::VideoCaptureModule::DeviceInfo> info(
-          webrtc::VideoCaptureFactory::CreateDeviceInfo(0));
+          webrtc::VideoCaptureFactory::CreateDeviceInfo());
       if (!info) {
         return nullptr;
       }
@@ -518,11 +522,12 @@ void Conductor::AddStreams() {
 
   rtc::scoped_refptr<webrtc::VideoTrackInterface> video_track(
       peer_connection_factory_->CreateVideoTrack(
-          kVideoLabel, peer_connection_factory_->CreateVideoSource(
-                           OpenVideoCaptureDevice(), NULL)));
+          kVideoLabel,
+          peer_connection_factory_->CreateVideoSource(OpenVideoCaptureDevice(),
+                                                      NULL)));
 
   // Starting local renderer
-  m_localRenderer.reset(new AlLocalVideoRenderer(1, video_track, m_alCallback));
+  m_localRenderer.reset(new AlVideoRenderer(1, video_track, m_alCallback));
 
   rtc::scoped_refptr<webrtc::MediaStreamInterface> stream =
       peer_connection_factory_->CreateLocalMediaStream(kStreamLabel);
