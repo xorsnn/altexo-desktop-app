@@ -80,7 +80,7 @@ void SceneRenderer::render() {
   m_sensorDataFboRenderer.render(WIDTH * 2, HEIGHT);
 
   // alLogger() << "preSendingFrames";
-  if (sendingFrames) {
+  if (sendingFrames || true) {
     // alLogger() << "sendingFrames";
     glReadPixels(0, 0, WIDTH * 2, HEIGHT, GL_RGB, GL_UNSIGNED_BYTE,
                  &(m_outPixel[0]));
@@ -90,7 +90,7 @@ void SceneRenderer::render() {
     // NOTE: TESTING
     // TODO: remove
     // updateLocalFrame(&m_outPixel[0], WIDTH * 2, HEIGHT);
-    // updateRemoteFrame(&m_outPixel[0], WIDTH * 2, HEIGHT);
+    updateRemoteFrame(&m_outPixel[0], WIDTH * 2, HEIGHT);
   }
 
   // ============ FBO ==============
