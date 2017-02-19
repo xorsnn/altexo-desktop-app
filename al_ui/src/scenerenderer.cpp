@@ -1,8 +1,8 @@
 #include "scenerenderer.hpp"
 
 SceneRenderer::SceneRenderer(int winWidth, int winHeight)
-    : WIDTH(0), HEIGHT(0), m_outPixel(0), pendingRenderTexResize(false),
-      m_debug(true), m_remoteFrameRenderer(-0.5, -0.5, -0.5, -0.5),
+    : WIDTH(0), HEIGHT(0), pendingRenderTexResize(false), m_debug(true),
+      m_remoteFrameRenderer(-0.5, -0.5, -0.5, -0.5),
       m_localFrameRenderer(-0.5, -0.5, -0.5, -0.5), m_winWidth(winWidth),
       m_winHeight(winHeight), m_remoteStreamMode(1), m_localStreamMode(1) {
   _updateRenderersPos();
@@ -14,7 +14,7 @@ void SceneRenderer::setLocalStreamMode(int mode) { m_localStreamMode = mode; }
 void SceneRenderer::updateResolution(int width, int height) {
   WIDTH = width;
   HEIGHT = height;
-  m_outPixel.resize(WIDTH * HEIGHT * 2 * 3);
+  m_sensorDataFboRenderer.onUpdateResolution(width, height);
   pendingRenderTexResize = true;
 }
 
@@ -82,15 +82,15 @@ void SceneRenderer::render() {
   // alLogger() << "preSendingFrames";
   if (sendingFrames || true) {
     // alLogger() << "sendingFrames";
-    glReadPixels(0, 0, WIDTH * 2, HEIGHT, GL_RGB, GL_UNSIGNED_BYTE,
-                 &(m_outPixel[0]));
+    m_sensorDataFboRenderer.readGlFrame();
+
     // TODO: NOT SURE IF IT IS OK TO MULTIPLY BY 2
-    newFrameSignal(m_outPixel, WIDTH * 2, HEIGHT);
+    newFrameSignal(m_sensorDataFboRenderer.m_outPixel, WIDTH * 2, HEIGHT);
 
     // NOTE: TESTING
     // TODO: remove
-    // updateLocalFrame(&m_outPixel[0], WIDTH * 2, HEIGHT);
-    updateRemoteFrame(&m_outPixel[0], WIDTH * 2, HEIGHT);
+    updateRemoteFrame(&(m_sensorDataFboRenderer.m_outPixel)[0], WIDTH * 2,
+                      HEIGHT);
   }
 
   // ============ FBO ==============
