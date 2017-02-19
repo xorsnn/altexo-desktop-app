@@ -8,8 +8,8 @@
 #include "glelements/bottomplane.hpp"
 #include "glelements/hologram.hpp"
 // #include "glelements/hologramtest.hpp"
-#include "glelements/worldcoordinate.hpp"
 #include "GLSLShader.hpp"
+#include "glelements/worldcoordinate.hpp"
 #include "sensordatafborenderer.hpp"
 #include "targetcamera.h"
 #include "videostreamrenderer.hpp"
@@ -102,7 +102,6 @@ private:
   int m_winWidth;
   int m_winHeight;
 
-  std::vector<GLubyte> m_outPixel;
   boost::signals2::signal<void(std::vector<GLubyte>, int, int)> newFrameSignal;
 
   // target camera instance

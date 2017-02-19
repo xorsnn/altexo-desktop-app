@@ -19,19 +19,17 @@ AlKinectPlugin::AlKinectPlugin() {
 
   uint8_t curPixel[3];
   int index = 0;
+  int indexRgb = 0;
   for (int y = 0; y < 480; y++) {
     for (int x = 0; x < 1280; x++) {
-      // curPixel[0] = m_img[y * x + x * 3];
-      // curPixel[1] = m_img[y * x + x * 3 + 1];
-      // curPixel[2] = m_img[y * x + x * 3 + 2];
       curPixel[0] = m_img[index * 3];
       curPixel[1] = m_img[index * 3 + 1];
       curPixel[2] = m_img[index * 3 + 2];
       if (x >= 640) {
-        int curX = x - 640;
-        m_rgb[curX * y + curX * 3] = curPixel[0];
-        m_rgb[curX * y + curX * 3 + 1] = curPixel[1];
-        m_rgb[curX * y + curX * 3 + 2] = curPixel[2];
+        m_rgb[indexRgb * 3] = curPixel[0];
+        m_rgb[indexRgb * 3 + 1] = curPixel[1];
+        m_rgb[indexRgb * 3 + 2] = curPixel[2];
+        indexRgb++;
       } else {
         AlKinectPlugin::PIXEL color;
         color.R = (1.0 * curPixel[0]) / 255;
@@ -41,8 +39,7 @@ AlKinectPlugin::AlKinectPlugin() {
 
         float val = hsl.R * (MAX_DEPTH - MIN_DEPTH) + MIN_DEPTH;
         uint16_t intVal = std::lround(val);
-        // m_depth[(x - 640) * y + (x - 640)] = intVal;
-        m_depth[x * y + x] = 1000;
+        m_depth[640 * y + x] = intVal;
       }
       index++;
     }
@@ -91,8 +88,9 @@ AlKinectPlugin::PIXEL AlKinectPlugin::_rgb2hsl(AlKinectPlugin::PIXEL color) {
 
 void AlKinectPlugin::init(AlSensorCb *alSensorCb) {
   m_sensorCb = alSensorCb;
-  m_newFrameSignal.connect(
-      boost::bind(&AlSensorCb::newFrame, m_sensorCb, _1, _2));
+  m_sensorCb->onVideoFrameParams(640, 480, AlSensorCb::RGB, 640, 480);
+  // m_newFrameSignal.connect(
+  //     boost::bind(&AlSensorCb::newFrame, m_sensorCb, _1, _2));
 }
 
 void AlKinectPlugin::requestNewFrame() {
@@ -101,7 +99,8 @@ void AlKinectPlugin::requestNewFrame() {
     // std::cout << "AlKinectPlugin::requestNewFrame" << std::endl;
     std::vector<uint8_t> rgbVec(m_rgb, m_rgb + 640 * 480 * 3);
     std::vector<uint16_t> depthVec(m_depth, m_depth + 640 * 480);
-    m_newFrameSignal(rgbVec, depthVec);
+    // m_newFrameSignal(rgbVec, depthVec);
+    m_sensorCb->newFrame(rgbVec, depthVec);
     // m_newFrameSignal(this->m_device->getRGB(), this->m_device->getDepth());
   }
 }

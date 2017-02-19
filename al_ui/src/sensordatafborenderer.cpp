@@ -1,9 +1,40 @@
 #include "sensordatafborenderer.hpp"
 #include "allogger.hpp"
 
-SensorDataFboRenderer::SensorDataFboRenderer() : m_debug(true) {}
+SensorDataFboRenderer::SensorDataFboRenderer()
+    : m_debug(true), m_outPixel(0), m_rgbWidth(0), m_rgbHeight(0),
+      m_depthWidth(0), m_depthHeight(0), m_videoType(AlSensorCb::RGB), WIDTH(0),
+      HEIGHT(0) {}
 
 SensorDataFboRenderer::~SensorDataFboRenderer() {}
+
+void SensorDataFboRenderer::onUpdateResolution(int width, int height) {
+  WIDTH = width;
+  HEIGHT = height;
+  // TODO: handle all cases
+  switch (m_videoType) {
+  case AlSensorCb::RGB: {
+    m_outPixel.resize(width * width * 2 * 3);
+  } break;
+  case AlSensorCb::RGBA: {
+    m_outPixel.resize(width * width * 2 * 4);
+  } break;
+  }
+}
+
+void SensorDataFboRenderer::readGlFrame() {
+  // TODO: handle all cases
+  switch (m_videoType) {
+  case AlSensorCb::RGB: {
+    glReadPixels(0, 0, WIDTH * 2, HEIGHT, GL_RGB, GL_UNSIGNED_BYTE,
+                 &(m_outPixel[0]));
+  } break;
+  case AlSensorCb::RGBA: {
+    glReadPixels(0, 0, WIDTH * 2, HEIGHT, GL_RGBA, GL_UNSIGNED_BYTE,
+                 &(m_outPixel[0]));
+  } break;
+  }
+}
 
 int SensorDataFboRenderer::init() {
   m_newFrame = false;
@@ -118,7 +149,6 @@ void SensorDataFboRenderer::render(int viewWidth, int viewHeight) {
   glBindBuffer(GL_ELEMENT_ARRAY_BUFFER, vboIndicesID);
 
   if (m_newFrame) {
-    alLogger() << "new frame";
     // allocate texture
     glActiveTexture(GL_TEXTURE0);
     glBindTexture(GL_TEXTURE_2D, sensorRGBTexID);
@@ -157,4 +187,29 @@ void SensorDataFboRenderer::newFrame(std::vector<uint8_t> rgbFrame,
     m_depthFrame.swap(depthFrame);
     m_newFrame = true;
   }
+}
+
+void SensorDataFboRenderer::newFrame(const uint8_t *rgbFrame,
+                                     const uint16_t *depthFrame) {
+  if (!m_newFrame) {
+    switch (m_videoType) {
+    case AlSensorCb::RGB: {
+      m_rgbFrame.assign(rgbFrame, rgbFrame + m_rgbWidth * m_rgbHeight * 3);
+      m_depthFrame.assign(depthFrame,
+                          depthFrame + m_depthWidth * m_depthHeight);
+    } break;
+    }
+  }
+}
+
+void SensorDataFboRenderer::onVideoFrameParams(uint rgbWidth, uint rgbHeight,
+                                               AlSensorCb::VideoType videoType,
+                                               uint depthWidth,
+                                               uint depthHeight) {
+  m_rgbWidth = rgbWidth;
+  m_rgbHeight = rgbHeight;
+  m_depthWidth = depthHeight;
+  m_depthHeight = depthHeight;
+  m_videoType = videoType;
+  onUpdateResolution(WIDTH, HEIGHT);
 }

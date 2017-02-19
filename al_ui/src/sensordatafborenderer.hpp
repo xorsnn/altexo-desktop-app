@@ -15,12 +15,29 @@ public:
   SensorDataFboRenderer();
   ~SensorDataFboRenderer();
 
+  void onUpdateResolution(int width, int height);
+
+  void readGlFrame();
+
   int init();
+
   void render(int viewWidth, int viewHeigt);
 
-  // sensor cb
+  /*
+   * AlSensorCb implementation
+   */
+  // TODO: deprecated
   void newFrame(std::vector<uint8_t> rgbFrame,
                 std::vector<uint16_t> depthFrame);
+
+  void newFrame(const uint8_t *rgbFrame, const uint16_t *depthFrame);
+
+  void onVideoFrameParams(uint rgbWidth, uint rgbHeight,
+                          AlSensorCb::VideoType videoType, uint depthWidth,
+                          uint depthHeight);
+
+  // renderered frame
+  std::vector<GLubyte> m_outPixel;
 
 private:
   bool m_debug;
@@ -52,6 +69,21 @@ private:
   std::vector<uint8_t> m_rgbFrame;
   std::vector<uint16_t> m_depthFrame;
   bool m_newFrame;
+
+  /*
+   * Sensor snapshot parameters
+   */
+  uint m_rgbWidth;
+  uint m_rgbHeight;
+  uint m_depthWidth;
+  uint m_depthHeight;
+  AlSensorCb::VideoType m_videoType;
+
+  /*
+   * TODO: remove this, window width and height
+   */
+  int WIDTH;
+  int HEIGHT;
 
   // sensor data resolution
   // this depends from sensor
