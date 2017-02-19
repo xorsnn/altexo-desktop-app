@@ -27,8 +27,9 @@ std::vector<T> as_vector(boost::property_tree::ptree const &pt,
 
 Manager::Manager()
     : m_sdk(NULL), m_wsClient(NULL), m_sensor(NULL), m_frameThread(NULL),
-      m_id(""), m_peerId("-1"), m_videoDeviceName(""), m_videoDeviceType(-1),
-      m_beenCalled(false), m_processingCandidates(false), m_calling(false),
+      m_id(""), m_peerId("-1"), m_videoDeviceName(""),
+      m_videoDeviceType(AlSdkAPI::CAMERA), m_beenCalled(false),
+      m_processingCandidates(false), m_calling(false),
       m_localCandidatesCounter(0), m_remoteCandidatesCounter(0) {
   alLogger() << "Manager constructor";
   sensorList.push_back(AlTextMessage::stringToMsg("Kinect"));
@@ -358,10 +359,10 @@ void Manager::onNewCaptureDeciceCb(const char *newDeviceName) {
   webcamList.push_back(AlTextMessage::cStrToMsg(newDeviceName));
 
   // NOTE: set device name if not already set (firs is default)
-  if (m_videoDeviceName == "") {
-    setDeviceName(AlTextMessage::cStrToMsg(newDeviceName),
-                  AlSdkAPI::DesiredVideoSource::CAMERA);
-  }
+  // if (m_videoDeviceName == "") {
+  //   setDeviceName(AlTextMessage::cStrToMsg(newDeviceName),
+  //                 AlSdkAPI::DesiredVideoSource::CAMERA);
+  // }
 }
 
 void Manager::updateFrameCb(const uint8_t *image, int width, int height) {
@@ -369,11 +370,12 @@ void Manager::updateFrameCb(const uint8_t *image, int width, int height) {
 }
 
 void Manager::updateLocalFrameCb(const uint8_t *image, int width, int height) {
-  alLogger() << "Manager::updateLocalFrameCb";
+  // alLogger() << "Manager::updateLocalFrameCb";
   m_holoRenderer->updateLocalFrame(image, width, height);
 }
 
-void Manager::setDeviceName(alMsg deviceName, int deviceType) {
+void Manager::setDeviceName(alMsg deviceName,
+                            AlSdkAPI::DesiredVideoSource deviceType) {
   alLogger() << "Manager::setDeviceName";
   alLogger() << "*************************";
   m_videoDeviceName = AlTextMessage::msgToString(deviceName);
@@ -394,6 +396,7 @@ void Manager::setDeviceName(alMsg deviceName, int deviceType) {
 
 void Manager::_initVideoDevice() {
   alLogger() << "Manager::_initVideoDevice";
+  std::cout << m_videoDeviceType << std::endl;
 
   switch (m_videoDeviceType) {
   case AlSdkAPI::DesiredVideoSource::CAMERA: {
