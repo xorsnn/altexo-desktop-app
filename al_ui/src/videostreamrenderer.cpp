@@ -103,7 +103,7 @@ void VideoStreamRenderer::render() {
     m_remoteFrameMtx.lock();
     glActiveTexture(GL_TEXTURE4);
     glBindTexture(GL_TEXTURE_2D, sensorDepthTexID);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_BGRA,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0, GL_BGR,
                  GL_UNSIGNED_BYTE, &(m_remoteFrame[0]));
     m_remoteFrameMtx.unlock();
   }
@@ -138,10 +138,10 @@ void VideoStreamRenderer::updateFrame(const uint8_t *image, int width,
   if (m_width != width || m_height != height) {
     m_width = width;
     m_height = height;
-    m_remoteFrame.resize(width * height * 4);
+    m_remoteFrame.resize(width * height * 3);
     m_updateSize = true;
   }
-  std::copy(image, image + width * height * 4, m_remoteFrame.begin());
+  std::copy(image, image + width * height * 3, m_remoteFrame.begin());
   m_newFrame = true;
 }
 
@@ -150,7 +150,7 @@ void VideoStreamRenderer::bindToTex() {
     m_remoteFrameMtx.lock();
     glActiveTexture(GL_TEXTURE3);
     glBindTexture(GL_TEXTURE_2D, sensorDepthTexID);
-    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGBA, m_width, m_height, 0, GL_BGRA,
+    glTexImage2D(GL_TEXTURE_2D, 0, GL_RGB, m_width, m_height, 0, GL_BGR,
                  GL_UNSIGNED_BYTE, &(m_remoteFrame[0]));
     m_remoteFrameMtx.unlock();
   }
