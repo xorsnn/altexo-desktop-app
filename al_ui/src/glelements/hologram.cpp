@@ -1,4 +1,5 @@
 #include "glelements/hologram.hpp"
+#include "allogger.hpp"
 
 Hologram::Hologram() { m_vertices = new Vertex[wAmount * hAmount]; }
 
@@ -15,9 +16,11 @@ void Hologram::init() {
                     (float(yCoord) - (0.5 * float(hAmount))) / normConst);
       m_vertices[index].texCoord =
           glm::vec2(float(xCoord) / wAmount, float(yCoord) / hAmount);
+
       index++;
     }
   }
+
   // setup triangle vao and vbo stuff
   glGenVertexArrays(1, &vaoID);
   glGenBuffers(1, &vboVerticesID);
@@ -27,9 +30,11 @@ void Hologram::init() {
   glBindVertexArray(vaoID);
 
   glBindBuffer(GL_ARRAY_BUFFER, vboVerticesID);
+
   // pass triangle verteices to buffer object
-  glBufferData(GL_ARRAY_BUFFER, sizeof(m_vertices), &m_vertices[0],
-               GL_STATIC_DRAW);
+  glBufferData(GL_ARRAY_BUFFER, sizeof(Vertex) * wAmount * hAmount,
+               &m_vertices[0], GL_STATIC_DRAW);
+
   // GL_CHECK_ERRORS
   // enable vertex attribute array for position
   glEnableVertexAttribArray(m_shader["vVertex"]);
@@ -69,10 +74,8 @@ void Hologram::render(glm::mat4 *MVP) {
 
 void Hologram::_initShaders() {
   // load the shader
-  m_shader.LoadFromFile(GL_VERTEX_SHADER,
-                        "shaders/hologramRenderer.vert");
-  m_shader.LoadFromFile(GL_FRAGMENT_SHADER,
-                        "shaders/hologramRenderer.frag");
+  m_shader.LoadFromFile(GL_VERTEX_SHADER, "shaders/hologramRenderer.vert");
+  m_shader.LoadFromFile(GL_FRAGMENT_SHADER, "shaders/hologramRenderer.frag");
   // compile and link shader
   m_shader.CreateAndLinkProgram();
   m_shader.Use();

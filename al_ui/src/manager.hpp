@@ -55,7 +55,7 @@ public:
   void handleMessages();
   void initHoloRenderer(SceneRenderer *holoRenderer);
 
-  void setDeviceName(alMsg deviceNama, int deviceType);
+  void setDeviceName(alMsg deviceNama, AlSdkAPI::DesiredVideoSource deviceType);
   int getDeviceType() { return m_videoDeviceType; }
 
   boost::shared_ptr<AlSdkAPI> m_sdk;
@@ -82,7 +82,7 @@ private:
   std::string m_id;
   std::string m_peerId;
   std::string m_videoDeviceName;
-  int m_videoDeviceType;
+  AlSdkAPI::DesiredVideoSource m_videoDeviceType;
 
   std::string m_localSdp = "";
   bool m_sentLocalSdp = false;

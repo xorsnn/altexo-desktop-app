@@ -6,9 +6,9 @@
 #include "allogger.hpp"
 #include "contact.hpp"
 #include "glelements/bottomplane.hpp"
-#include "glelements/hologram.hpp"
-// #include "glelements/hologramtest.hpp"
+// #include "glelements/hologram.hpp"
 #include "GLSLShader.hpp"
+#include "glelements/hologramtest.hpp"
 #include "glelements/worldcoordinate.hpp"
 #include "sensordatafborenderer.hpp"
 #include "targetcamera.h"
@@ -61,8 +61,8 @@ public:
 
   VideoStreamRenderer m_remoteFrameRenderer;
   VideoStreamRenderer m_localFrameRenderer;
-  // HologramTest m_hologram;
-  Hologram m_hologram;
+  HologramTest m_hologram;
+  // Hologram m_hologram;
   BottomPlane m_bottomPlane;
   WorldCoordinate m_worldCoordinate;
 

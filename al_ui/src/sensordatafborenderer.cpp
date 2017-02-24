@@ -26,7 +26,7 @@ void SensorDataFboRenderer::readGlFrame() {
   // TODO: handle all cases
   switch (m_videoType) {
   case AlSensorCb::RGB: {
-    glReadPixels(0, 0, WIDTH * 2, HEIGHT, GL_RGB, GL_UNSIGNED_BYTE,
+    glReadPixels(0, 0, WIDTH * 2, HEIGHT, GL_BGR, GL_UNSIGNED_BYTE,
                  &(m_outPixel[0]));
   } break;
   case AlSensorCb::RGBA: {
