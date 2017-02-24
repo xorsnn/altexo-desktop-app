@@ -96,6 +96,9 @@ void MainWindow::init() {
   // io.Fonts->AddFontFromFileTTF("../../extra_fonts/ProggyTiny.ttf", 10.0f);
   // io.Fonts->AddFontFromFileTTF("c:\\Windows\\Fonts\\ArialUni.ttf", 18.0f,
   // NULL, io.Fonts->GetGlyphRangesJapanese());
+  std::cout << "====== openGl version ==============" << std::endl;
+  std::cout << glGetString(GL_VERSION) << std::endl;
+  std::cout << "====================================" << std::endl;
 }
 
 void MainWindow::run() {

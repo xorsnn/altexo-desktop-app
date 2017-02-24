@@ -119,7 +119,6 @@ void SceneRenderer::render() {
     // alLogger() << "HOLOGRAM";
     m_hologram.render(&MVP);
   } else if (m_localStreamMode == AUDIO_VIDEO) {
-    // alLogger() << "VIDEO";
     m_localFrameRenderer.render();
   }
 
