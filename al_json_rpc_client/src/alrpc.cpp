@@ -112,6 +112,42 @@ void AlRpc::roomOffer(AlTextMessage offerSdp) {
   sendMessage(msgToSend);
 }
 
+/*
+ * user/mode
+ */
+void AlRpc::userMode(al::VideoMode videoMode) {
+
+  std::ostringstream stream;
+
+  Json::Value docVal(Json::objectValue);
+  Json::Value bodyVal(Json::arrayValue);
+  Json::Value bodyContentVal(Json::objectValue);
+
+  switch (videoMode) {
+  case al::MODE_2D: {
+    bodyContentVal["video"] = "2d";
+  } break;
+  case al::MODE_3D: {
+    bodyContentVal["video"] = "3d";
+  } break;
+  case al::MODE_NONE: {
+    bodyContentVal["video"] = "none";
+  } break;
+  default: { bodyContentVal["video"] = "none"; } break;
+  }
+
+  bodyContentVal["audio"] = true;
+  bodyVal.append(bodyContentVal);
+
+  docVal["params"] = bodyVal;
+
+  docVal["method"] = "user/mode";
+  docVal["jsonrpc"] = "2.0";
+  stream << docVal;
+
+  sendMessage(AlTextMessage(stream.str()));
+}
+
 void AlRpc::onRoomIceCandidate() {}
 void AlRpc::offer() {}
 void AlRpc::onIceCandidate() {}

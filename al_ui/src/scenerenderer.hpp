@@ -3,12 +3,13 @@
 
 #include "AL_API/sdk_api.hpp"
 #include "AL_CB/al_sensor_cb.hpp"
+#include "GLSLShader.hpp"
 #include "allogger.hpp"
 #include "contact.hpp"
 #include "glelements/bottomplane.hpp"
-// #include "glelements/hologram.hpp"
-#include "GLSLShader.hpp"
-#include "glelements/hologramtest.hpp"
+#include "glelements/hologram.hpp"
+// #include "glelements/hologramtest.hpp"
+#include "altypes.hpp"
 #include "glelements/worldcoordinate.hpp"
 #include "sensordatafborenderer.hpp"
 #include "targetcamera.h"
@@ -28,13 +29,8 @@ public:
   SceneRenderer(int winWidth, int winHeight);
   ~SceneRenderer() {}
 
-  enum StreamMode {
-    AUDIO_VIDEO = 1,
-    HOLOGRAM,
-  };
-
-  void setRemoteStreamMode(int mode);
-  void setLocalStreamMode(int mode);
+  void setRemoteStreamMode(al::VideoMode mode);
+  void setLocalStreamMode(al::VideoMode mode);
 
   void updateResolution(int width, int height);
   int init();
@@ -61,8 +57,8 @@ public:
 
   VideoStreamRenderer m_remoteFrameRenderer;
   VideoStreamRenderer m_localFrameRenderer;
-  HologramTest m_hologram;
-  // Hologram m_hologram;
+  // HologramTest m_hologram;
+  Hologram m_hologram;
   BottomPlane m_bottomPlane;
   WorldCoordinate m_worldCoordinate;
 
@@ -74,8 +70,8 @@ private:
   void _updateRenderersPos();
   void _resizeRenderTex();
 
-  int m_remoteStreamMode;
-  int m_localStreamMode;
+  al::VideoMode m_remoteStreamMode;
+  al::VideoMode m_localStreamMode;
 
   // mouse history buffer
   glm::vec2 mouseHistory[MOUSE_HISTORY_BUFFER_SIZE];

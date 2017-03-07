@@ -8,6 +8,7 @@ public:
     NONE = 1,
     AUTHENTICATE, // authenticate [ token ] -> boolean аутентификация
                   // соединения;
+    USER_MODE,
     ROOM_OPEN, // room/open [ name, p2p ] -> boolean создание комнаты;
     ROOM_CLOSE, // room/close -> boolean закрытие текущей комнат;
     ROOM_ENTER, // room/enter [ name ] -> boolean вход в созданную комнату;

@@ -170,7 +170,7 @@ void MainWindow::_handleWindowEvents() {
       } break;
       case SDL_BUTTON_RIGHT: {
         m_sceneRenderer->onPan(event.motion.x, event.motion.y);
-      }
+      } break;
       default: { } break; }
     } break;
 
@@ -281,6 +281,11 @@ void MainWindow::_drawSetTestSourceDialog() {
     // TODO: be sure init once
     m_manager->initSensor(&(m_sceneRenderer->m_sensorDataFboRenderer),
                           Manager::FAKE_SENSOR);
+
+    // m_manager->m_wsClient->userMode(AlWsAPI::MODE_2D);
+  }
+  if (ImGui::Button("toggle video")) {
+    m_manager->toggleVideo();
   }
   ImGui::EndChild();
   ImGui::End();

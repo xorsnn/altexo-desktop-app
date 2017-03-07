@@ -11,8 +11,6 @@
 #include "contact.hpp"
 #include "scenerenderer.hpp"
 #include <boost/dll/import.hpp>
-#include <boost/log/sources/global_logger_storage.hpp>
-#include <boost/log/trivial.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/signals2/signal.hpp>
 #include <boost/thread.hpp>
@@ -23,6 +21,11 @@ public:
   enum SensorType {
     KINECT_1 = 1,
     FAKE_SENSOR,
+  };
+
+  struct VideoSetting {
+    bool isOn;
+    al::VideoMode videoMode;
   };
 
   Manager();
@@ -58,8 +61,11 @@ public:
   void setDeviceName(alMsg deviceNama, AlSdkAPI::DesiredVideoSource deviceType);
   int getDeviceType() { return m_videoDeviceType; }
 
+  void toggleVideo();
+
   boost::shared_ptr<AlSdkAPI> m_sdk;
   boost::shared_ptr<AlWsAPI> m_wsClient;
+
   // TODO remove I think
   boost::shared_ptr<AlPluginTestAPI> m_plugin_test;
 
@@ -79,10 +85,15 @@ private:
 
   boost::shared_ptr<AlWebRtcPluginApi> m_sdkPlugin;
 
+  // TODO: remove deprecated
   std::string m_id;
   std::string m_peerId;
+
   std::string m_videoDeviceName;
   AlSdkAPI::DesiredVideoSource m_videoDeviceType;
+
+  // NOTE: video mode
+  VideoSetting m_videoSetting;
 
   std::string m_localSdp = "";
   bool m_sentLocalSdp = false;

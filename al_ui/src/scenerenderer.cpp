@@ -4,12 +4,17 @@ SceneRenderer::SceneRenderer(int winWidth, int winHeight)
     : WIDTH(0), HEIGHT(0), pendingRenderTexResize(false), m_debug(true),
       m_remoteFrameRenderer(-0.5, -0.5, -0.5, -0.5),
       m_localFrameRenderer(-0.5, -0.5, -0.5, -0.5), m_winWidth(winWidth),
-      m_winHeight(winHeight), m_remoteStreamMode(1), m_localStreamMode(1) {
+      m_winHeight(winHeight), m_remoteStreamMode(al::MODE_2D),
+      m_localStreamMode(al::MODE_2D) {
   _updateRenderersPos();
 }
 
-void SceneRenderer::setRemoteStreamMode(int mode) { m_remoteStreamMode = mode; }
-void SceneRenderer::setLocalStreamMode(int mode) { m_localStreamMode = mode; }
+void SceneRenderer::setRemoteStreamMode(al::VideoMode mode) {
+  m_remoteStreamMode = mode;
+}
+void SceneRenderer::setLocalStreamMode(al::VideoMode mode) {
+  m_localStreamMode = mode;
+}
 
 void SceneRenderer::updateResolution(int width, int height) {
   WIDTH = width;
@@ -29,7 +34,7 @@ int SceneRenderer::init() {
 
   m_sensorDataFboRenderer.init();
   // TODO: doesn't make sense sitce it's default
-  if (m_remoteStreamMode == AUDIO_VIDEO) {
+  if (m_remoteStreamMode == al::MODE_2D) {
     m_remoteFrameRenderer.init();
   }
   m_localFrameRenderer.init();
@@ -108,17 +113,16 @@ void SceneRenderer::render() {
   // Elements rendering
   m_bottomPlane.render(&MVP);
   // TODO: case when both sides has sensors is not handled
-  if (m_remoteStreamMode == AUDIO_VIDEO) {
+  if (m_remoteStreamMode == al::MODE_2D) {
     m_remoteFrameRenderer.render();
-  } else if (m_remoteStreamMode == HOLOGRAM) {
+  } else if (m_remoteStreamMode == al::MODE_3D) {
     m_remoteFrameRenderer.bindToTex();
     m_hologram.render(&MVP);
   }
 
-  if (m_localStreamMode == HOLOGRAM) {
-    // alLogger() << "HOLOGRAM";
+  if (m_localStreamMode == al::MODE_3D) {
     m_hologram.render(&MVP);
-  } else if (m_localStreamMode == AUDIO_VIDEO) {
+  } else if (m_localStreamMode == al::MODE_2D) {
     m_localFrameRenderer.render();
   }
 

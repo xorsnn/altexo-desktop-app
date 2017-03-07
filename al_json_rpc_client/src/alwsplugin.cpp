@@ -20,13 +20,16 @@ void AlWsPlugin::init(AlWsCb *alWsCb) {
   // TODO: deprecated
   sendWsMessageToPeerSignal.connect(boost::bind(
       &AlWsClient::sendMessageToPeer, m_connClient->getWsClientRef(), _1, _2));
+
   sendWsMessageSignal.connect(boost::bind(&AlWsClient::sendMessage,
                                           m_connClient->getWsClientRef(), _1));
 
   sendSdpAnswerSignal.connect(
       boost::bind(&AlRpc::sendSdpAnswer, m_connClient->getWsClientRef(), _1));
+
   sendSdpOfferSignal.connect(
       boost::bind(&AlRpc::sendSdpOffer, m_connClient->getWsClientRef(), _1));
+
   sendIceCandidateSignal.connect(boost::bind(
       &AlRpc::sendIceCandidate, m_connClient->getWsClientRef(), _1));
 
@@ -34,12 +37,16 @@ void AlWsPlugin::init(AlWsCb *alWsCb) {
   roomOpenSignal.connect(
       boost::bind(&AlRpc::roomOpen, m_connClient->getWsClientRef(), _1));
 
+  userModeSignal.connect(
+      boost::bind(&AlRpc::userMode, m_connClient->getWsClientRef(), _1));
+
   m_internalThread = boost::thread(&AlWsPlugin::threadMain, this);
 }
 
 void AlWsPlugin::threadMain() {
   // TODO remove for now
-  m_connClient->login("Galya", "ujnm567"); // TODO: move to GUI
+  // m_connClient->login("Galya", "ujnm567"); // TODO: move to GUI
+  m_connClient->login("xors_1", "ghbphfrb"); // TODO: move to GUI
 }
 
 void AlWsPlugin::sendMessageToPeer(AlTextMessage peerId, AlTextMessage msg) {
@@ -61,3 +68,7 @@ void AlWsPlugin::sendIceCandidate(AlTextMessage msg) {
 
 // json-rpc
 void AlWsPlugin::roomOpen(AlTextMessage msg) { roomOpenSignal(msg); }
+
+void AlWsPlugin::userMode(al::VideoMode videoMode) {
+  userModeSignal(videoMode);
+}

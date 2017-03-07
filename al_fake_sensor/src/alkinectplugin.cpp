@@ -39,7 +39,11 @@ AlKinectPlugin::AlKinectPlugin() {
 
         float val = hsl.R * (MAX_DEPTH - MIN_DEPTH) + MIN_DEPTH;
         uint16_t intVal = std::lround(val);
-        m_depth[640 * y + x] = intVal;
+        if (hsl.B * 2 < 0.95) {
+          m_depth[640 * y + x] = 0;
+        } else {
+          m_depth[640 * y + x] = intVal;
+        }
       }
       index++;
     }

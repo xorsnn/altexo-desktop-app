@@ -3,6 +3,7 @@
 
 #include "AL_CB/al_ws_cb.hpp"
 #include "altextmessage.hpp"
+#include "altypes.hpp"
 #include <string>
 
 class AlWsAPI {
@@ -20,6 +21,8 @@ public:
 
   // json-rpc
   virtual void roomOpen(AlTextMessage msg) = 0;
+
+  virtual void userMode(al::VideoMode videoMode) = 0;
 };
 //]
 

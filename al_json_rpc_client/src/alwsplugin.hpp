@@ -29,6 +29,7 @@ public:
 
   // json-rpc
   void roomOpen(AlTextMessage msg);
+  void userMode(al::VideoMode videoMode);
 
   void threadMain();
 
@@ -46,6 +47,7 @@ private:
   boost::signals2::signal<void(AlTextMessage)> sendSdpOfferSignal;
   boost::signals2::signal<void(AlTextMessage)> sendSdpAnswerSignal;
   boost::signals2::signal<void(AlTextMessage)> sendIceCandidateSignal;
+  boost::signals2::signal<void(al::VideoMode)> userModeSignal;
 
   // json-rpc
   boost::signals2::signal<void(AlTextMessage)> roomOpenSignal;

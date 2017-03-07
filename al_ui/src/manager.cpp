@@ -9,12 +9,6 @@
 namespace boostfs = boost::filesystem;
 namespace boostdll = boost::dll;
 
-using namespace boost::log::trivial;
-// boost::log::sources::severity_logger<severity_level> lg;
-BOOST_LOG_INLINE_GLOBAL_LOGGER_DEFAULT(
-    al_logger, boost::log::sources::severity_logger<severity_level>);
-boost::log::sources::severity_logger<severity_level> &lg = al_logger::get();
-
 // TODO: repeated over multiple files, move to a separate lib
 template <typename T>
 std::vector<T> as_vector(boost::property_tree::ptree const &pt,
@@ -31,7 +25,12 @@ Manager::Manager()
       m_videoDeviceType(AlSdkAPI::CAMERA), m_beenCalled(false),
       m_processingCandidates(false), m_calling(false),
       m_localCandidatesCounter(0), m_remoteCandidatesCounter(0) {
+
   alLogger() << "Manager constructor";
+
+  m_videoSetting.videoMode = al::MODE_2D;
+  m_videoSetting.isOn = true;
+
   sensorList.push_back(AlTextMessage::stringToMsg("Kinect"));
 }
 
@@ -247,9 +246,7 @@ void Manager::onSdpOfferCb(const char *cMsg) {
 
   m_remoteSdp = streamRes.str();
 
-  alLogger() << "> Manager::onSdpOfferCb end!";
   handleMessages();
-  alLogger() << "> Manager::onSdpOfferCb end! 2";
 }
 
 void Manager::onInitCall() {
@@ -370,22 +367,21 @@ void Manager::updateFrameCb(const uint8_t *image, int width, int height) {
 }
 
 void Manager::updateLocalFrameCb(const uint8_t *image, int width, int height) {
-  // alLogger() << "Manager::updateLocalFrameCb";
   m_holoRenderer->updateLocalFrame(image, width, height);
 }
 
 void Manager::setDeviceName(alMsg deviceName,
                             AlSdkAPI::DesiredVideoSource deviceType) {
-  alLogger() << "Manager::setDeviceName";
-  alLogger() << "*************************";
   m_videoDeviceName = AlTextMessage::msgToString(deviceName);
   m_videoDeviceType = deviceType;
   switch (m_videoDeviceType) {
   case AlSdkAPI::DesiredVideoSource::CAMERA: {
-    m_holoRenderer->setLocalStreamMode(SceneRenderer::AUDIO_VIDEO);
+    m_holoRenderer->setLocalStreamMode(al::MODE_2D);
+    m_videoSetting.videoMode = al::MODE_2D;
   } break;
   case AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS: {
-    m_holoRenderer->setLocalStreamMode(SceneRenderer::HOLOGRAM);
+    m_holoRenderer->setLocalStreamMode(al::MODE_3D);
+    m_videoSetting.videoMode = al::MODE_3D;
   } break;
   default:
     break;
@@ -395,11 +391,9 @@ void Manager::setDeviceName(alMsg deviceName,
 }
 
 void Manager::_initVideoDevice() {
-  alLogger() << "Manager::_initVideoDevice";
-  std::cout << m_videoDeviceType << std::endl;
-
   switch (m_videoDeviceType) {
   case AlSdkAPI::DesiredVideoSource::CAMERA: {
+
     m_sdk->setDesiredDataSource(m_videoDeviceType);
 
     char *cstr = new char[m_videoDeviceName.length() + 1];
@@ -409,14 +403,26 @@ void Manager::_initVideoDevice() {
     delete[] cstr;
 
     setConnectionMode("audio+video");
+
   } break;
   case AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS: {
+
     m_sdk->setDesiredDataSource(m_videoDeviceType);
     // setConnectionMode("audio+video");
     setConnectionMode("hologram");
+
   } break;
   default: {
     // unhandled video device
   }
+  }
+}
+
+void Manager::toggleVideo() {
+  m_videoSetting.isOn = !m_videoSetting.isOn;
+  if (m_videoSetting.isOn) {
+    m_wsClient->userMode(m_videoSetting.videoMode);
+  } else {
+    m_wsClient->userMode(al::MODE_NONE);
   }
 }

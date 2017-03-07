@@ -2,6 +2,7 @@
 #ifndef ALRPC_H
 #define ALRPC_H
 
+#include "AL_API/ws_client_api.hpp"
 #include "alrpcrequest.hpp"
 #include "altextmessage.hpp"
 #include "alwsclient.hpp"
@@ -23,6 +24,8 @@ public:
   void roomEnter();
   void roomLeave();
   void roomOffer(AlTextMessage offerSdp);
+
+  void userMode(al::VideoMode videoMode);
 
   void onRoomIceCandidate();
   void offer();
