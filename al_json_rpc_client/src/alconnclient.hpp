@@ -17,25 +17,19 @@ public:
   enum HTTP_RESPONSE_TYPE {
     HTTP_LOGIN = 1,
     HTTP_ME,
-    // TODO: remove, not used any more
-    // HTTP_INIT_WS_CONN,
   };
 
-  void login(std::string login, std::string password);
+  void initWsConnection();
 
   AlRpc *getWsClientRef() { return &m_wsCl; };
 
 private:
-  void handleHttpResponse(cpr::Response r, int responseType);
-  // void threadMain();
   bool m_debug;
 
   std::string m_token;
   std::string m_wssLink;
-  std::string m_peerId;
 
   AlRpc m_wsCl;
-  // boost::thread m_internalThread;
   AlWsCb *m_alWsCb;
 };
 
