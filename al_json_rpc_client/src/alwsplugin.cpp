@@ -43,11 +43,7 @@ void AlWsPlugin::init(AlWsCb *alWsCb) {
   m_internalThread = boost::thread(&AlWsPlugin::threadMain, this);
 }
 
-void AlWsPlugin::threadMain() {
-  // TODO remove for now
-  // m_connClient->login("Galya", "ujnm567"); // TODO: move to GUI
-  m_connClient->login("xors_1", "ghbphfrb"); // TODO: move to GUI
-}
+void AlWsPlugin::threadMain() { m_connClient->initWsConnection(); }
 
 void AlWsPlugin::sendMessageToPeer(AlTextMessage peerId, AlTextMessage msg) {
   sendWsMessageToPeerSignal(peerId.asCharVector(), msg.asCharVector());
