@@ -3,12 +3,14 @@
 #define MAINWINDOW_H
 
 #include <imgui/imgui.h>
+
 #include "imgui_impl_sdl_gl3.h"
 #include <GL/gl3w.h>
 // #define SDL_MAIN_HANDLED
 #include <SDL.h>
 
 #include "manager.hpp"
+#include "scenerenderer.hpp"
 
 class MainWindow {
 public:
@@ -26,7 +28,7 @@ private:
   void _drawDeviceList();
   void _drawRoomSelectDialog();
   void _drawSetTestSourceDialog();
-  
+
   bool m_showRoomSelectDialog;
 
   SDL_GLContext m_glcontext;

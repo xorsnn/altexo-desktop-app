@@ -11,6 +11,7 @@
 // #include "glelements/hologramtest.hpp"
 #include "altypes.hpp"
 #include "glelements/worldcoordinate.hpp"
+#include "scenerenderercb.hpp"
 #include "sensordatafborenderer.hpp"
 #include "targetcamera.h"
 #include "videostreamrenderer.hpp"
@@ -24,15 +25,13 @@
 const int MOUSE_HISTORY_BUFFER_SIZE = 10;
 const float MOUSE_FILTER_WEIGHT = 0.75f;
 
-class SceneRenderer {
+class SceneRenderer : public SceneRendererCb {
 public:
   SceneRenderer(int winWidth, int winHeight);
   ~SceneRenderer() {}
 
   void setRemoteStreamMode(al::VideoMode mode);
-  void setLocalStreamMode(al::VideoMode mode);
 
-  void updateResolution(int width, int height);
   int init();
   void render();
   void initFBO();
@@ -48,10 +47,19 @@ public:
 
   void onWinResize(int winWidth, int winHeight);
 
-  // Plain video stream renderer
-  void updateRemoteFrame(const uint8_t *image, int width, int height);
-  void updateLocalFrame(const uint8_t *image, int width, int height);
+  /*
+   * SceneRendererCb implemetatiopn
+   */
 
+  // Plain video stream renderer
+  void updateRemoteFrameCb(const uint8_t *image, int width, int height);
+  void updateLocalFrameCb(const uint8_t *image, int width, int height);
+  void setLocalStreamModeCb(al::VideoMode mode);
+  void updateResolutionCb(int width, int height);
+
+  /*
+   * Attribute
+   */
   // Sensor data capturer
   SensorDataFboRenderer m_sensorDataFboRenderer;
 
