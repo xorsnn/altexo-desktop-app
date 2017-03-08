@@ -10,13 +10,6 @@
 #include <queue>
 #include <utility>
 
-// void usage() {
-//   fprintf(stderr, "Usage: libwebsockets-test-client "
-// 	  "<server address> [--port=<p>] "
-// 	  "[--ssl] [-k] [-v <ver>] "
-// 	  "[-d <log bitfield>] [-l]\n");
-// }
-
 // supposed to be just a transport
 class AlWsClient {
 public:
@@ -55,8 +48,8 @@ private:
   int threadMain();
   void _onMessageReceived(AlTextMessage msg);
 
-  int m_useSsl = 2;  /* 2 = allow selfsigned */
-  int m_port = 8888; // TODO: move to parameters
+  int m_useSsl = 2; /* 2 = allow selfsigned */
+  // int m_port = 8888; // TODO: move to parameters
   int m_ietfVersion = -1;
   int m_denyDeflate = 1;
   std::string m_path;
@@ -64,7 +57,7 @@ private:
   unsigned int rl_dumb = 0;
   struct lws_context_creation_info info;
   struct lws_client_connect_info m_i;
-  struct lws_context *context;
+  struct lws_context *m_context;
   const char *prot, *p;
   char path[300];
   // list of supported protocols and callbacks
@@ -74,10 +67,10 @@ private:
 
   // std::queue<std::pair<std::string, std::string>> m_messageQueue;
   std::queue<AlTextMessage> m_messageQueue;
-  char *m_writable;
+  // char *m_writable;
 
   bool m_debug;
-  bool m_tmpFlag = false;
+  // bool m_tmpFlag = false;
 };
 
 #endif // ALWsCLIENT_H

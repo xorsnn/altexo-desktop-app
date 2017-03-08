@@ -50,10 +50,9 @@ static int ratelimit_connects(unsigned int *last, unsigned int secs) {
   return 1;
 }
 
-AlWsClient::AlWsClient()
-    : m_writable(NULL), m_internalThread(NULL), m_debug(true) {
+AlWsClient::AlWsClient() : m_internalThread(NULL), m_debug(true) {
   me = this;
-  lws_protocols pr1 = {"default", cbDumbIncrementStatic, 0};
+  lws_protocols pr1 = {"default", cbDumbIncrementStatic, 0, 4096 * 4};
   m_protocols[0] = pr1;
 
   lws_protocols pr3 = {NULL, NULL, 0};
@@ -91,11 +90,6 @@ AlWsClient::~AlWsClient() {
 int AlWsClient::cbDumbIncrement(struct lws *wsi,
                                 enum lws_callback_reasons reason, void *user,
                                 void *in, size_t len) {
-  unsigned char buf[LWS_PRE + 4096];
-
-  // if (m_debug) {
-  //   std::cout << "reason: " << reason << std::endl;
-  // }
 
   switch (reason) {
 
@@ -109,28 +103,24 @@ int AlWsClient::cbDumbIncrement(struct lws *wsi,
     break;
 
   case LWS_CALLBACK_CLIENT_RECEIVE: {
+    std::cout << "LWS_CALLBACK_CLIENT_RECEIVE" << std::endl;
     ((char *)in)[len] = '\0';
     std::string msg((char *)in);
     _onMessageReceived(AlTextMessage(msg));
   } break;
 
   case LWS_CALLBACK_CLIENT_WRITEABLE: {
-    if (m_debug) {
-      std::cout << "LWS_CALLBACK_CLIENT_WRITEABLE" << std::endl;
-    }
+    std::cout << "LWS_CALLBACK_CLIENT_WRITEABLE" << std::endl;
     if (!m_messageQueue.empty()) {
       AlTextMessage msg = m_messageQueue.front();
+      unsigned char *buf =
+          (unsigned char *)malloc(LWS_PRE + msg.toString().size() + 1);
       m_messageQueue.pop();
       std::string msgStr = msg.toString();
       std::copy(std::begin(msgStr), std::end(msgStr), &(buf[LWS_PRE]));
       buf[LWS_PRE + msgStr.size()] = '\0';
-      int n = lws_write(wsi, &buf[LWS_PRE], msgStr.size(), LWS_WRITE_TEXT);
-      if (m_debug) {
-        std::cout << "+++++++++++++++" << std::endl;
-        std::cout << msgStr << std::endl;
-        std::cout << n << std::endl;
-        std::cout << "+++++++++++++++" << std::endl;
-      }
+      lws_write(wsi, &buf[LWS_PRE], msgStr.size(), LWS_WRITE_TEXT);
+      free(buf);
     }
   } break;
 
@@ -170,15 +160,12 @@ int AlWsClient::threadMain() {
 
   memset(&info, 0, sizeof info);
 
-  lwsl_notice("libwebsockets test client - license LGPL2.1+SLE\n");
-  lwsl_notice("(C) Copyright 2010-2016 Andy Green <andy@warmcat.com>\n");
-
   signal(SIGINT, sighandler);
 
   memset(&m_i, 0, sizeof(m_i));
 
   // TODO: remove
-  m_i.port = m_port;
+  // m_i.port = m_port;
 
   char *pathTmp = (char *)(m_path.c_str());
   if (lws_parse_uri(pathTmp, &prot, &m_i.address, &m_i.port, &p)) {
@@ -214,21 +201,22 @@ int AlWsClient::threadMain() {
   info.gid = -1;
   info.uid = -1;
 
-  context = lws_create_context(&info);
-  if (context == NULL) {
+  m_context = lws_create_context(&info);
+  if (m_context == NULL) {
     fprintf(stderr, "Creating libwebsocket context failed\n");
     return 1;
   }
 
-  m_i.context = context;
+  m_i.context = m_context;
   m_i.ssl_connection = m_useSsl;
   m_i.host = m_i.address;
   m_i.origin = m_i.address;
   m_i.ietf_version_or_minus_one = m_ietfVersion;
   m_i.client_exts = exts;
+
   /*
   * sit there servicing the websocket context to handle incoming
-  * packets, and drawing random circles on the mirror protocol websocket
+  * packets
   *
   * nothing happens until the client websocket connection is
   * asynchronously established... calling lws_client_connect() only
@@ -249,11 +237,11 @@ int AlWsClient::threadMain() {
       lws_callback_on_writable(wsi_dumb);
     }
 
-    lws_service(context, 500);
+    lws_service(m_context, 500);
   }
 
   lwsl_err("Exiting\n");
-  lws_context_destroy(context);
+  lws_context_destroy(m_context);
 
   return 1;
 }
