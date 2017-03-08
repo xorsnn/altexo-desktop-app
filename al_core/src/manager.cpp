@@ -55,10 +55,10 @@ Manager::~Manager() {
   }
 }
 
-void Manager::initHoloRenderer(SceneRenderer *holoRenderer) {
+void Manager::initHoloRenderer(SceneRendererCb *holoRenderer) {
   m_holoRenderer = holoRenderer;
   updateResolutionSignal.connect(
-      boost::bind(&SceneRenderer::updateResolution, holoRenderer, _1, _2));
+      boost::bind(&SceneRendererCb::updateResolutionCb, holoRenderer, _1, _2));
   updateResolutionSignal(WIDTH, HEIGHT);
 }
 
@@ -363,11 +363,11 @@ void Manager::onNewCaptureDeciceCb(const char *newDeviceName) {
 }
 
 void Manager::updateFrameCb(const uint8_t *image, int width, int height) {
-  m_holoRenderer->updateRemoteFrame(image, width, height);
+  m_holoRenderer->updateRemoteFrameCb(image, width, height);
 }
 
 void Manager::updateLocalFrameCb(const uint8_t *image, int width, int height) {
-  m_holoRenderer->updateLocalFrame(image, width, height);
+  m_holoRenderer->updateLocalFrameCb(image, width, height);
 }
 
 void Manager::setDeviceName(alMsg deviceName,
@@ -376,11 +376,11 @@ void Manager::setDeviceName(alMsg deviceName,
   m_videoDeviceType = deviceType;
   switch (m_videoDeviceType) {
   case AlSdkAPI::DesiredVideoSource::CAMERA: {
-    m_holoRenderer->setLocalStreamMode(al::MODE_2D);
+    m_holoRenderer->setLocalStreamModeCb(al::MODE_2D);
     m_videoSetting.videoMode = al::MODE_2D;
   } break;
   case AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS: {
-    m_holoRenderer->setLocalStreamMode(al::MODE_3D);
+    m_holoRenderer->setLocalStreamModeCb(al::MODE_3D);
     m_videoSetting.videoMode = al::MODE_3D;
   } break;
   default:

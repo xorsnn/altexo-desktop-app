@@ -99,6 +99,7 @@ endif()
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 
 INCLUDE_DIRECTORIES( ../al_utils/src )
+INCLUDE_DIRECTORIES( ../al_core/src )
 INCLUDE_DIRECTORIES( ./src/ )
 INCLUDE_DIRECTORIES( ./src )
 INCLUDE_DIRECTORIES( include )
@@ -131,7 +132,8 @@ link_directories(${CMAKE_BINARY_DIR})
 add_executable(${PROJECT_NAME} ${SRC_LIST})
 
 if (APPLE)
-  target_link_libraries(${PROJECT_NAME} ${SDL2_LIBRARY}
+  target_link_libraries(${PROJECT_NAME}
+    ${SDL2_LIBRARY}
     ${OPENGL_LIBRARIES}
     ${Boost_FILESYSTEM_LIBRARY}
     ${Boost_SYSTEM_LIBRARY}
@@ -150,6 +152,7 @@ elseif(UNIX)
     -lal_utils
     -lboost_log_setup
     -lpng
+    -lal_core
     "/home/xors/workspace/lib/webrtc-checkout/src/out/Default/libprotobuf_lite.so"
     -ldl)
 elseif(WIN32)

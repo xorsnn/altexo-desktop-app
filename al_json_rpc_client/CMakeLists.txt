@@ -32,32 +32,31 @@ set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 
 set(LWS_OPENSSL_SUPPORT 1)
 
-include_directories(include)
-include_directories(/usr/include)
+INCLUDE_DIRECTORIES(include)
+INCLUDE_DIRECTORIES(/usr/include)
 
 # TODO: environment dependent
 if (APPLE)
   set(LIB_CPR_PATH "/Volumes/MAC/workspace/cpr")
   set(OPENSSL_LIBRARIES "/usr/local/Cellar/openssl/1.0.2h_1/lib")
   set(OPENSSL_ROOT_DIR "/usr/local/Cellar/openssl/1.0.2h_1/")
-  include_directories("/usr/local/Cellar/openssl/1.0.2h_1/include/")
-  include_directories(/Volumes/MAC/workspace/libwebsockets/build)
-  include_directories(/Volumes/MAC/workspace/libwebsockets/lib)
+  INCLUDE_DIRECTORIES("/usr/local/Cellar/openssl/1.0.2h_1/include/")
+  INCLUDE_DIRECTORIES(/Volumes/MAC/workspace/libwebsockets/build)
+  INCLUDE_DIRECTORIES(/Volumes/MAC/workspace/libwebsockets/lib)
   link_directories(/Volumes/MAC/workspace/libwebsockets/build/lib )
 elseif(UNIX)
   set(LIB_CPR_PATH "/home/xors/workspace/ALTEXO/altexo/helper_scripts/compile/libs/cpr")
 endif()
 
-include_directories("${LIB_CPR_PATH}/include")
-include_directories(../include/)
+INCLUDE_DIRECTORIES("${LIB_CPR_PATH}/include")
+INCLUDE_DIRECTORIES(../include/)
 
 find_package( Boost COMPONENTS system thread REQUIRED )
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 
-include(./cmake/FindJsoncpp.cmake)
+INCLUDE(./cmake/FindJsoncpp.cmake)
 INCLUDE_DIRECTORIES( ${JSONCPP_INCLUDE_DIR} )
 
-# add_executable(${PROJECT_NAME} ${SRC_LIST})
 add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
 
 target_link_libraries(${PROJECT_NAME}

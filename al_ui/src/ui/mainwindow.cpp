@@ -243,14 +243,18 @@ void MainWindow::_drawRoomSelectDialog() {
   int dialogHeight = 100;
   ImGui::SetNextWindowSize(ImVec2(dialogWidth, dialogHeight),
                            ImGuiSetCond_Once);
-  ImGui::SetNextWindowPos(ImVec2(m_winWidth / 2 - dialogWidth / 2,
-                                 m_winHeight / 2 - dialogHeight / 2),
-                          ImGuiSetCond_Once);
+
+  int dX = 0; // m_winWidth / 2 - dialogWidth / 2
+  int dY = m_winHeight / 2 - dialogHeight / 2;
+  ImGui::SetNextWindowPos(ImVec2(dX, dY), ImGuiSetCond_Once);
+
   ImGui::Begin("Enter room name", NULL,
                ImGuiWindowFlags_NoTitleBar | ImGuiWindowFlags_NoResize |
                    ImGuiWindowFlags_NoMove | ImGuiWindowFlags_NoCollapse);
+
   ImGui::BeginChild("left pane", ImVec2(-1, 0), true);
   ImGui::InputText("room", m_room, MAX_ROOM_NAME_SIZE);
+
   if (ImGui::Button("enter")) {
     AlSettings st;
     std::string roomStr(m_room);

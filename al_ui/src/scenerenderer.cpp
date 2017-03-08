@@ -12,11 +12,11 @@ SceneRenderer::SceneRenderer(int winWidth, int winHeight)
 void SceneRenderer::setRemoteStreamMode(al::VideoMode mode) {
   m_remoteStreamMode = mode;
 }
-void SceneRenderer::setLocalStreamMode(al::VideoMode mode) {
+void SceneRenderer::setLocalStreamModeCb(al::VideoMode mode) {
   m_localStreamMode = mode;
 }
 
-void SceneRenderer::updateResolution(int width, int height) {
+void SceneRenderer::updateResolutionCb(int width, int height) {
   WIDTH = width;
   HEIGHT = height;
   m_sensorDataFboRenderer.onUpdateResolution(width, height);
@@ -269,13 +269,13 @@ void SceneRenderer::filterMouseMoves(float dx, float dy) {
   mouseY = averageY / averageTotal;
 }
 
-void SceneRenderer::updateRemoteFrame(const uint8_t *image, int width,
-                                      int height) {
+void SceneRenderer::updateRemoteFrameCb(const uint8_t *image, int width,
+                                        int height) {
   m_remoteFrameRenderer.updateFrame(image, width, height);
 }
 
-void SceneRenderer::updateLocalFrame(const uint8_t *image, int width,
-                                     int height) {
+void SceneRenderer::updateLocalFrameCb(const uint8_t *image, int width,
+                                       int height) {
   m_localFrameRenderer.updateFrame(image, width, height);
 }
 

@@ -9,7 +9,7 @@
 #include "AL_CB/al_sdk_cb.hpp"
 #include "allogger.hpp"
 #include "contact.hpp"
-#include "scenerenderer.hpp"
+#include "scenerenderercb.hpp"
 #include <boost/dll/import.hpp>
 #include <boost/property_tree/ptree.hpp>
 #include <boost/signals2/signal.hpp>
@@ -56,7 +56,7 @@ public:
   void setConnectionMode(std::string mode);
 
   void handleMessages();
-  void initHoloRenderer(SceneRenderer *holoRenderer);
+  void initHoloRenderer(SceneRendererCb *holoRenderer);
 
   void setDeviceName(alMsg deviceNama, AlSdkAPI::DesiredVideoSource deviceType);
   int getDeviceType() { return m_videoDeviceType; }
@@ -108,7 +108,7 @@ private:
 
   boost::signals2::signal<void(int, int)> updateResolutionSignal;
 
-  SceneRenderer *m_holoRenderer;
+  SceneRendererCb *m_holoRenderer;
 
   // TODO: temorary solution
   bool m_beenCalled;
