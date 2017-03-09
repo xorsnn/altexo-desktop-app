@@ -16,8 +16,8 @@ AlKinectPlugin::~AlKinectPlugin() {
 
 void AlKinectPlugin::init(AlSensorCb *alSensorCb) {
   m_sensorCb = alSensorCb;
-  m_newFrameSignal.connect(
-      boost::bind(&AlSensorCb::newFrame, m_sensorCb, _1, _2));
+  // m_newFrameSignal.connect(
+  //     boost::bind(&AlSensorCb::newFrame, m_sensorCb, _1, _2));
   // init in another thread no to delay main prograpm execution
   m_internalThread = new boost::thread(&AlKinectPlugin::threadMain, this);
 }
@@ -37,7 +37,9 @@ void AlKinectPlugin::threadMain() {
 void AlKinectPlugin::requestNewFrame() {
   if (m_sensorCb && m_initFinished) {
     if (this->m_device->m_newDepthFrame && this->m_device->m_newDepthFrame) {
-      m_newFrameSignal(this->m_device->getRGB(), this->m_device->getDepth());
+      // m_newFrameSignal(this->m_device->getRGB(), this->m_device->getDepth());
+      m_sensorCb->newFrame(this->m_device->getRGB(),
+                           this->m_device->getDepth());
     }
   }
 }

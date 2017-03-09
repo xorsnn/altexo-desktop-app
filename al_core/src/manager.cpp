@@ -301,7 +301,6 @@ void Manager::handleMessages() {
   alLogger() << "Manager::handleMessages";
   if (!m_sentLocalSdp && m_localSdp != "") {
     if (!m_calling) {
-      alLogger() << "> 2";
       m_wsClient->sendSdpAnswer(AlTextMessage(m_localSdp));
     } else {
       char *cstr = new char[m_localSdp.length() + 1];
@@ -313,7 +312,6 @@ void Manager::handleMessages() {
     m_sentLocalSdp = true;
   }
   if (!m_sentRemoteSdp && m_remoteSdp != "") {
-    alLogger() << "> 3";
     // std::vector<char> remoteSdpVec(m_remoteSdp.begin(), m_remoteSdp.end());
     char *cstr = new char[m_remoteSdp.length() + 1];
     cstr[m_remoteSdp.length()] = '\n';
@@ -326,6 +324,7 @@ void Manager::handleMessages() {
     m_processingCandidates = true;
     while (!m_localCandidates.empty()) {
       m_localCandidatesCounter++;
+
       alLogger() << "local candidates: ";
       std::cout << m_localCandidatesCounter << std::endl;
 
@@ -335,6 +334,7 @@ void Manager::handleMessages() {
     }
     while (!m_remoteCandidates.empty()) {
       m_remoteCandidatesCounter++;
+
       alLogger() << "remote candidates: ";
       std::cout << m_remoteCandidatesCounter << std::endl;
 
@@ -345,6 +345,9 @@ void Manager::handleMessages() {
       m_sdk->setRemoteIceCandidate(candidateVec);
     }
     m_processingCandidates = false;
+
+    // NOTE: since we have connection - set desired video mode
+    m_wsClient->userMode(m_videoSetting.videoMode);
   }
   if (m_sentLocalSdp && m_sentRemoteSdp && m_localCandidates.empty() &&
       m_remoteCandidates.empty() && !connectionInitialized) {
