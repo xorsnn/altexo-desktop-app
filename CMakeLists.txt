@@ -24,14 +24,9 @@ include_directories("${PROJECT_SOURCE_DIR}")
 add_subdirectory(al_utils)
 
 # Standard apps
-# add_subdirectory(al_sdk_2_1)
-# add_subdirectory(al_sdk_tester_2)
-# add_subdirectory(al_sdk_2_0)
-# add_subdirectory(al_sdk_2_2)
-# add_subdirectory(al_sdk_tester)
 
 add_subdirectory(al_core)
 add_subdirectory(al_ui)
 add_subdirectory(al_json_rpc_client)
-# # add_subdirectory(al_kinect)
+add_subdirectory(al_kinect)
 add_subdirectory(al_fake_sensor)
