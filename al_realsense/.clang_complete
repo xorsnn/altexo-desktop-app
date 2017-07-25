@@ -1,0 +1,5 @@
+-I/usr/include/
+-I./include/
+-I../include/
+-I../vendor/Boost.DLL/include/
+-I/home/xors/workspace/lib/librealsense/include

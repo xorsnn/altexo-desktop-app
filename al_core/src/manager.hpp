@@ -21,6 +21,7 @@ public:
   enum SensorType {
     KINECT_1 = 1,
     FAKE_SENSOR,
+    REALSENSE,
   };
 
   struct VideoSetting {

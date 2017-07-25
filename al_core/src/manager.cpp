@@ -32,6 +32,7 @@ Manager::Manager()
   m_videoSetting.isOn = true;
 
   sensorList.push_back(AlTextMessage::stringToMsg("Kinect"));
+  sensorList.push_back(AlTextMessage::stringToMsg("Realsense"));
 }
 
 Manager::~Manager() {
@@ -85,6 +86,7 @@ void Manager::initSensor(AlSensorCb *sensorCb, SensorType sensorType) {
     // setDeviceName(sensorList[sensorList.size() - 1],
     //               AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS);
     // tread requesting new sensor frame every 30 times per second
+
   } break;
   case FAKE_SENSOR: {
     alLogger() << "FAKE_SENSOR";
@@ -93,6 +95,16 @@ void Manager::initSensor(AlSensorCb *sensorCb, SensorType sensorType) {
         boost::dll::load_mode::append_decorations);
     m_sensor->init(sensorCb);
     m_frameThread = new boost::thread(&Manager::frameThread, this);
+
+  } break;
+  case REALSENSE: {
+    alLogger() << "REALSENSE SENSOR";
+    m_sensor = boost::dll::import<AlSensorAPI>(
+        lib_path / "libal_realsense.so", "plugin",
+        boost::dll::load_mode::append_decorations);
+    m_sensor->init(sensorCb);
+    m_frameThread = new boost::thread(&Manager::frameThread, this);
+
   } break;
   default: { } break; }
 }

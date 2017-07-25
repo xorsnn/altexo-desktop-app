@@ -114,7 +114,14 @@ void main() {
   } else {
     vec2 vUV1 = vUV;
     vUV1.y /= 2;
+
     uint val = texture(depthTexMap, vUV1).r;
     vFragColor = huePixelForDepth(float(val));
+
+    // TODO: for realsense
+    // float val = float(texture(depthTexMap, vUV1).r) * 1000.0 * realsenseK;
+    // vFragColor = huePixelForDepth(val);
+    // TODO: move this to uniform
+    // const float realsenseK = 0.000124987;
   }
 }

@@ -224,14 +224,26 @@ void MainWindow::_drawDeviceList() {
   ImGui::BeginChild("sensor list", ImVec2(-1, 180), true);
   for (int i = 0; i < m_manager->sensorList.size(); i++) {
     std::string devName = AlTextMessage::msgToString(m_manager->sensorList[i]);
-    const char *label = devName.c_str();
-    if (ImGui::Selectable(label, selected == i)) {
-      selected = i;
-      m_manager->setDeviceName(m_manager->sensorList[i],
-                               AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS);
-      // TODO: be sure init once
-      m_manager->initSensor(&(m_sceneRenderer->m_sensorDataFboRenderer),
-                            Manager::KINECT_1);
+    if (devName == "Kinect") {
+      const char *label = devName.c_str();
+      if (ImGui::Selectable(label, selected == i)) {
+        selected = i;
+        m_manager->setDeviceName(m_manager->sensorList[i],
+                                 AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS);
+        // TODO: be sure init once
+        m_manager->initSensor(&(m_sceneRenderer->m_sensorDataFboRenderer),
+                              Manager::KINECT_1);
+      }
+    } else if (devName == "Realsense") {
+      const char *label = devName.c_str();
+      if (ImGui::Selectable(label, selected == i)) {
+        selected = i;
+        m_manager->setDeviceName(m_manager->sensorList[i],
+                                 AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS);
+        // TODO: be sure init once
+        m_manager->initSensor(&(m_sceneRenderer->m_sensorDataFboRenderer),
+                              Manager::REALSENSE);
+      }
     }
   }
   ImGui::EndChild();

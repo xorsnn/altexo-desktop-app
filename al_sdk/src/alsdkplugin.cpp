@@ -9,9 +9,6 @@ AlSdkPlugin::AlSdkPlugin()
     : m_debug(true), WIDTH(0), HEIGHT(0), m_videoDeviceName(""),
       m_internalThread(NULL) {
 
-  std::cout << "1111111111111111111111111111" << std::endl;
-  std::cout << "1111111111111111111111111111" << std::endl;
-  std::cout << "1111111111111111111111111111" << std::endl;
   if (m_debug) {
     std::cout << "AlSdkPlugin::AlSdkPlugin()" << std::endl;
   }
@@ -96,7 +93,6 @@ void AlSdkPlugin::updateResolution(int width, int height) {
 
 void AlSdkPlugin::setDesiredVideDeviceName(AlTextMessage deviceName) {
   if (m_debug) {
-    std::cout << "222222222222222222222222222222222" << std::endl;
     std::cout << deviceName.getText() << std::endl;
   }
 
