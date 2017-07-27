@@ -36,6 +36,8 @@ public:
                           AlSensorCb::VideoType videoType, uint depthWidth,
                           uint depthHeight);
 
+  void onSensorParamsCb(float depthScaleK);
+
   // renderered frame
   std::vector<GLubyte> m_outPixel;
 
@@ -78,6 +80,10 @@ private:
   uint m_depthWidth;
   uint m_depthHeight;
   AlSensorCb::VideoType m_videoType;
+
+  // shader params
+  float m_depthScaleK;
+  bool m_updateDepthScaleK;
 
   /*
    * TODO: remove this, window width and height

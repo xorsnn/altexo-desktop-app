@@ -5,6 +5,8 @@
 layout(location=0) out vec4 vFragColor;
 uniform sampler2D textureMap;
 uniform usampler2D depthTexMap;
+uniform float depthScaleK;
+
 smooth in vec2 vUV;
 
 const float FLT_EPSILON = 1.19209290E-07F;
@@ -114,14 +116,7 @@ void main() {
   } else {
     vec2 vUV1 = vUV;
     vUV1.y /= 2;
-
-    uint val = texture(depthTexMap, vUV1).r;
-    vFragColor = huePixelForDepth(float(val));
-
-    // TODO: for realsense
-    // float val = float(texture(depthTexMap, vUV1).r) * 1000.0 * realsenseK;
-    // vFragColor = huePixelForDepth(val);
-    // TODO: move this to uniform
-    // const float realsenseK = 0.000124987;
+    float val = float(texture(depthTexMap, vUV1).r) * depthScaleK;
+    vFragColor = huePixelForDepth(val);
   }
 }

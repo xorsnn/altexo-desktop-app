@@ -23,6 +23,8 @@ public:
   virtual void onVideoFrameParams(uint rgbWidth, uint rgbHeight,
                                   AlSensorCb::VideoType videoType,
                                   uint depthWidth, uint depthHeight) = 0;
+
+  virtual void onSensorParamsCb(float depthScaleK) = 0;
 };
 
 #endif // AL_SENSOR_CB_H

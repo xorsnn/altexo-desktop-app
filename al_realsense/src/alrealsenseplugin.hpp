@@ -50,8 +50,6 @@ private:
                                std::vector<uint16_t> depthFrame)>
       m_newFrameSignal;
 
-  bool m_debug;
-
   Mutex m_mutex;
   rs::device *m_dev;
 
@@ -60,6 +58,8 @@ private:
 
   uint16_t *m_depthImage;
   uint8_t *m_colorImage;
+
+  std::vector<uint8_t> m_resRgb;
 };
 
 extern "C" BOOST_SYMBOL_EXPORT AlRealsensePlugin plugin;
