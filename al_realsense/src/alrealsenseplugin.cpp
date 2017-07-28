@@ -10,6 +10,10 @@ AlRealsensePlugin::AlRealsensePlugin()
 }
 
 AlRealsensePlugin::~AlRealsensePlugin() {
+  // #ifdef DEBUG
+  std::cout << "AlRealsensePlugin::~AlRealsensePlugin()" << std::endl;
+  // #endif
+
   if (m_internalThread->joinable()) {
     // TODO: may be join a little bit earlyer
     m_internalThread->join();
@@ -20,8 +24,6 @@ AlRealsensePlugin::~AlRealsensePlugin() {
 
 void AlRealsensePlugin::init(AlSensorCb *alSensorCb) {
   m_sensorCb = alSensorCb;
-  // m_newFrameSignal.connect(
-  //     boost::bind(&AlSensorCb::newFrame, m_sensorCb, _1, _2));
   // init in another thread no to delay main prograpm execution
   m_internalThread = new boost::thread(&AlRealsensePlugin::threadMain, this);
 }
@@ -30,9 +32,13 @@ void AlRealsensePlugin::threadMain() {
   try {
     rs::context ctx;
     m_dev = ctx.get_device(0);
+
+    // TODO: maybe move to "start()"
     m_dev->enable_stream(rs::stream::depth, rs::preset::best_quality);
     m_dev->enable_stream(rs::stream::color, rs::preset::best_quality);
     m_dev->start();
+    // ~
+
     m_running = true;
     m_sensorCb->onSensorParamsCb(m_dev->get_depth_scale() * 1000.0);
     while (m_running) {
@@ -103,13 +109,6 @@ void AlRealsensePlugin::requestNewFrame() {
   }
 }
 
-void AlRealsensePlugin::start() {
-  // this->m_device->startVideo();
-  // this->m_device->startDepth();
-}
+void AlRealsensePlugin::start() {}
 
-void AlRealsensePlugin::stop() {
-  m_running = false;
-  // this->m_device->stopVideo();
-  // this->m_device->stopDepth();
-}
+void AlRealsensePlugin::stop() { m_running = false; }

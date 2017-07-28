@@ -60,6 +60,7 @@ AlWsClient::AlWsClient() : m_internalThread(NULL), m_debug(true) {
 }
 
 AlWsClient::~AlWsClient() {
+  force_exit = 1;
   if (m_debug) {
     std::cout << "AlWsClient::~AlWsClient 1" << std::endl;
   }
@@ -225,7 +226,6 @@ int AlWsClient::threadMain() {
   */
 
   while (!force_exit) {
-
     if (!wsi_dumb && ratelimit_connects(&rl_dumb, 2u)) {
       lwsl_notice("dumb: connecting\n");
       m_i.protocol = m_protocols[0].name;

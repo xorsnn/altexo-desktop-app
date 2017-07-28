@@ -36,24 +36,31 @@ Manager::Manager()
 }
 
 Manager::~Manager() {
+
+  std::cout << "Manager::~Manager()" << std::endl;
+
   if (m_frameThread != NULL) {
     m_frameThread->interrupt();
     m_frameThread->join();
     delete m_frameThread;
     m_frameThread = NULL;
   }
+  std::cout << "Manager::~Manager()1" << std::endl;
   if (m_wsClient != NULL) {
     m_wsClient.reset();
     m_wsClient = NULL;
   }
+  std::cout << "Manager::~Manager()2" << std::endl;
   if (m_sensor != NULL) {
     m_sensor.reset();
     m_sensor = NULL;
   }
+  std::cout << "Manager::~Manager()3" << std::endl;
   if (m_sdk != NULL) {
     m_sdk.reset();
     m_sdk = NULL;
   }
+  std::cout << "Manager::~Manager()4" << std::endl;
 }
 
 void Manager::initHoloRenderer(SceneRendererCb *holoRenderer) {
@@ -237,8 +244,6 @@ void Manager::onSdpAnswerCb(AlTextMessage msg) {
 void Manager::onSdpOfferCb(const char *cMsg) {
   alLogger() << "Manager::onSdpOfferCb";
   AlTextMessage msg = AlTextMessage::cStrToMsg(cMsg);
-  // alLogger() << "Manager::onSdpOfferCb";
-  // alLogger() << msg.toString();
 
   // **
   // TODO: this is temprorary solution, we make messages similar to what we used

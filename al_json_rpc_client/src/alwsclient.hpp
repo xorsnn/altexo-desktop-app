@@ -49,7 +49,6 @@ private:
   void _onMessageReceived(AlTextMessage msg);
 
   int m_useSsl = 2; /* 2 = allow selfsigned */
-  // int m_port = 8888; // TODO: move to parameters
   int m_ietfVersion = -1;
   int m_denyDeflate = 1;
   std::string m_path;

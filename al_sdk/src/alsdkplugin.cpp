@@ -23,12 +23,16 @@ AlSdkPlugin::~AlSdkPlugin() {
 
   std::cout << "AlSdkPlugin::~AlSdkPlugin 1" << std::endl;
   if (m_internalThread != NULL) {
+    std::cout << "AlSdkPlugin::~AlSdkPlugin 11" << std::endl;
     m_internalThread->interrupt();
+    std::cout << "AlSdkPlugin::~AlSdkPlugin 12" << std::endl;
     // TODO interrupt custom sockerserver
     // if (m_internalThread->joinable()) {
     // m_internalThread->join();
     // }
     delete m_internalThread;
+
+    std::cout << "AlSdkPlugin::~AlSdkPlugin 13" << std::endl;
     m_internalThread = NULL;
     std::cout << "AlSdkPlugin::~AlSdkPlugin 2" << std::endl;
   }

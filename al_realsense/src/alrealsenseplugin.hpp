@@ -46,9 +46,6 @@ private:
   boost::thread *m_internalThread;
 
   AlSensorCb *m_sensorCb;
-  boost::signals2::signal<void(std::vector<uint8_t> rgbFrame,
-                               std::vector<uint16_t> depthFrame)>
-      m_newFrameSignal;
 
   Mutex m_mutex;
   rs::device *m_dev;
