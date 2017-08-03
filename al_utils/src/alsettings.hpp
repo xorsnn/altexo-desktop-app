@@ -5,11 +5,12 @@
 #include <boost/property_tree/ptree.hpp>
 #include <boost/property_tree/xml_parser.hpp>
 #include <iostream>
+#include "al_utils_export.h"
 
 // class to read and store settings in external file
 using boost::property_tree::ptree;
 
-class AlSettings {
+class AL_UTILS_EXPORT AlSettings {
 
 public:
   AlSettings();

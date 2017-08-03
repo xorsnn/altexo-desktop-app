@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 project (rootproject)
 
 if(APPLE)
@@ -9,7 +9,7 @@ elseif(UNIX)
   set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
 endif()
 
-add_definitions(-DAL_DEBUG)
+# add_definitions(-DAL_DEBUG)
 
 set(CMAKE_BINARY_DIR ${CMAKE_SOURCE_DIR}/build)
 
@@ -27,7 +27,7 @@ add_subdirectory(al_utils)
 
 add_subdirectory(al_core)
 add_subdirectory(al_ui)
-add_subdirectory(al_json_rpc_client)
-add_subdirectory(al_kinect)
-add_subdirectory(al_fake_sensor)
-add_subdirectory(al_realsense)
+# add_subdirectory(al_json_rpc_client)
+# add_subdirectory(al_kinect)
+# add_subdirectory(al_fake_sensor)
+# add_subdirectory(al_realsense)

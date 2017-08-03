@@ -1,5 +1,5 @@
 project(al_core)
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
 MESSAGE("***************************")
 MESSAGE("***** bulding CORE ********")
@@ -23,6 +23,7 @@ if(UNIX)
 endif()
 
 if (WIN32)
+
 else()
   SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${${PROJECT_NAME}_SOURCE_DIR}/cmake")
 endif()
@@ -40,20 +41,16 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
 endif()
 
 if (WIN32)
-# SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MT")
+  # SET Boost dir
+  # SET(BOOST_ROOT "C:\\local\\boost_1_61_0")
+  # SET(BOOST_LIBRARYDIR "C:\\local\\boost_1_61_0\\lib32-msvc-14.0")
+  # SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MT")
+  INCLUDE_DIRECTORIES( ../side-libs/boost_1_64_0 )
 else()
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+  FIND_PACKAGE( Boost COMPONENTS system filesystem thread log REQUIRED )
+  INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 endif()
-
-if (WIN32)
-  # SET Boost dir
-  SET(BOOST_ROOT "C:\\local\\boost_1_61_0")
-  SET(BOOST_LIBRARYDIR "C:\\local\\boost_1_61_0\\lib32-msvc-14.0")
-endif()
-
-FIND_PACKAGE( Boost COMPONENTS system filesystem thread log REQUIRED )
-
-INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 
 INCLUDE_DIRECTORIES( ../al_utils/src )
 INCLUDE_DIRECTORIES( ./src/ )
@@ -69,20 +66,24 @@ if(APPLE)
   SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
 endif()
 
-SET(progdll_dbg_libs
-  ${Boost_SYSTEM_LIBRARY_DEBUG}
-  ${Boost_FILESYSTEM_LIBRARY_DEBUG}
-  ${Boost_LOG_LIBRARY_DEBUG})
+if (WIN32)
 
-SET(progdll_opt_libs
-  ${Boost_SYSTEM_LIBRARY_RELEASE}
-  ${Boost_FILESYSTEM_LIBRARY_RELEASE}
-  ${Boost_LOG_LIBRARY_RELEASE})
+else()
+  SET(progdll_dbg_libs
+    ${Boost_SYSTEM_LIBRARY_DEBUG}
+    ${Boost_FILESYSTEM_LIBRARY_DEBUG}
+    ${Boost_LOG_LIBRARY_DEBUG})
+
+  SET(progdll_opt_libs
+    ${Boost_SYSTEM_LIBRARY_RELEASE}
+    ${Boost_FILESYSTEM_LIBRARY_RELEASE}
+    ${Boost_LOG_LIBRARY_RELEASE})
+
+    INCLUDE(./cmake/FindJsoncpp.cmake)
+    INCLUDE_DIRECTORIES( ${JSONCPP_INCLUDE_DIR} )
+endif()
 
 LINK_DIRECTORIES(${CMAKE_BINARY_DIR})
-
-INCLUDE(./cmake/FindJsoncpp.cmake)
-INCLUDE_DIRECTORIES( ${JSONCPP_INCLUDE_DIR} )
 
 ADD_LIBRARY(${PROJECT_NAME} SHARED ${SRC_LIST})
 
@@ -108,10 +109,21 @@ elseif(UNIX)
   )
 elseif(WIN32)
   TARGET_LINK_LIBRARIES(${PROJECT_NAME}
-    "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_system-vc140-mt-1_61.lib"
-    "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_filesystem-vc140-mt-1_61.lib"
-    "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_date_time-vc140-mt-1_61.lib"
-    "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_chrono-vc140-mt-1_61.lib"
-    "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_thread-vc140-mt-1_61.lib"
+    ${CMAKE_CURRENT_SOURCE_DIR}/../build/Release/al_utils.lib
+    # "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_system-vc140-mt-1_61.lib"
+    # ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/system/build/msvc-14.0/rls/adrs-mdl-64/lnk-sttc/thrd-mlt/libboost_system-vc140-mt-1_64.lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/system/build/msvc-14.0/rls/lnk-sttc/thrd-mlt/libboost_system-vc140-mt-1_64.lib
+    # "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_filesystem-vc140-mt-1_61.lib"
+    # ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/filesystem/build/msvc-14.0/rls/adrs-mdl-64/lnk-sttc/thrd-mlt/libboost_filesystem-vc140-mt-1_64.lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/filesystem/build/msvc-14.0/rls/lnk-sttc/thrd-mlt/libboost_filesystem-vc140-mt-1_64.lib
+    # "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_date_time-vc140-mt-1_61.lib"
+    # ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/date_time/build/msvc-14.0/rls/adrs-mdl-64/lnk-sttc/thrd-mlt/libboost_date_time-vc140-mt-1_64.lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/date_time/build/msvc-14.0/rls/lnk-sttc/thrd-mlt/libboost_date_time-vc140-mt-1_64.lib
+    # "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_chrono-vc140-mt-1_61.lib"
+    # ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/chrono/build/msvc-14.0/rls/adrs-mdl-64/lnk-sttc/thrd-mlt/libboost_chrono-vc140-mt-1_64.lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/chrono/build/msvc-14.0/rls/lnk-sttc/thrd-mlt/libboost_chrono-vc140-mt-1_64.lib
+    # "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_thread-vc140-mt-1_61.lib"
+    # ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/thread/build/msvc-14.0/rls/adrs-mdl-64/lnk-sttc/thrd-mlt/libboost_thread-vc140-mt-1_64.lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/thread/build/msvc-14.0/rls/lnk-sttc/thrd-mlt/libboost_thread-vc140-mt-1_64.lib
   )
 endif()

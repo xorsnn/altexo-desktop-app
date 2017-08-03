@@ -175,7 +175,7 @@ void Manager::initSdk() {
   boostfs::path pluginPath = boostfs::current_path() /
                              boostfs::path("Release") /
                              boostfs::path("altexo_sdk");
-  alLogger() << "Load Plugin from " << pluginPath;
+  // alLogger() << "Load Plugin from " << pluginPath;
 
   typedef boost::shared_ptr<AlSdkAPI>(PluginCreate)();
   boost::function<PluginCreate> pluginCreator;
@@ -183,8 +183,8 @@ void Manager::initSdk() {
     pluginCreator = boostdll::import_alias<PluginCreate>(
         pluginPath, "create_plugin", boostdll::load_mode::append_decorations);
   } catch (const boost::system::system_error &err) {
-    BOOST_LOG_SEV(lg, error) << "Cannot load Plugin from " << pluginPath;
-    BOOST_LOG_SEV(lg, error) << err.what();
+    // BOOST_LOG_SEV(lg, error) << "Cannot load Plugin from " << pluginPath;
+    // BOOST_LOG_SEV(lg, error) << err.what();
     return;
   }
   /* create the plugin */

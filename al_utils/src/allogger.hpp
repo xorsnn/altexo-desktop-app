@@ -3,8 +3,10 @@
 #define ALLOGGER_H
 
 #include <iostream>
+#include <string>
+#include "al_utils_export.h"
 
-class AlLogger {
+class AL_UTILS_EXPORT AlLogger {
 
 public:
   AlLogger();

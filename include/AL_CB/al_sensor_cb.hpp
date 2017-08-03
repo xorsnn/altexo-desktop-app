@@ -4,6 +4,10 @@
 #include <string>
 #include <vector>
 
+#ifdef _WIN32
+#define uint unsigned int
+#endif
+
 class AlSensorCb {
 public:
   enum VideoType {
