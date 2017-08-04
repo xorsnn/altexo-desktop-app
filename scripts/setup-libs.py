@@ -21,6 +21,9 @@ BOOST_ARCH_HASH = "49c6abfeb5b480f6a86119c0d57235966b4690ee6ff9e6401ee868244808d
 SDL_DOWNLOAD_LINK = "https://www.libsdl.org/release/SDL2-2.0.5.zip"
 SDL_ARCHIVE = os.path.realpath(os.path.join(DOWNLOAD_DIR, "SDL2-2.0.5.zip"))
 
+GLM_DOWNLOAD_LINK = "https://github.com/g-truc/glm/archive/0.9.8.4.zip"
+GLM_ARCHIVE = os.path.realpath(os.path.join(DOWNLOAD_DIR, "0.9.8.4.zip"))
+
 def _download_boost():
     print(" -> downloading boost")
     response = urlopen(BOOST_DOWNLOAD_LINK)
@@ -97,9 +100,45 @@ def build_SDL():
     _build_SDL()
     pass
 
+def _download_glm():
+    print(" -> downloading glm")
+    response = urlopen(GLM_DOWNLOAD_LINK)
+    CHUNK = 16 * 1024
+    with open(GLM_ARCHIVE, 'wb') as f:
+        while True:
+            chunk = response.read(CHUNK)
+            if not chunk:
+                break
+            f.write(chunk)
+
+    print(" -> unzip glm")
+    zip_ref = zipfile.ZipFile( GLM_ARCHIVE, 'r' )
+    zip_ref.extractall( DOWNLOAD_DIR )
+    zip_ref.close()
+    pass
+
+def _build_glm():
+    print(" -> building glm")
+    os.chdir(os.path.realpath(os.path.join(DOWNLOAD_DIR, "glm-0.9.8.4")))
+
+    build_dir = os.path.realpath(os.path.join(os.path.join(DOWNLOAD_DIR, "glm-0.9.8.4"), "build"))
+    if not os.path.exists(build_dir):
+        os.makedirs(build_dir)
+
+    os.chdir(build_dir)
+    subprocess.run("cmake ..", shell=True, check=True)
+    subprocess.run("MSBuild glm.sln /p:Configuration=Release", shell=True, check=True)
+    os.chdir(SCRIPT_DIR)
+
+def build_glm():
+    # _download_glm()
+    _build_glm()
+    pass
+
 def main():
     # build_boost()
-    build_SDL()
+    # build_SDL()
+    build_glm()
     pass
 
 if __name__ == "__main__":

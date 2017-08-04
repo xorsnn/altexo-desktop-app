@@ -15,8 +15,9 @@
 #include <boost/signals2/signal.hpp>
 #include <boost/thread.hpp>
 #include <queue>
+#include "al_core_export.h"
 
-class Manager : public AlWsCb, public AlSDKCb {
+class AL_CORE_EXPORT Manager : public AlWsCb, public AlSDKCb {
 public:
   enum SensorType {
     KINECT_1 = 1,

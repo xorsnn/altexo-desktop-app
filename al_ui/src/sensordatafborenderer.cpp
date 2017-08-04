@@ -213,10 +213,10 @@ void SensorDataFboRenderer::newFrame(const uint8_t *rgbFrame,
   }
 }
 
-void SensorDataFboRenderer::onVideoFrameParams(uint rgbWidth, uint rgbHeight,
+void SensorDataFboRenderer::onVideoFrameParams(unsigned int rgbWidth, unsigned int rgbHeight,
                                                AlSensorCb::VideoType videoType,
-                                               uint depthWidth,
-                                               uint depthHeight) {
+                                               unsigned int depthWidth,
+                                               unsigned int depthHeight) {
   m_rgbWidth = rgbWidth;
   m_rgbHeight = rgbHeight;
   m_depthWidth = depthHeight;

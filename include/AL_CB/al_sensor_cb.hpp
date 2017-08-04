@@ -4,9 +4,9 @@
 #include <string>
 #include <vector>
 
-#ifdef _WIN32
-#define uint unsigned int
-#endif
+// #ifdef _WIN32
+// #define uint unsigned int
+// #endif
 
 class AlSensorCb {
 public:
@@ -24,9 +24,9 @@ public:
   virtual void newFrame(const uint8_t *rgbFrame,
                         const uint16_t *depthFrame) = 0;
 
-  virtual void onVideoFrameParams(uint rgbWidth, uint rgbHeight,
+  virtual void onVideoFrameParams(unsigned int rgbWidth, unsigned int rgbHeight,
                                   AlSensorCb::VideoType videoType,
-                                  uint depthWidth, uint depthHeight) = 0;
+                                  unsigned int depthWidth, unsigned int depthHeight) = 0;
 
   virtual void onSensorParamsCb(float depthScaleK) = 0;
 };

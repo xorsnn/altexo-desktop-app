@@ -22,6 +22,8 @@ file(GLOB SHADERS_LIST
   shaders/*.vert
 )
 
+# add_definitions(-D_CRT_SECURE_NO_WARNINGS)
+
 if(UNIX)
   set(CMAKE_C_COMPILER "/usr/bin/clang")
   set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
@@ -47,12 +49,14 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
   else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
   endif()
+  # add_definitions(/Za)
+  # add_definitions(/FAs)
 endif()
 
 if (WIN32)
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MT")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MT")
 else()
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 endif()
 
 if (WIN32)
@@ -92,8 +96,9 @@ if(UNIX)
 # win32
 else()
   INCLUDE_DIRECTORIES( "D:\\WORKSPACE\\BUILD_ALTEXO\\glew-2.0.0\\include" )
-  INCLUDE_DIRECTORIES( "D:\\WORKSPACE\\BUILD_ALTEXO\\SDL2-2.0.4\\build\\include" )
-  INCLUDE_DIRECTORIES( "D:\\WORKSPACE\\BUILD_ALTEXO\\glm" )
+  INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/SDL2-2.0.5/build/include )
+  INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/SDL2-2.0.5/include )
+  INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/glm-0.9.8.4 )
 endif()
 
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
@@ -157,18 +162,28 @@ elseif(UNIX)
     -ldl)
 elseif(WIN32)
   target_link_libraries(${PROJECT_NAME}
-    "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_system-vc140-mt-1_61.lib"
-    "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_filesystem-vc140-mt-1_61.lib"
+    ${CMAKE_CURRENT_SOURCE_DIR}/../build/Release/al_utils.lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/../build/Release/al_core.lib
+    # "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_system-vc140-mt-1_61.lib"
+    ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/system/build/msvc-14.0/rls/lnk-sttc/thrd-mlt/libboost_system-vc140-mt-1_64.lib
+    # "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_filesystem-vc140-mt-1_61.lib"
+    ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/filesystem/build/msvc-14.0/rls/lnk-sttc/thrd-mlt/libboost_filesystem-vc140-mt-1_64.lib
+    #
+    # "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_date_time-vc140-mt-1_61.lib"
+    ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/date_time/build/msvc-14.0/rls/lnk-sttc/thrd-mlt/libboost_date_time-vc140-mt-1_64.lib
+    # "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_chrono-vc140-mt-1_61.lib"
+    ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/chrono/build/msvc-14.0/rls/lnk-sttc/thrd-mlt/libboost_chrono-vc140-mt-1_64.lib
+    # "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_thread-vc140-mt-1_61.lib"
+    ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/thread/build/msvc-14.0/rls/lnk-sttc/thrd-mlt/libboost_thread-vc140-mt-1_64.lib
+    #
+    # "D:\\WORKSPACE\\BUILD_ALTEXO\\SDL2-2.0.4\\build\\Release\\SDL2.lib"
+    # "D:\\WORKSPACE\\BUILD_ALTEXO\\SDL2-2.0.4\\build\\Release\\SDL2main.lib"
+    ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/SDL2-2.0.5/build/Release/SDL2.lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/SDL2-2.0.5/build/Release/SDL2main.lib
 
-    "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_date_time-vc140-mt-1_61.lib"
-    "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_chrono-vc140-mt-1_61.lib"
-    "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_thread-vc140-mt-1_61.lib"
-
-    "D:\\WORKSPACE\\BUILD_ALTEXO\\SDL2-2.0.4\\build\\Release\\SDL2.lib"
-    "D:\\WORKSPACE\\BUILD_ALTEXO\\SDL2-2.0.4\\build\\Release\\SDL2main.lib"
-    "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.10586.0\\um\\x86\\WinMM.Lib"
-    "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.10586.0\\um\\x86\\Imm32.Lib"
-    "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.10586.0\\um\\x86\\Version.Lib"
-    "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.10586.0\\um\\x86\\OpenGL32.Lib"
+    "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.15063.0\\um\\x86\\WinMM.Lib"
+    "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.15063.0\\um\\x86\\Imm32.Lib"
+    "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.15063.0\\um\\x86\\Version.Lib"
+    "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.15063.0\\um\\x86\\OpenGL32.Lib"
   )
 endif()

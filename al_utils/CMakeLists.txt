@@ -44,10 +44,4 @@ endif()
 add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
 
 include(GenerateExportHeader)
-
-generate_export_header(${PROJECT_NAME}
-  # BASE_NAME ${PROJECT_NAME}
-  # EXPORT_MACRO_NAME ${PROJECT_NAME}_EXPORTS
-  # EXPORT_FILE_NAME ${PROJECT_NAME}_EXPORTS.h
-  # STATIC_DEFINE SHARED_EXPORTS_BUILT_AS_STATIC
-)
+generate_export_header(${PROJECT_NAME})

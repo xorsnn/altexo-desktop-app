@@ -127,3 +127,6 @@ elseif(WIN32)
     ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/thread/build/msvc-14.0/rls/lnk-sttc/thrd-mlt/libboost_thread-vc140-mt-1_64.lib
   )
 endif()
+
+include(GenerateExportHeader)
+generate_export_header(${PROJECT_NAME})

@@ -32,9 +32,9 @@ public:
 
   void newFrame(const uint8_t *rgbFrame, const uint16_t *depthFrame);
 
-  void onVideoFrameParams(uint rgbWidth, uint rgbHeight,
-                          AlSensorCb::VideoType videoType, uint depthWidth,
-                          uint depthHeight);
+  void onVideoFrameParams(unsigned int rgbWidth, unsigned int rgbHeight,
+                          AlSensorCb::VideoType videoType, unsigned int depthWidth,
+                          unsigned int depthHeight);
 
   void onSensorParamsCb(float depthScaleK);
 
@@ -75,10 +75,10 @@ private:
   /*
    * Sensor snapshot parameters
    */
-  uint m_rgbWidth;
-  uint m_rgbHeight;
-  uint m_depthWidth;
-  uint m_depthHeight;
+  unsigned int m_rgbWidth;
+  unsigned int m_rgbHeight;
+  unsigned int m_depthWidth;
+  unsigned int m_depthHeight;
   AlSensorCb::VideoType m_videoType;
 
   // shader params
