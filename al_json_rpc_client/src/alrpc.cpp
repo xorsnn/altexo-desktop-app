@@ -1,7 +1,7 @@
 #include "alrpc.hpp"
 #include <boost/foreach.hpp>
 #include <iostream>
-#include <jsoncpp/json/json.h>
+#include <json/json.h>
 
 template <typename T>
 std::vector<T> as_vector(boost::property_tree::ptree const &pt,

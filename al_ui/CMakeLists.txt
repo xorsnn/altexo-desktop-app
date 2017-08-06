@@ -22,8 +22,6 @@ file(GLOB SHADERS_LIST
   shaders/*.vert
 )
 
-# add_definitions(-D_CRT_SECURE_NO_WARNINGS)
-
 if(UNIX)
   set(CMAKE_C_COMPILER "/usr/bin/clang")
   set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
@@ -32,7 +30,11 @@ endif()
 file( COPY res/cto_intro.png DESTINATION . )
 
 # shaders
-file( COPY ${SHADERS_LIST} DESTINATION ./shaders )
+if (WIN32)
+  file( COPY ${SHADERS_LIST} DESTINATION ../Release/shaders )
+else()
+  file( COPY ${SHADERS_LIST} DESTINATION ./shaders )
+endif()
 
 if (WIN32)
 else()
@@ -49,8 +51,6 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
   else()
     set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /W4")
   endif()
-  # add_definitions(/Za)
-  # add_definitions(/FAs)
 endif()
 
 if (WIN32)
@@ -60,16 +60,11 @@ else()
 endif()
 
 if (WIN32)
-  # set Boost dir
-  set(BOOST_ROOT "C:\\local\\boost_1_61_0")
-  set(BOOST_LIBRARYDIR "C:\\local\\boost_1_61_0\\lib32-msvc-14.0")
 else()
-
   if (APPLE)
     FIND_PACKAGE( glm REQUIRED )
     FIND_LIBRARY( QUICKTIME QTKit )
   endif()
-
   FIND_PACKAGE( SDL2 REQUIRED )
   FIND_PACKAGE( GLEW REQUIRED )
   # used for testing now
@@ -164,26 +159,22 @@ elseif(WIN32)
   target_link_libraries(${PROJECT_NAME}
     ${CMAKE_CURRENT_SOURCE_DIR}/../build/Release/al_utils.lib
     ${CMAKE_CURRENT_SOURCE_DIR}/../build/Release/al_core.lib
-    # "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_system-vc140-mt-1_61.lib"
     ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/system/build/msvc-14.0/rls/lnk-sttc/thrd-mlt/libboost_system-vc140-mt-1_64.lib
-    # "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_filesystem-vc140-mt-1_61.lib"
     ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/filesystem/build/msvc-14.0/rls/lnk-sttc/thrd-mlt/libboost_filesystem-vc140-mt-1_64.lib
-    #
-    # "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_date_time-vc140-mt-1_61.lib"
     ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/date_time/build/msvc-14.0/rls/lnk-sttc/thrd-mlt/libboost_date_time-vc140-mt-1_64.lib
-    # "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_chrono-vc140-mt-1_61.lib"
     ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/chrono/build/msvc-14.0/rls/lnk-sttc/thrd-mlt/libboost_chrono-vc140-mt-1_64.lib
-    # "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_thread-vc140-mt-1_61.lib"
     ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/thread/build/msvc-14.0/rls/lnk-sttc/thrd-mlt/libboost_thread-vc140-mt-1_64.lib
-    #
-    # "D:\\WORKSPACE\\BUILD_ALTEXO\\SDL2-2.0.4\\build\\Release\\SDL2.lib"
-    # "D:\\WORKSPACE\\BUILD_ALTEXO\\SDL2-2.0.4\\build\\Release\\SDL2main.lib"
+
     ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/SDL2-2.0.5/build/Release/SDL2.lib
     ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/SDL2-2.0.5/build/Release/SDL2main.lib
 
-    "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.15063.0\\um\\x86\\WinMM.Lib"
-    "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.15063.0\\um\\x86\\Imm32.Lib"
-    "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.15063.0\\um\\x86\\Version.Lib"
-    "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.15063.0\\um\\x86\\OpenGL32.Lib"
+    # "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.15063.0\\um\\x86\\WinMM.Lib"
+    # "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.15063.0\\um\\x86\\Imm32.Lib"
+    # "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.15063.0\\um\\x86\\Version.Lib"
+    # "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.15063.0\\um\\x86\\OpenGL32.Lib"
+    WinMM.Lib
+    Imm32.Lib
+    Version.Lib
+    OpenGL32.Lib
   )
 endif()

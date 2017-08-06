@@ -12,7 +12,7 @@
 
 #ifdef _WIN32
 #define random rand
-#include "gettimeofday.h"
+#include "win32helpers/gettimeofday.h"
 #else
 #include <sys/time.h>
 #include <syslog.h>
