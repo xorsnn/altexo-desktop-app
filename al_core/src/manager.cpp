@@ -49,6 +49,7 @@ Manager::~Manager() {
   if (m_wsClient != NULL) {
     m_wsClient.reset();
     m_wsClient = NULL;
+    m_wsClientFactory.clear();
   }
   std::cout << "Manager::~Manager()2" << std::endl;
   if (m_sensor != NULL) {
@@ -142,10 +143,24 @@ void Manager::initWsConnection(AlWsCb *alWsCb) {
   boost::filesystem::path lib_path("");
   alLogger() << "Loading ws plugin";
 
-#ifdef __APPLE__
+#if defined __APPLE__
   m_wsClient = boost::dll::import<AlWsAPI>(
       lib_path / "libjson_rpc_client.dylib", "plugin",
       boost::dll::load_mode::append_decorations);
+#elif defined _WIN32
+  std::cout << "opening" << std::endl;
+  boostfs::path pluginPath = boostfs::current_path() /
+                             boostfs::path("json_rpc_client_2");
+  try {
+    m_wsClientFactory = boostdll::import_alias<WsClientFactotry>(
+        pluginPath, "create_plugin", boostdll::load_mode::append_decorations);
+  } catch (const boost::system::system_error &err) {
+    std::cout << "Cannot load Plugin from " << pluginPath << std::endl;
+    std::cout << err.what() << std::endl;
+    return;
+  }
+  m_wsClient = m_wsClientFactory();
+  std::cout << m_wsClient << std::endl;
 #else
   m_wsClient =
       boost::dll::import<AlWsAPI>(lib_path / "libjson_rpc_client.so", "plugin",

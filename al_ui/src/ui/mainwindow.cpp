@@ -79,9 +79,9 @@ void MainWindow::init() {
   // m_manager->initSensor(&(m_sceneRenderer.m_sensorDataFboRenderer));
   m_manager->initSdk();
 
-#ifndef _WIN32
+
   m_manager->initWsConnection(m_manager);
-#endif
+
   // ~ local init
 
   // Load Fonts

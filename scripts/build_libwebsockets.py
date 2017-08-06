@@ -1,7 +1,10 @@
 import os
 import subprocess
 
-LIBWEBSOCKETS_REV = "e6bd6296bd9f90f6a264ea9e69825552e8702490" # v2.3.0
+# LIBWEBSOCKETS_REV = "e6bd6296bd9f90f6a264ea9e69825552e8702490" # v2.3.0
+# LIBWEBSOCKETS_REV = "a085a0ab3838401c7ff9bf2ad8646af633746a14" # v1.7.9
+# LIBWEBSOCKETS_REV = "2209ceb3f5ff3cfad7af9a81327012d15d0d5094" # v1.7.1
+LIBWEBSOCKETS_REV = "34266b786162656f48e63aa81c39f55dc6c72015" # v1.7.2
 
 def _download_libwebsockets(SCRIPT_DIR, DOWNLOAD_DIR):
     print(" -> downloading libwebsockets")
@@ -36,5 +39,5 @@ def _build_libwebsockets(SCRIPT_DIR, DOWNLOAD_DIR):
     os.chdir(SCRIPT_DIR)
 
 def build_libwebsockets(SCRIPT_DIR, DOWNLOAD_DIR):
-    # _download_libwebsockets(SCRIPT_DIR, DOWNLOAD_DIR)
+    _download_libwebsockets(SCRIPT_DIR, DOWNLOAD_DIR)
     _build_libwebsockets(SCRIPT_DIR, DOWNLOAD_DIR)

@@ -17,6 +17,8 @@
 #include <queue>
 #include "al_core_export.h"
 
+typedef boost::shared_ptr<AlWsAPI>(WsClientFactotry)();
+
 class AL_CORE_EXPORT Manager : public AlWsCb, public AlSDKCb {
 public:
   enum SensorType {
@@ -66,7 +68,10 @@ public:
   void toggleVideo();
 
   boost::shared_ptr<AlSdkAPI> m_sdk;
+
+
   boost::shared_ptr<AlWsAPI> m_wsClient;
+  boost::function<WsClientFactotry> m_wsClientFactory;
 
   // TODO remove I think
   boost::shared_ptr<AlPluginTestAPI> m_plugin_test;

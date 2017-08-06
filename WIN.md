@@ -7,3 +7,7 @@ install
 
 to build from cmd
 MSBuild rootproject.sln /p:Configuration=Release
+cmake --build . --config Release
+
+#change cmd locale
+chcp 437

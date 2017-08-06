@@ -4,6 +4,7 @@
 #include "AL_API/ws_client_api.hpp"
 #include "AL_CB/al_ws_cb.hpp"
 #include "alconnclient.hpp"
+#include "boost/thread.hpp"
 #include "altextmessage.hpp"
 
 #ifdef _WIN32
