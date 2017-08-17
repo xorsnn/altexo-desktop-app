@@ -2,6 +2,7 @@ import os
 import subprocess
 from urllib.request import urlopen
 import zipfile
+import platform
 
 # BOOST_DIR = os.path.realpath(os.path.join(DOWNLOAD_DIR, "boost_1_64_0"))
 BOOST_DOWNLOAD_LINK = "https://dl.bintray.com/boostorg/release/1.64.0/source/boost_1_64_0.zip"
@@ -42,9 +43,14 @@ def _clean(SCRIPT_DIR, DOWNLOAD_DIR):
 def _build_boost(SCRIPT_DIR, DOWNLOAD_DIR):
     print(" -> building boost")
     os.chdir(os.path.realpath(os.path.join(DOWNLOAD_DIR, "boost_1_64_0")))
+
+    INSTALL_DIR = os.path.realpath(os.path.join(DOWNLOAD_DIR, "boost"))
+
+    # TODO: provide prefix var
     subprocess.run("bootstrap.bat", shell=True, check=True)
     subprocess.run("b2 toolset=msvc-14.0 --clean-all -n", shell=True, check=True)
-    subprocess.run("b2 toolset=msvc-14.0 --build-type=complete --abbreviate-paths architecture=x86 address-model=32 install -j4", shell=True, check=True)
+    subprocess.run("b2 toolset=msvc-14.0 --build-type=complete --abbreviate-paths architecture=x86 address-model=32 install -j4 --prefix=%s" % INSTALL_DIR, shell=True, check=True)
+
     os.chdir(SCRIPT_DIR)
 
 def build_boost(SCRIPT_DIR, DOWNLOAD_DIR):

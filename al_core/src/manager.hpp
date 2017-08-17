@@ -15,11 +15,19 @@
 #include <boost/signals2/signal.hpp>
 #include <boost/thread.hpp>
 #include <queue>
+
+#if defined _WIN32
 #include "al_core_export.h"
+#endif
 
 typedef boost::shared_ptr<AlWsAPI>(WsClientFactotry)();
 
-class AL_CORE_EXPORT Manager : public AlWsCb, public AlSDKCb {
+class
+#if defined _WIN32
+AL_CORE_EXPORT
+#endif
+Manager : public AlWsCb, public AlSDKCb {
+  
 public:
   enum SensorType {
     KINECT_1 = 1,

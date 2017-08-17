@@ -1,7 +1,12 @@
 #include "alrpc.hpp"
 #include <boost/foreach.hpp>
 #include <iostream>
+
+#if defined _WIN32
 #include <json/json.h>
+#else
+#include <jsoncpp/json/json.h>
+#endif
 
 template <typename T>
 std::vector<T> as_vector(boost::property_tree::ptree const &pt,

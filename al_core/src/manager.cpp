@@ -163,7 +163,7 @@ void Manager::initWsConnection(AlWsCb *alWsCb) {
   std::cout << m_wsClient << std::endl;
 #else
   m_wsClient =
-      boost::dll::import<AlWsAPI>(lib_path / "libjson_rpc_client.so", "plugin",
+      boost::dll::import<AlWsAPI>(lib_path / "libjson_rpc_client_2.so", "plugin",
                                   boost::dll::load_mode::append_decorations);
 #endif
   m_wsClient->init(alWsCb);
@@ -206,7 +206,7 @@ void Manager::initSdk() {
   m_sdk = pluginCreator();
 #else
   boost::filesystem::path lib_path2(
-      "/home/xors/workspace/lib/webrtc-checkout/src/out/Default");
+      "/home/xors/workspace/lib/webrtc/webrtc-checkout/src/out/Default");
 
   alLogger() << "Loading the plugin";
 

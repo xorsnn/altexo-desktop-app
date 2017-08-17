@@ -33,7 +33,7 @@ file( COPY res/cto_intro.png DESTINATION . )
 if (WIN32)
   file( COPY ${SHADERS_LIST} DESTINATION ../Release/shaders )
 else()
-  file( COPY ${SHADERS_LIST} DESTINATION ./shaders )
+  file( COPY ${SHADERS_LIST} DESTINATION ../shaders )
 endif()
 
 if (WIN32)
@@ -153,7 +153,7 @@ elseif(UNIX)
     -lboost_log_setup
     -lpng
     -lal_core
-    "/home/xors/workspace/lib/webrtc-checkout/src/out/Default/libprotobuf_lite.so"
+    # "/home/xors/workspace/lib/webrtc-checkout/src/out/Default/libprotobuf_lite.so"
     -ldl)
 elseif(WIN32)
   target_link_libraries(${PROJECT_NAME}

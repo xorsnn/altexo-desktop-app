@@ -104,7 +104,7 @@ elseif(UNIX)
     ${JSONCPP_LIBRARY}
     -lal_utils
     -lboost_log_setup
-    "/home/xors/workspace/lib/webrtc-checkout/src/out/Default/libprotobuf_lite.so"
+    "/home/xors/workspace/lib/webrtc/webrtc-checkout/src/out/Default/obj/third_party/protobuf/libprotobuf_lite.a"
     -ldl
   )
 elseif(WIN32)

@@ -41,16 +41,17 @@ if(WIN32)
   INCLUDE_DIRECTORIES( ../side-libs/libwebsockets_install/include )
   INCLUDE_DIRECTORIES( ../side-libs/openssl/include )
   INCLUDE_DIRECTORIES( ../side-libs/libwebsockets/win32port/win32helpers )
-else()
+elseif(UNIX)
+  SET( LIB_CPR_PATH ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/cpr-1.3.0 )
+  INCLUDE_DIRECTORIES( ${LIB_CPR_PATH}/include )
 #   INCLUDE_DIRECTORIES( /usr/include )
-#   find_package( Boost COMPONENTS system thread REQUIRED )
-#   INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
+  find_package( Boost COMPONENTS system thread REQUIRED )
+  INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 #   INCLUDE( ./cmake/FindJsoncpp.cmake )
 endif()
 
 # INCLUDE_DIRECTORIES( include )
 # INCLUDE_DIRECTORIES( ../include/ )
-# INCLUDE_DIRECTORIES( ${LIB_CPR_PATH}/include )
 INCLUDE_DIRECTORIES( ${JSONCPP_INCLUDE_DIR} )
 
 # # TODO: environment dependent
@@ -63,7 +64,6 @@ INCLUDE_DIRECTORIES( ${JSONCPP_INCLUDE_DIR} )
 #   INCLUDE_DIRECTORIES( /Volumes/MAC/workspace/libwebsockets/lib )
 #   link_directories( /Volumes/MAC/workspace/libwebsockets/build/lib )
 # elseif(UNIX)
-#   set( LIB_CPR_PATH "/home/xors/workspace/ALTEXO/altexo/helper_scripts/compile/libs/cpr" )
 # endif()
 
 add_library(${PROJECT_NAME} SHARED ${SRC_LIST})
@@ -84,12 +84,13 @@ if(WIN32)
     ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/libwebsockets/build/lib/Release/zlib_internal.lib
   )
 else()
-#   target_link_libraries(${PROJECT_NAME}
-#     ${LIB_CPR_PATH}/../build/lib/libcpr.a
-#     -lpthread -lssl -lcrypto -lcurl
-#     -lwebsockets
-#     ${Boost_SYSTEM_LIBRARY}
-#     ${Boost_THREAD_LIBRARY}
-#     ${JSONCPP_LIBRARY}
-#   )
+  target_link_libraries(${PROJECT_NAME}
+    ${LIB_CPR_PATH}/build/lib/libcpr.a
+    # ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/cpr-1.3.0/build/lib/libcpr.a
+    -lpthread -lssl -lcrypto -lcurl
+    -lwebsockets
+    ${Boost_SYSTEM_LIBRARY}
+    ${Boost_THREAD_LIBRARY}
+    ${JSONCPP_LIBRARY}
+  )
 endif()
