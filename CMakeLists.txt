@@ -1,5 +1,6 @@
 cmake_minimum_required(VERSION 3.0)
 project (rootproject)
+SET( CMAKE_VERBOSE_MAKEFILE on )
 
 if(APPLE)
 #   # set(CMAKE_C_COMPILER "/Volumes/MAC/workspace/WEBRTC/webrtc/src/chromium/src/third_party/llvm-build/Release+Asserts/bin/clang")
@@ -7,6 +8,9 @@ if(APPLE)
 elseif(UNIX)
   set(CMAKE_C_COMPILER "/usr/bin/clang")
   set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+  # set(CMAKE_CXX_COMPILER "/usr/bin/g++")
+  # set(CMAKE_C_COMPILER "/home/xors/workspace/lib/webrtc/webrtc-checkout/src/third_party/llvm-build/Release+Asserts/bin/clang")
+  # set(CMAKE_CXX_COMPILER "/home/xors/workspace/lib/webrtc/webrtc-checkout/src/third_party/llvm-build/Release+Asserts/bin/clang++")
 endif()
 
 # add_definitions(-DAL_DEBUG)

@@ -1,4 +1,6 @@
 #include "manager.hpp"
+// #include "altesting.hpp"
+// #include "alsdkplugin.hpp"
 #include "boost/function.hpp"
 #include "boost/shared_ptr.hpp"
 #include <boost/dll/import.hpp>
@@ -125,18 +127,6 @@ void Manager::frameThread() {
 }
 
 /*
- * Serving separate thread for webrtc plugin
- */
-void Manager::sdkThread() {
-  if (m_sdk) {
-    alLogger() << "start!";
-    m_sdk->init(this);
-    std::cout << m_sdk << std::endl;
-    alLogger() << "end!";
-  }
-}
-
-/*
  * Init websocket connection
  */
 void Manager::initWsConnection(AlWsCb *alWsCb) {
@@ -149,8 +139,8 @@ void Manager::initWsConnection(AlWsCb *alWsCb) {
       boost::dll::load_mode::append_decorations);
 #elif defined _WIN32
   std::cout << "opening" << std::endl;
-  boostfs::path pluginPath = boostfs::current_path() /
-                             boostfs::path("json_rpc_client_2");
+  boostfs::path pluginPath =
+      boostfs::current_path() / boostfs::path("json_rpc_client_2");
   try {
     m_wsClientFactory = boostdll::import_alias<WsClientFactotry>(
         pluginPath, "create_plugin", boostdll::load_mode::append_decorations);
@@ -162,11 +152,23 @@ void Manager::initWsConnection(AlWsCb *alWsCb) {
   m_wsClient = m_wsClientFactory();
   std::cout << m_wsClient << std::endl;
 #else
-  m_wsClient =
-      boost::dll::import<AlWsAPI>(lib_path / "libjson_rpc_client_2.so", "plugin",
-                                  boost::dll::load_mode::append_decorations);
+  m_wsClient = boost::dll::import<AlWsAPI>(
+      lib_path / "libjson_rpc_client_2.so", "plugin",
+      boost::dll::load_mode::append_decorations);
 #endif
   m_wsClient->init(alWsCb);
+}
+
+/*
+ * Serving separate thread for webrtc plugin
+ */
+void Manager::sdkThread() {
+  if (m_sdk) {
+    alLogger() << "start sdk!";
+    m_sdk->init(this);
+    std::cout << m_sdk << std::endl;
+    alLogger() << "end!";
+  }
 }
 
 /*
@@ -176,12 +178,11 @@ void Manager::initSdk() {
   boost::filesystem::path lib_path("");
   alLogger() << "Loading sdk plugin";
 
-#ifdef __APPLE__
+#if defined __APPLE__
   m_sdk =
       boost::dll::import<AlSdkAPI>(lib_path / "libaltexo_sdk.dylib", "plugin",
                                    boost::dll::load_mode::append_decorations);
-#else
-#ifdef _WIN32
+#elif defined _WIN32
   alLogger() << "Boost DLL testing ...";
 
   /* Load the plugin from current working path
@@ -204,20 +205,39 @@ void Manager::initSdk() {
   }
   /* create the plugin */
   m_sdk = pluginCreator();
+
 #else
   boost::filesystem::path lib_path2(
       "/home/xors/workspace/lib/webrtc/webrtc-checkout/src/out/Default");
 
   alLogger() << "Loading the plugin";
 
-  m_sdkPlugin = boost::dll::import<AlWebRtcPluginApi>(
-      lib_path2 / "libaltexosdk.so", "plugin",
-      boost::dll::load_mode::append_decorations);
+  try {
+    m_sdkPlugin = boost::dll::import<AlWebRtcPluginApi>(
+        lib_path2 / "libaltexosdk.so", "plugin",
+        boost::dll::load_mode::append_decorations);
+  } catch (const boost::system::system_error &err) {
+    // BOOST_LOG_SEV(lg, error) << "Cannot load Plugin from " << pluginPath;
+    // BOOST_LOG_SEV(lg, error) << err.what();
+    std::cout << err.what();
+    return;
+  }
+
+  alLogger() << "Loading the plugin 0.1";
   m_sdk = boost::shared_ptr<AlSdkAPI>(m_sdkPlugin->createSdkApi());
+  // m_sdk = boost::shared_ptr<AlSdkAPI>(new AlSdkPlugin());
+  // AlSdkPlugin d;
+  // AlTesting t;
+  // t.testMethod();
+  // std::cout << t.testMethod2(3, 5) << std::endl;
+  alLogger() << "Loading the plugin 0.2";
+
 #endif
-#endif
+
+  alLogger() << "Loading the plugin 1";
   m_sdkThread = new boost::thread(&Manager::sdkThread, this);
 
+  alLogger() << "Loading the plugin 2";
   updateResolutionSignal.connect(
       boost::bind(&AlSdkAPI::updateResolution, m_sdk, _1, _2));
   updateResolutionSignal(WIDTH, HEIGHT);
@@ -287,6 +307,7 @@ void Manager::onInitCall() {
   m_sdk->initializePeerConnection();
 }
 
+// TODO: check if needed
 void Manager::initConnection(std::string peerId) {
   // TODO: controll assigning once for a call
   m_peerId = peerId;

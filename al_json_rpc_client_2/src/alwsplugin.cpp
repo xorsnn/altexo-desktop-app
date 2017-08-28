@@ -47,36 +47,28 @@ void AlWsPlugin::init(AlWsCb *alWsCb) {
   m_internalThread = boost::thread(&AlWsPlugin::threadMain, this);
 }
 
-void AlWsPlugin::threadMain() {
-  m_connClient->initWsConnection();
-}
+void AlWsPlugin::threadMain() { m_connClient->initWsConnection(); }
 
 void AlWsPlugin::sendMessageToPeer(AlTextMessage peerId, AlTextMessage msg) {
-  // sendWsMessageToPeerSignal(peerId.asCharVector(), msg.asCharVector());
+  sendWsMessageToPeerSignal(peerId.asCharVector(), msg.asCharVector());
 }
 
-void AlWsPlugin::sendMessage(AlTextMessage msg) {
-  // sendWsMessageSignal(msg);
-}
+void AlWsPlugin::sendMessage(AlTextMessage msg) { sendWsMessageSignal(msg); }
 
 void AlWsPlugin::sendSdpOffer(const char *cMsg) {
-  // AlTextMessage msg = AlTextMessage::cStrToMsg(cMsg);
-  // sendSdpOfferSignal(msg);
+  AlTextMessage msg = AlTextMessage::cStrToMsg(cMsg);
+  sendSdpOfferSignal(msg);
 }
 
-void AlWsPlugin::sendSdpAnswer(AlTextMessage msg) {
-  // sendSdpAnswerSignal(msg);
-}
+void AlWsPlugin::sendSdpAnswer(AlTextMessage msg) { sendSdpAnswerSignal(msg); }
 
 void AlWsPlugin::sendIceCandidate(AlTextMessage msg) {
-  // sendIceCandidateSignal(msg);
+  sendIceCandidateSignal(msg);
 }
 
 // json-rpc
-void AlWsPlugin::roomOpen(AlTextMessage msg) {
-  // roomOpenSignal(msg);
-}
+void AlWsPlugin::roomOpen(AlTextMessage msg) { roomOpenSignal(msg); }
 
 void AlWsPlugin::userMode(al::VideoMode videoMode) {
-  // userModeSignal(videoMode);
+  userModeSignal(videoMode);
 }

@@ -4,6 +4,7 @@ cmake_minimum_required(VERSION 3.0)
 MESSAGE("***************************")
 MESSAGE("***** bulding CORE ********")
 MESSAGE("***************************")
+SET( CMAKE_VERBOSE_MAKEFILE on )
 
 FILE(GLOB SRC_LIST
   src/*.cpp
@@ -20,6 +21,9 @@ FILE(GLOB SRC_LIST
 if(UNIX)
   SET(CMAKE_C_COMPILER "/usr/bin/clang")
   SET(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+  # SET(CMAKE_CXX_COMPILER "/usr/bin/g++")
+  # set(CMAKE_C_COMPILER "/home/xors/workspace/lib/webrtc/webrtc-checkout/src/third_party/llvm-build/Release+Asserts/bin/clang")
+  # set(CMAKE_CXX_COMPILER "/home/xors/workspace/lib/webrtc/webrtc-checkout/src/third_party/llvm-build/Release+Asserts/bin/clang++")
 endif()
 
 if (WIN32)
@@ -29,6 +33,7 @@ else()
 endif()
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+  # SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -std=c++11 -stdlib=libstdc++ -DBOOST_LOG_DYN_LINK")
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -std=c++11 -DBOOST_LOG_DYN_LINK")
   SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG} -g")
   SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE} -O2")
@@ -50,6 +55,7 @@ else()
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
   FIND_PACKAGE( Boost COMPONENTS system filesystem thread log REQUIRED )
   INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
+  # INCLUDE_DIRECTORIES ( /usr/include/libcxxabi )
 endif()
 
 INCLUDE_DIRECTORIES( ../al_utils/src )
@@ -81,6 +87,7 @@ else()
 
     INCLUDE(./cmake/FindJsoncpp.cmake)
     INCLUDE_DIRECTORIES( ${JSONCPP_INCLUDE_DIR} )
+    # INCLUDE_DIRECTORIES( /home/xors/workspace/lib/webrtc/webrtc-checkout/src/webrtc/examples/altexosdk/src )
 endif()
 
 LINK_DIRECTORIES(${CMAKE_BINARY_DIR})
@@ -105,6 +112,11 @@ elseif(UNIX)
     -lal_utils
     -lboost_log_setup
     "/home/xors/workspace/lib/webrtc/webrtc-checkout/src/out/Default/obj/third_party/protobuf/libprotobuf_lite.a"
+    # "/home/xors/workspace/lib/webrtc/webrtc-checkout/src/out/Default/libaltexosdk.so"
+    # "/home/xors/workspace/lib/webrtc/webrtc-checkout/src/out/Default/obj/webrtc/examples/libaltexosdk.a"
+    # -lssl
+    # -lcrypto
+    # -lstdc++
     -ldl
   )
 elseif(WIN32)

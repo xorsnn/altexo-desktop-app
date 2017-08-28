@@ -1,9 +1,10 @@
 project(al_ui.run)
 cmake_minimum_required(VERSION 2.8)
 
-message("***************************")
-message("***** bulding UI **********")
-message("***************************")
+MESSAGE("***************************")
+MESSAGE("***** bulding UI **********")
+MESSAGE("***************************")
+SET( CMAKE_VERBOSE_MAKEFILE on )
 
 file(GLOB SRC_LIST
   src/*.cpp
@@ -25,6 +26,9 @@ file(GLOB SHADERS_LIST
 if(UNIX)
   set(CMAKE_C_COMPILER "/usr/bin/clang")
   set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+  # set(CMAKE_CXX_COMPILER "/usr/bin/g++")
+  # set(CMAKE_C_COMPILER "/home/xors/workspace/lib/webrtc/webrtc-checkout/src/third_party/llvm-build/Release+Asserts/bin/clang")
+  # set(CMAKE_CXX_COMPILER "/home/xors/workspace/lib/webrtc/webrtc-checkout/src/third_party/llvm-build/Release+Asserts/bin/clang++")
 endif()
 
 file( COPY res/cto_intro.png DESTINATION . )
@@ -42,6 +46,7 @@ else()
 endif()
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+  # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -std=c++11 -stdlib=libstdc++ -DBOOST_LOG_DYN_LINK")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -std=c++11 -DBOOST_LOG_DYN_LINK")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG} -g")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE} -O2")
@@ -125,7 +130,7 @@ set(progdll_opt_libs
   ${Boost_LOG_LIBRARY_RELEASE})
   # "${Boost_THREAD_LIBRARY_RELEASE}")
 
-message(${progdll_opt_libs})
+MESSAGE( ${progdll_opt_libs} )
 
 link_directories(${CMAKE_BINARY_DIR})
 
@@ -143,6 +148,7 @@ if (APPLE)
     -ldl)
 elseif(UNIX)
   target_link_libraries(${PROJECT_NAME}
+    "/home/xors/workspace/lib/webrtc/webrtc-checkout/src/out/Default/obj/third_party/protobuf/libprotobuf_lite.a"
     ${SDL2_LIBRARY}
     ${OPENGL_LIBRARIES}
     ${Boost_FILESYSTEM_LIBRARY}
@@ -153,7 +159,12 @@ elseif(UNIX)
     -lboost_log_setup
     -lpng
     -lal_core
+    # "/home/xors/workspace/lib/webrtc/webrtc-checkout/src/out/Default/obj/webrtc/examples/libaltexosdk.a"
     # "/home/xors/workspace/lib/webrtc-checkout/src/out/Default/libprotobuf_lite.so"
+    # "/home/xors/workspace/lib/webrtc/webrtc-checkout/src/out/Default/obj/webrtc/examples/libaltexosdk.a"
+    # -lssl
+    # -lcrypto
+    # -lstdc++
     -ldl)
 elseif(WIN32)
   target_link_libraries(${PROJECT_NAME}
