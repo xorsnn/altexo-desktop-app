@@ -393,9 +393,10 @@ void Manager::handleMessages() {
 
       std::string candidate = m_remoteCandidates.front();
       m_remoteCandidates.pop();
-      std::vector<char> candidateVec(candidate.begin(), candidate.end());
+      // std::vector<char> candidateVec(candidate.begin(), candidate.end());
       // TODO: migrate to AlTextMessage
-      m_sdk->setRemoteIceCandidate(candidateVec);
+      // m_sdk->setRemoteIceCandidate(candidateVec);
+      m_sdk->setRemoteIceCandidate2(candidate.c_str());
     }
     m_processingCandidates = false;
 
