@@ -23,15 +23,14 @@ def main():
     if (platform.system() != "Linux"):
         build_boost(SCRIPT_DIR, DOWNLOAD_DIR)
 
-    # build_SDL(SCRIPT_DIR, DOWNLOAD_DIR)
-    # build_glm(SCRIPT_DIR, DOWNLOAD_DIR)
-    # build_curl(SCRIPT_DIR, DOWNLOAD_DIR)
+    build_SDL(SCRIPT_DIR, DOWNLOAD_DIR)
+    build_glm(SCRIPT_DIR, DOWNLOAD_DIR)
+    build_curl(SCRIPT_DIR, DOWNLOAD_DIR)
     build_cpr(SCRIPT_DIR, DOWNLOAD_DIR)
-    # build_jsoncpp(SCRIPT_DIR, DOWNLOAD_DIR)
-    # build_openssl(SCRIPT_DIR, DOWNLOAD_DIR)
-    # build_libwebsockets(SCRIPT_DIR, DOWNLOAD_DIR)
+    build_jsoncpp(SCRIPT_DIR, DOWNLOAD_DIR)
+    build_openssl(SCRIPT_DIR, DOWNLOAD_DIR)
+    build_libwebsockets(SCRIPT_DIR, DOWNLOAD_DIR)
     pass
 
 if __name__ == "__main__":
-    # execute only if run as a script
     main()
