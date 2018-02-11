@@ -33,9 +33,14 @@ void AlManager::run() {
   if (m_debug) {
     std::cout << "AlManager::run" << std::endl;
   }
+
+  std::cout << "AlManager::run1" << std::endl;
   this->m_thread->Run();
+  std::cout << "AlManager::run2" << std::endl;
   this->m_thread->set_socketserver(NULL);
+  std::cout << "AlManager::run3" << std::endl;
   rtc::CleanupSSL();
+  std::cout << "AlManager::run4" << std::endl;
 }
 
 bool AlManager::hasConnections() {

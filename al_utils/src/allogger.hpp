@@ -3,8 +3,18 @@
 #define ALLOGGER_H
 
 #include <iostream>
+#include <string>
 
-class AlLogger {
+#if defined _WIN32
+#include "al_utils_export.h"
+#endif
+
+class
+#if defined _WIN32
+AL_UTILS_EXPORT
+#endif
+AlLogger {
+
 
 public:
   AlLogger();

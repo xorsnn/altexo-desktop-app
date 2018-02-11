@@ -1,9 +1,10 @@
 project(al_ui.run)
 cmake_minimum_required(VERSION 2.8)
 
-message("***************************")
-message("***** bulding UI **********")
-message("***************************")
+MESSAGE("***************************")
+MESSAGE("***** bulding UI **********")
+MESSAGE("***************************")
+SET( CMAKE_VERBOSE_MAKEFILE on )
 
 file(GLOB SRC_LIST
   src/*.cpp
@@ -25,12 +26,19 @@ file(GLOB SHADERS_LIST
 if(UNIX)
   set(CMAKE_C_COMPILER "/usr/bin/clang")
   set(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+  # set(CMAKE_CXX_COMPILER "/usr/bin/g++")
+  # set(CMAKE_C_COMPILER "/home/xors/workspace/lib/webrtc/webrtc-checkout/src/third_party/llvm-build/Release+Asserts/bin/clang")
+  # set(CMAKE_CXX_COMPILER "/home/xors/workspace/lib/webrtc/webrtc-checkout/src/third_party/llvm-build/Release+Asserts/bin/clang++")
 endif()
 
 file( COPY res/cto_intro.png DESTINATION . )
 
 # shaders
-file( COPY ${SHADERS_LIST} DESTINATION ./shaders )
+if (WIN32)
+  file( COPY ${SHADERS_LIST} DESTINATION ../Release/shaders )
+else()
+  file( COPY ${SHADERS_LIST} DESTINATION ../shaders )
+endif()
 
 if (WIN32)
 else()
@@ -38,6 +46,7 @@ else()
 endif()
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+  # set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -std=c++11 -stdlib=libstdc++ -DBOOST_LOG_DYN_LINK")
   set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -std=c++11 -DBOOST_LOG_DYN_LINK")
   set(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG} -g")
   set(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE} -O2")
@@ -50,22 +59,17 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
 endif()
 
 if (WIN32)
-# set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MT")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MT")
 else()
-set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+  set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
 endif()
 
 if (WIN32)
-  # set Boost dir
-  set(BOOST_ROOT "C:\\local\\boost_1_61_0")
-  set(BOOST_LIBRARYDIR "C:\\local\\boost_1_61_0\\lib32-msvc-14.0")
 else()
-
   if (APPLE)
     FIND_PACKAGE( glm REQUIRED )
     FIND_LIBRARY( QUICKTIME QTKit )
   endif()
-
   FIND_PACKAGE( SDL2 REQUIRED )
   FIND_PACKAGE( GLEW REQUIRED )
   # used for testing now
@@ -92,8 +96,9 @@ if(UNIX)
 # win32
 else()
   INCLUDE_DIRECTORIES( "D:\\WORKSPACE\\BUILD_ALTEXO\\glew-2.0.0\\include" )
-  INCLUDE_DIRECTORIES( "D:\\WORKSPACE\\BUILD_ALTEXO\\SDL2-2.0.4\\build\\include" )
-  INCLUDE_DIRECTORIES( "D:\\WORKSPACE\\BUILD_ALTEXO\\glm" )
+  INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/SDL2-2.0.5/build/include )
+  INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/SDL2-2.0.5/include )
+  INCLUDE_DIRECTORIES( ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/glm-0.9.8.4 )
 endif()
 
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
@@ -125,7 +130,7 @@ set(progdll_opt_libs
   ${Boost_LOG_LIBRARY_RELEASE})
   # "${Boost_THREAD_LIBRARY_RELEASE}")
 
-message(${progdll_opt_libs})
+MESSAGE( ${progdll_opt_libs} )
 
 link_directories(${CMAKE_BINARY_DIR})
 
@@ -143,6 +148,7 @@ if (APPLE)
     -ldl)
 elseif(UNIX)
   target_link_libraries(${PROJECT_NAME}
+    "/home/xors/workspace/lib/webrtc/webrtc-checkout/src/out/Default/obj/third_party/protobuf/libprotobuf_lite.a"
     ${SDL2_LIBRARY}
     ${OPENGL_LIBRARIES}
     ${Boost_FILESYSTEM_LIBRARY}
@@ -153,22 +159,33 @@ elseif(UNIX)
     -lboost_log_setup
     -lpng
     -lal_core
-    "/home/xors/workspace/lib/webrtc-checkout/src/out/Default/libprotobuf_lite.so"
+    # "/home/xors/workspace/lib/webrtc/webrtc-checkout/src/out/Default/obj/webrtc/examples/libaltexosdk.a"
+    # "/home/xors/workspace/lib/webrtc-checkout/src/out/Default/libprotobuf_lite.so"
+    # "/home/xors/workspace/lib/webrtc/webrtc-checkout/src/out/Default/obj/webrtc/examples/libaltexosdk.a"
+    # -lssl
+    # -lcrypto
+    # -lstdc++
     -ldl)
 elseif(WIN32)
   target_link_libraries(${PROJECT_NAME}
-    "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_system-vc140-mt-1_61.lib"
-    "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_filesystem-vc140-mt-1_61.lib"
+    ${CMAKE_CURRENT_SOURCE_DIR}/../build/Release/al_utils.lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/../build/Release/al_core.lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/system/build/msvc-14.0/rls/lnk-sttc/thrd-mlt/libboost_system-vc140-mt-1_64.lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/filesystem/build/msvc-14.0/rls/lnk-sttc/thrd-mlt/libboost_filesystem-vc140-mt-1_64.lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/date_time/build/msvc-14.0/rls/lnk-sttc/thrd-mlt/libboost_date_time-vc140-mt-1_64.lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/chrono/build/msvc-14.0/rls/lnk-sttc/thrd-mlt/libboost_chrono-vc140-mt-1_64.lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/thread/build/msvc-14.0/rls/lnk-sttc/thrd-mlt/libboost_thread-vc140-mt-1_64.lib
 
-    "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_date_time-vc140-mt-1_61.lib"
-    "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_chrono-vc140-mt-1_61.lib"
-    "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_thread-vc140-mt-1_61.lib"
+    ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/SDL2-2.0.5/build/Release/SDL2.lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/SDL2-2.0.5/build/Release/SDL2main.lib
 
-    "D:\\WORKSPACE\\BUILD_ALTEXO\\SDL2-2.0.4\\build\\Release\\SDL2.lib"
-    "D:\\WORKSPACE\\BUILD_ALTEXO\\SDL2-2.0.4\\build\\Release\\SDL2main.lib"
-    "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.10586.0\\um\\x86\\WinMM.Lib"
-    "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.10586.0\\um\\x86\\Imm32.Lib"
-    "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.10586.0\\um\\x86\\Version.Lib"
-    "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.10586.0\\um\\x86\\OpenGL32.Lib"
+    # "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.15063.0\\um\\x86\\WinMM.Lib"
+    # "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.15063.0\\um\\x86\\Imm32.Lib"
+    # "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.15063.0\\um\\x86\\Version.Lib"
+    # "C:\\Program Files (x86)\\Windows Kits\\10\\Lib\\10.0.15063.0\\um\\x86\\OpenGL32.Lib"
+    WinMM.Lib
+    Imm32.Lib
+    Version.Lib
+    OpenGL32.Lib
   )
 endif()

@@ -16,11 +16,23 @@
 #include <boost/thread.hpp>
 #include <queue>
 
-class Manager : public AlWsCb, public AlSDKCb {
+#if defined _WIN32
+#include "al_core_export.h"
+#endif
+
+typedef boost::shared_ptr<AlWsAPI>(WsClientFactotry)();
+
+class
+#if defined _WIN32
+AL_CORE_EXPORT
+#endif
+Manager : public AlWsCb, public AlSDKCb {
+  
 public:
   enum SensorType {
     KINECT_1 = 1,
     FAKE_SENSOR,
+    REALSENSE,
   };
 
   struct VideoSetting {
@@ -64,7 +76,10 @@ public:
   void toggleVideo();
 
   boost::shared_ptr<AlSdkAPI> m_sdk;
+
+
   boost::shared_ptr<AlWsAPI> m_wsClient;
+  boost::function<WsClientFactotry> m_wsClientFactory;
 
   // TODO remove I think
   boost::shared_ptr<AlPluginTestAPI> m_plugin_test;

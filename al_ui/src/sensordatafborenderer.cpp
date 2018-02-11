@@ -4,7 +4,7 @@
 SensorDataFboRenderer::SensorDataFboRenderer()
     : m_debug(true), m_outPixel(0), m_rgbWidth(0), m_rgbHeight(0),
       m_depthWidth(0), m_depthHeight(0), m_videoType(AlSensorCb::RGB), WIDTH(0),
-      HEIGHT(0) {}
+      HEIGHT(0), m_depthScaleK(1), m_updateDepthScaleK(false) {}
 
 SensorDataFboRenderer::~SensorDataFboRenderer() {}
 
@@ -48,6 +48,11 @@ int SensorDataFboRenderer::init() {
   // add attributes and uniforms
   shader.AddAttribute("vVertex");
   shader.AddUniform("MVP");
+
+  shader.AddUniform("depthScaleK");
+
+  // m_depthScaleK = 0.000124987 * 1000.0;
+  glUniform1f(shader("depthScaleK"), m_depthScaleK);
 
   shader.AddUniform("textureMap");
   // pass values of constant uniforms at initialization
@@ -143,6 +148,7 @@ int SensorDataFboRenderer::init() {
 }
 
 void SensorDataFboRenderer::render(int viewWidth, int viewHeight) {
+
   glViewport(0, 0, viewWidth, viewHeight);
   glBindVertexArray(vaoID);
   glBindBuffer(GL_ARRAY_BUFFER, vboVerticesID);
@@ -168,6 +174,11 @@ void SensorDataFboRenderer::render(int viewWidth, int viewHeight) {
 
   // pass the shader uniform
   glUniformMatrix4fv(shader("MVP"), 1, GL_FALSE, glm::value_ptr(P * MV));
+
+  if (m_updateDepthScaleK) {
+    glUniform1f(shader("depthScaleK"), m_depthScaleK);
+    m_updateDepthScaleK = false;
+  }
 
   // drwa triangle
   glDrawElements(GL_TRIANGLES, 6, GL_UNSIGNED_SHORT, 0);
@@ -202,14 +213,19 @@ void SensorDataFboRenderer::newFrame(const uint8_t *rgbFrame,
   }
 }
 
-void SensorDataFboRenderer::onVideoFrameParams(uint rgbWidth, uint rgbHeight,
+void SensorDataFboRenderer::onVideoFrameParams(unsigned int rgbWidth, unsigned int rgbHeight,
                                                AlSensorCb::VideoType videoType,
-                                               uint depthWidth,
-                                               uint depthHeight) {
+                                               unsigned int depthWidth,
+                                               unsigned int depthHeight) {
   m_rgbWidth = rgbWidth;
   m_rgbHeight = rgbHeight;
   m_depthWidth = depthHeight;
   m_depthHeight = depthHeight;
   m_videoType = videoType;
   onUpdateResolution(WIDTH, HEIGHT);
+}
+
+void SensorDataFboRenderer::onSensorParamsCb(float depthScaleK) {
+  m_depthScaleK = depthScaleK;
+  m_updateDepthScaleK = true;
 }

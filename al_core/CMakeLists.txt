@@ -1,9 +1,10 @@
 project(al_core)
-cmake_minimum_required(VERSION 2.8)
+cmake_minimum_required(VERSION 3.0)
 
 MESSAGE("***************************")
 MESSAGE("***** bulding CORE ********")
 MESSAGE("***************************")
+SET( CMAKE_VERBOSE_MAKEFILE on )
 
 FILE(GLOB SRC_LIST
   src/*.cpp
@@ -20,14 +21,19 @@ FILE(GLOB SRC_LIST
 if(UNIX)
   SET(CMAKE_C_COMPILER "/usr/bin/clang")
   SET(CMAKE_CXX_COMPILER "/usr/bin/clang++")
+  # SET(CMAKE_CXX_COMPILER "/usr/bin/g++")
+  # set(CMAKE_C_COMPILER "/home/xors/workspace/lib/webrtc/webrtc-checkout/src/third_party/llvm-build/Release+Asserts/bin/clang")
+  # set(CMAKE_CXX_COMPILER "/home/xors/workspace/lib/webrtc/webrtc-checkout/src/third_party/llvm-build/Release+Asserts/bin/clang++")
 endif()
 
 if (WIN32)
+
 else()
   SET(CMAKE_MODULE_PATH ${CMAKE_MODULE_PATH} "${${PROJECT_NAME}_SOURCE_DIR}/cmake")
 endif()
 
 if (${CMAKE_CXX_COMPILER_ID} STREQUAL "GNU" OR ${CMAKE_CXX_COMPILER_ID} STREQUAL "Clang")
+  # SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -std=c++11 -stdlib=libstdc++ -DBOOST_LOG_DYN_LINK")
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -Wall -Wextra -pedantic -std=c++11 -DBOOST_LOG_DYN_LINK")
   SET(CMAKE_CXX_FLAGS_DEBUG "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_DEBUG} -g")
   SET(CMAKE_CXX_FLAGS_RELEASE "${CMAKE_CXX_FLAGS} ${CMAKE_CXX_FLAGS_RELEASE} -O2")
@@ -40,20 +46,17 @@ elseif (${CMAKE_CXX_COMPILER_ID} STREQUAL "MSVC")
 endif()
 
 if (WIN32)
-# SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MT")
+  # SET Boost dir
+  # SET(BOOST_ROOT "C:\\local\\boost_1_61_0")
+  # SET(BOOST_LIBRARYDIR "C:\\local\\boost_1_61_0\\lib32-msvc-14.0")
+  # SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} /MT")
+  INCLUDE_DIRECTORIES( ../side-libs/boost_1_64_0 )
 else()
   SET(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} -fPIC")
+  FIND_PACKAGE( Boost COMPONENTS system filesystem thread log REQUIRED )
+  INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
+  # INCLUDE_DIRECTORIES ( /usr/include/libcxxabi )
 endif()
-
-if (WIN32)
-  # SET Boost dir
-  SET(BOOST_ROOT "C:\\local\\boost_1_61_0")
-  SET(BOOST_LIBRARYDIR "C:\\local\\boost_1_61_0\\lib32-msvc-14.0")
-endif()
-
-FIND_PACKAGE( Boost COMPONENTS system filesystem thread log REQUIRED )
-
-INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} )
 
 INCLUDE_DIRECTORIES( ../al_utils/src )
 INCLUDE_DIRECTORIES( ./src/ )
@@ -69,20 +72,25 @@ if(APPLE)
   SET(CMAKE_MODULE_LINKER_FLAGS "${CMAKE_MODULE_LINKER_FLAGS} -undefined dynamic_lookup")
 endif()
 
-SET(progdll_dbg_libs
-  ${Boost_SYSTEM_LIBRARY_DEBUG}
-  ${Boost_FILESYSTEM_LIBRARY_DEBUG}
-  ${Boost_LOG_LIBRARY_DEBUG})
+if (WIN32)
 
-SET(progdll_opt_libs
-  ${Boost_SYSTEM_LIBRARY_RELEASE}
-  ${Boost_FILESYSTEM_LIBRARY_RELEASE}
-  ${Boost_LOG_LIBRARY_RELEASE})
+else()
+  SET(progdll_dbg_libs
+    ${Boost_SYSTEM_LIBRARY_DEBUG}
+    ${Boost_FILESYSTEM_LIBRARY_DEBUG}
+    ${Boost_LOG_LIBRARY_DEBUG})
+
+  SET(progdll_opt_libs
+    ${Boost_SYSTEM_LIBRARY_RELEASE}
+    ${Boost_FILESYSTEM_LIBRARY_RELEASE}
+    ${Boost_LOG_LIBRARY_RELEASE})
+
+    INCLUDE(./cmake/FindJsoncpp.cmake)
+    INCLUDE_DIRECTORIES( ${JSONCPP_INCLUDE_DIR} )
+    # INCLUDE_DIRECTORIES( /home/xors/workspace/lib/webrtc/webrtc-checkout/src/webrtc/examples/altexosdk/src )
+endif()
 
 LINK_DIRECTORIES(${CMAKE_BINARY_DIR})
-
-INCLUDE(./cmake/FindJsoncpp.cmake)
-INCLUDE_DIRECTORIES( ${JSONCPP_INCLUDE_DIR} )
 
 ADD_LIBRARY(${PROJECT_NAME} SHARED ${SRC_LIST})
 
@@ -103,15 +111,24 @@ elseif(UNIX)
     ${JSONCPP_LIBRARY}
     -lal_utils
     -lboost_log_setup
-    "/home/xors/workspace/lib/webrtc-checkout/src/out/Default/libprotobuf_lite.so"
+    "/home/xors/workspace/lib/webrtc/webrtc-checkout/src/out/Default/obj/third_party/protobuf/libprotobuf_lite.a"
+    # "/home/xors/workspace/lib/webrtc/webrtc-checkout/src/out/Default/libaltexosdk.so"
+    # "/home/xors/workspace/lib/webrtc/webrtc-checkout/src/out/Default/obj/webrtc/examples/libaltexosdk.a"
+    # -lssl
+    # -lcrypto
+    # -lstdc++
     -ldl
   )
 elseif(WIN32)
   TARGET_LINK_LIBRARIES(${PROJECT_NAME}
-    "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_system-vc140-mt-1_61.lib"
-    "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_filesystem-vc140-mt-1_61.lib"
-    "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_date_time-vc140-mt-1_61.lib"
-    "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_chrono-vc140-mt-1_61.lib"
-    "C:\\local\\boost_1_61_0\\lib32-msvc-14.0\\libboost_thread-vc140-mt-1_61.lib"
+    ${CMAKE_CURRENT_SOURCE_DIR}/../build/Release/al_utils.lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/system/build/msvc-14.0/rls/lnk-sttc/thrd-mlt/libboost_system-vc140-mt-1_64.lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/filesystem/build/msvc-14.0/rls/lnk-sttc/thrd-mlt/libboost_filesystem-vc140-mt-1_64.lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/date_time/build/msvc-14.0/rls/lnk-sttc/thrd-mlt/libboost_date_time-vc140-mt-1_64.lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/chrono/build/msvc-14.0/rls/lnk-sttc/thrd-mlt/libboost_chrono-vc140-mt-1_64.lib
+    ${CMAKE_CURRENT_SOURCE_DIR}/../side-libs/boost_1_64_0/bin.v2/libs/thread/build/msvc-14.0/rls/lnk-sttc/thrd-mlt/libboost_thread-vc140-mt-1_64.lib
   )
 endif()
+
+include(GenerateExportHeader)
+generate_export_header(${PROJECT_NAME})

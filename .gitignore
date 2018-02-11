@@ -1,0 +1,6 @@
+build/
+side-libs/
+venv/
+__pycache__/
+*.pyc
+scripts/composing/out/

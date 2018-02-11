@@ -9,9 +9,6 @@ AlSdkPlugin::AlSdkPlugin()
     : m_debug(true), WIDTH(0), HEIGHT(0), m_videoDeviceName(""),
       m_internalThread(NULL) {
 
-  std::cout << "1111111111111111111111111111" << std::endl;
-  std::cout << "1111111111111111111111111111" << std::endl;
-  std::cout << "1111111111111111111111111111" << std::endl;
   if (m_debug) {
     std::cout << "AlSdkPlugin::AlSdkPlugin()" << std::endl;
   }
@@ -26,12 +23,16 @@ AlSdkPlugin::~AlSdkPlugin() {
 
   std::cout << "AlSdkPlugin::~AlSdkPlugin 1" << std::endl;
   if (m_internalThread != NULL) {
+    std::cout << "AlSdkPlugin::~AlSdkPlugin 11" << std::endl;
     m_internalThread->interrupt();
+    std::cout << "AlSdkPlugin::~AlSdkPlugin 12" << std::endl;
     // TODO interrupt custom sockerserver
     // if (m_internalThread->joinable()) {
     // m_internalThread->join();
     // }
     delete m_internalThread;
+
+    std::cout << "AlSdkPlugin::~AlSdkPlugin 13" << std::endl;
     m_internalThread = NULL;
     std::cout << "AlSdkPlugin::~AlSdkPlugin 2" << std::endl;
   }
@@ -96,7 +97,6 @@ void AlSdkPlugin::updateResolution(int width, int height) {
 
 void AlSdkPlugin::setDesiredVideDeviceName(AlTextMessage deviceName) {
   if (m_debug) {
-    std::cout << "222222222222222222222222222222222" << std::endl;
     std::cout << deviceName.getText() << std::endl;
   }
 

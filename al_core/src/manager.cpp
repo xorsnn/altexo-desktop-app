@@ -1,4 +1,6 @@
 #include "manager.hpp"
+// #include "altesting.hpp"
+// #include "alsdkplugin.hpp"
 #include "boost/function.hpp"
 #include "boost/shared_ptr.hpp"
 #include <boost/dll/import.hpp>
@@ -32,27 +34,36 @@ Manager::Manager()
   m_videoSetting.isOn = true;
 
   sensorList.push_back(AlTextMessage::stringToMsg("Kinect"));
+  sensorList.push_back(AlTextMessage::stringToMsg("Realsense"));
 }
 
 Manager::~Manager() {
+
+  std::cout << "Manager::~Manager()" << std::endl;
+
   if (m_frameThread != NULL) {
     m_frameThread->interrupt();
     m_frameThread->join();
     delete m_frameThread;
     m_frameThread = NULL;
   }
+  std::cout << "Manager::~Manager()1" << std::endl;
   if (m_wsClient != NULL) {
     m_wsClient.reset();
     m_wsClient = NULL;
+    m_wsClientFactory.clear();
   }
+  std::cout << "Manager::~Manager()2" << std::endl;
   if (m_sensor != NULL) {
     m_sensor.reset();
     m_sensor = NULL;
   }
+  std::cout << "Manager::~Manager()3" << std::endl;
   if (m_sdk != NULL) {
     m_sdk.reset();
     m_sdk = NULL;
   }
+  std::cout << "Manager::~Manager()4" << std::endl;
 }
 
 void Manager::initHoloRenderer(SceneRendererCb *holoRenderer) {
@@ -85,6 +96,7 @@ void Manager::initSensor(AlSensorCb *sensorCb, SensorType sensorType) {
     // setDeviceName(sensorList[sensorList.size() - 1],
     //               AlSdkAPI::DesiredVideoSource::IMG_SNAPSHOTS);
     // tread requesting new sensor frame every 30 times per second
+
   } break;
   case FAKE_SENSOR: {
     alLogger() << "FAKE_SENSOR";
@@ -93,6 +105,16 @@ void Manager::initSensor(AlSensorCb *sensorCb, SensorType sensorType) {
         boost::dll::load_mode::append_decorations);
     m_sensor->init(sensorCb);
     m_frameThread = new boost::thread(&Manager::frameThread, this);
+
+  } break;
+  case REALSENSE: {
+    alLogger() << "REALSENSE SENSOR";
+    m_sensor = boost::dll::import<AlSensorAPI>(
+        lib_path / "libal_realsense.so", "plugin",
+        boost::dll::load_mode::append_decorations);
+    m_sensor->init(sensorCb);
+    m_frameThread = new boost::thread(&Manager::frameThread, this);
+
   } break;
   default: { } break; }
 }
@@ -105,34 +127,48 @@ void Manager::frameThread() {
 }
 
 /*
- * Serving separate thread for webrtc plugin
- */
-void Manager::sdkThread() {
-  if (m_sdk) {
-    alLogger() << "start!";
-    m_sdk->init(this);
-    std::cout << m_sdk << std::endl;
-    alLogger() << "end!";
-  }
-}
-
-/*
  * Init websocket connection
  */
 void Manager::initWsConnection(AlWsCb *alWsCb) {
   boost::filesystem::path lib_path("");
   alLogger() << "Loading ws plugin";
 
-#ifdef __APPLE__
+#if defined __APPLE__
   m_wsClient = boost::dll::import<AlWsAPI>(
       lib_path / "libjson_rpc_client.dylib", "plugin",
       boost::dll::load_mode::append_decorations);
+#elif defined _WIN32
+  std::cout << "opening" << std::endl;
+  boostfs::path pluginPath =
+      boostfs::current_path() / boostfs::path("json_rpc_client_2");
+  try {
+    m_wsClientFactory = boostdll::import_alias<WsClientFactotry>(
+        pluginPath, "create_plugin", boostdll::load_mode::append_decorations);
+  } catch (const boost::system::system_error &err) {
+    std::cout << "Cannot load Plugin from " << pluginPath << std::endl;
+    std::cout << err.what() << std::endl;
+    return;
+  }
+  m_wsClient = m_wsClientFactory();
+  std::cout << m_wsClient << std::endl;
 #else
-  m_wsClient =
-      boost::dll::import<AlWsAPI>(lib_path / "libjson_rpc_client.so", "plugin",
-                                  boost::dll::load_mode::append_decorations);
+  m_wsClient = boost::dll::import<AlWsAPI>(
+      lib_path / "libjson_rpc_client_2.so", "plugin",
+      boost::dll::load_mode::append_decorations);
 #endif
   m_wsClient->init(alWsCb);
+}
+
+/*
+ * Serving separate thread for webrtc plugin
+ */
+void Manager::sdkThread() {
+  if (m_sdk) {
+    alLogger() << "start sdk!";
+    m_sdk->init(this);
+    std::cout << m_sdk << std::endl;
+    alLogger() << "end!";
+  }
 }
 
 /*
@@ -142,12 +178,11 @@ void Manager::initSdk() {
   boost::filesystem::path lib_path("");
   alLogger() << "Loading sdk plugin";
 
-#ifdef __APPLE__
+#if defined __APPLE__
   m_sdk =
       boost::dll::import<AlSdkAPI>(lib_path / "libaltexo_sdk.dylib", "plugin",
                                    boost::dll::load_mode::append_decorations);
-#else
-#ifdef _WIN32
+#elif defined _WIN32
   alLogger() << "Boost DLL testing ...";
 
   /* Load the plugin from current working path
@@ -156,7 +191,7 @@ void Manager::initSdk() {
   boostfs::path pluginPath = boostfs::current_path() /
                              boostfs::path("Release") /
                              boostfs::path("altexo_sdk");
-  alLogger() << "Load Plugin from " << pluginPath;
+  // alLogger() << "Load Plugin from " << pluginPath;
 
   typedef boost::shared_ptr<AlSdkAPI>(PluginCreate)();
   boost::function<PluginCreate> pluginCreator;
@@ -164,26 +199,45 @@ void Manager::initSdk() {
     pluginCreator = boostdll::import_alias<PluginCreate>(
         pluginPath, "create_plugin", boostdll::load_mode::append_decorations);
   } catch (const boost::system::system_error &err) {
-    BOOST_LOG_SEV(lg, error) << "Cannot load Plugin from " << pluginPath;
-    BOOST_LOG_SEV(lg, error) << err.what();
+    // BOOST_LOG_SEV(lg, error) << "Cannot load Plugin from " << pluginPath;
+    // BOOST_LOG_SEV(lg, error) << err.what();
     return;
   }
   /* create the plugin */
   m_sdk = pluginCreator();
+
 #else
   boost::filesystem::path lib_path2(
-      "/home/xors/workspace/lib/webrtc-checkout/src/out/Default");
+      "/home/xors/workspace/lib/webrtc/webrtc-checkout/src/out/Default");
 
   alLogger() << "Loading the plugin";
 
-  m_sdkPlugin = boost::dll::import<AlWebRtcPluginApi>(
-      lib_path2 / "libaltexosdk.so", "plugin",
-      boost::dll::load_mode::append_decorations);
+  try {
+    m_sdkPlugin = boost::dll::import<AlWebRtcPluginApi>(
+        lib_path2 / "libaltexosdk.so", "plugin",
+        boost::dll::load_mode::append_decorations);
+  } catch (const boost::system::system_error &err) {
+    // BOOST_LOG_SEV(lg, error) << "Cannot load Plugin from " << pluginPath;
+    // BOOST_LOG_SEV(lg, error) << err.what();
+    std::cout << err.what();
+    return;
+  }
+
+  alLogger() << "Loading the plugin 0.1";
   m_sdk = boost::shared_ptr<AlSdkAPI>(m_sdkPlugin->createSdkApi());
+  // m_sdk = boost::shared_ptr<AlSdkAPI>(new AlSdkPlugin());
+  // AlSdkPlugin d;
+  // AlTesting t;
+  // t.testMethod();
+  // std::cout << t.testMethod2(3, 5) << std::endl;
+  alLogger() << "Loading the plugin 0.2";
+
 #endif
-#endif
+
+  alLogger() << "Loading the plugin 1";
   m_sdkThread = new boost::thread(&Manager::sdkThread, this);
 
+  alLogger() << "Loading the plugin 2";
   updateResolutionSignal.connect(
       boost::bind(&AlSdkAPI::updateResolution, m_sdk, _1, _2));
   updateResolutionSignal(WIDTH, HEIGHT);
@@ -225,8 +279,6 @@ void Manager::onSdpAnswerCb(AlTextMessage msg) {
 void Manager::onSdpOfferCb(const char *cMsg) {
   alLogger() << "Manager::onSdpOfferCb";
   AlTextMessage msg = AlTextMessage::cStrToMsg(cMsg);
-  // alLogger() << "Manager::onSdpOfferCb";
-  // alLogger() << msg.toString();
 
   // **
   // TODO: this is temprorary solution, we make messages similar to what we used
@@ -255,6 +307,7 @@ void Manager::onInitCall() {
   m_sdk->initializePeerConnection();
 }
 
+// TODO: check if needed
 void Manager::initConnection(std::string peerId) {
   // TODO: controll assigning once for a call
   m_peerId = peerId;
@@ -340,9 +393,10 @@ void Manager::handleMessages() {
 
       std::string candidate = m_remoteCandidates.front();
       m_remoteCandidates.pop();
-      std::vector<char> candidateVec(candidate.begin(), candidate.end());
+      // std::vector<char> candidateVec(candidate.begin(), candidate.end());
       // TODO: migrate to AlTextMessage
-      m_sdk->setRemoteIceCandidate(candidateVec);
+      // m_sdk->setRemoteIceCandidate(candidateVec);
+      m_sdk->setRemoteIceCandidate2(candidate.c_str());
     }
     m_processingCandidates = false;
 

@@ -19,15 +19,24 @@ public:
   virtual ~AlSdkAPI() {}
 
   virtual void init(AlSDKCb *alSdkCb) = 0;
-  virtual void init2() = 0;
+  // virtual void init2() = 0;
   virtual void initializePeerConnection() = 0;
   virtual void setRemoteSdp(const char *sdp) = 0;
-  virtual void setRemoteIceCandidate(std::vector<char> candidate) = 0;
+
+  // TODO: deprecated
+  // virtual void setRemoteIceCandidate(std::vector<char> candidate) = 0;
+
+  virtual void setRemoteIceCandidate2(const char *candidate) = 0;
   virtual void
   setDesiredDataSource(AlSdkAPI::DesiredVideoSource dataSource) = 0;
   virtual void setDesiredVideDeviceName(const char *deviceName) = 0;
+
+  // TODO: deprecated
   virtual void setImageData(std::vector<unsigned char> imageBytes, int width,
                             int height) = 0;
+
+  virtual void setImageData2(const unsigned char *imageBytes, int width,
+                             int height) = 0;
   virtual void updateResolution(int widht, int height) = 0;
 
   // virtual AlWsCb *getWsCb() = 0;
