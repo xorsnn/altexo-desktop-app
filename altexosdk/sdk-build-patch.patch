@@ -1,0 +1,127 @@
+From ba0bcdbcaac5440685112bd4a31f93e8e5af9bdf Mon Sep 17 00:00:00 2001
+From: Sergey Grigorev <xors.nn@gmail.com>
+Date: Mon, 7 Aug 2017 17:14:02 +0300
+Subject: [PATCH 1/2] patch
+
+Signed-off-by: Sergey Grigorev <xors.nn@gmail.com>
+---
+ webrtc/examples/BUILD.gn | 59 ++++++++++++++++++++++++++++++++++++++++++++++++
+ 1 file changed, 59 insertions(+)
+
+diff --git a/webrtc/examples/BUILD.gn b/webrtc/examples/BUILD.gn
+index 3ee9ae5..372cd36 100644
+--- a/webrtc/examples/BUILD.gn
++++ b/webrtc/examples/BUILD.gn
+@@ -39,6 +39,7 @@ group("examples") {
+
+   if (is_linux || is_win) {
+     public_deps += [
++      ":altexosdk",
+       ":peerconnection_client",
+       ":peerconnection_server",
+       ":relayserver",
+@@ -492,6 +493,64 @@ if (is_linux || is_win) {
+     }
+   }
+
++  rtc_shared_library("altexosdk") {
++    sources = [
++        "altexosdk/src/alvideocapturer.cpp",
++        "altexosdk/src/alvideocapturer.h",
++        "altexosdk/src/conductor/aldatamanager.cpp",
++        "altexosdk/src/conductor/aldatamanager.h",
++        "altexosdk/src/alvideorenderer.cpp",
++        "altexosdk/src/alvideorenderer.h",
++        "altexosdk/src/alwebrtcfactory.cc",
++        "altexosdk/src/customsocketserver.h",
++        "altexosdk/src/alsdkplugin.cpp",
++#        "altexosdk/src/main.cc",
++        "altexosdk/src/alsdkplugin.hpp",
++        "altexosdk/src/alcallback.h",
++        "altexosdk/src/almanager.h",
++        "altexosdk/src/almanager.cpp",
++        "altexosdk/src/conductor/defaults.h",
++        "altexosdk/src/conductor/conductor.cc",
++        "altexosdk/src/conductor/defaults.cc",
++        "altexosdk/src/conductor/peer_connection_client.h",
++        "altexosdk/src/conductor/conductor.h",
++        "altexosdk/src/conductor/peer_connection_client.cc",
++    ]
++
++    if (!build_with_chromium && is_clang) {
++      # Suppress warnings from the Chromium Clang plugin (bugs.webrtc.org/163).
++      suppressed_configs += [ "//build/config/clang:find_bad_constructs" ]
++    }
++    if (is_win) {
++      sources += [
++      ]
++      cflags = [ "/wd4245" ]
++      configs += [ "//build/config/win:windowed" ]
++    }
++    deps = [
++      "//third_party/libyuv",
++      "//webrtc/api:libjingle_peerconnection",
++      "//webrtc/system_wrappers:field_trial_default",
++      "//webrtc/system_wrappers:metrics_default",
++    ]
++    if (is_linux) {
++      sources += [
++      ]
++      libs = [
++        "X11",
++        "Xcomposite",
++        "Xext",
++        "Xrender",
++      ]
++      # deps += [ "//build/config/linux/gtk" ]
++    }
++    configs += [ ":peerconnection_client_warnings_config" ]
++    if (rtc_build_json) {
++      deps += [ "//third_party/jsoncpp" ]
++    }
++    include_dirs = [ "/home/xors/workspace/ALTEXO/altexo/include", "/home/xors/workspace/ALTEXO/altexo/vendor/Boost.DLL/include", "/usr/include" ]
++  }
++
+   rtc_executable("peerconnection_client") {
+     sources = [
+       "peerconnection/client/conductor.cc",
+--
+2.7.4
+
+
+From f12c70cb33747fa6eede540848355bb1fda72cef Mon Sep 17 00:00:00 2001
+From: Sergey Grigorev <xors.nn@gmail.com>
+Date: Wed, 16 Aug 2017 21:59:37 +0300
+Subject: [PATCH 2/2] altexo
+
+---
+ webrtc/examples/BUILD.gn | 14 +++++++++++++-
+ 1 file changed, 13 insertions(+), 1 deletion(-)
+
+diff --git a/webrtc/examples/BUILD.gn b/webrtc/examples/BUILD.gn
+index 372cd36..7c9cd19 100644
+--- a/webrtc/examples/BUILD.gn
++++ b/webrtc/examples/BUILD.gn
+@@ -548,7 +548,19 @@ if (is_linux || is_win) {
+     if (rtc_build_json) {
+       deps += [ "//third_party/jsoncpp" ]
+     }
+-    include_dirs = [ "/home/xors/workspace/ALTEXO/altexo/include", "/home/xors/workspace/ALTEXO/altexo/vendor/Boost.DLL/include", "/usr/include" ]
++    if (is_win) {
++      include_dirs = [
++        "C:/Users/grigo/workspace/altexo/include",
++        "C:/Boost/include/boost-1_64"
++      ]
++    }
++    if (is_linux) {
++      include_dirs = [
++        "/home/xors/workspace/ALTEXO/altexo/include",
++        "/home/xors/workspace/ALTEXO/altexo/vendor/Boost.DLL/include",
++        "/usr/include"
++      ]
++    }
+   }
+
+   rtc_executable("peerconnection_client") {
+--
+2.7.4
