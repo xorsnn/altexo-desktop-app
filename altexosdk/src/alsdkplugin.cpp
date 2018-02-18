@@ -1,4 +1,4 @@
-#include "webrtc/altexosdk/src/alsdkplugin.hpp"
+#include "altexosdk/src/alsdkplugin.hpp"
 #include "alcallback.h"
 #include "almanager.h"
 

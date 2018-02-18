@@ -1,5 +1,5 @@
 #include "almanager.h"
-#include "webrtc/rtc_base/ssladapter.h"
+#include "rtc_base/ssladapter.h"
 
 AlManager::AlManager()
     : m_socketServer(NULL), m_thread(NULL), m_conductor(NULL) {}

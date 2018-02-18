@@ -1,8 +1,8 @@
 #ifndef ALVIDEORENDERER_H
 #define ALVIDEORENDERER_H
 
-#include "webrtc/api/mediastreaminterface.h"
-#include "webrtc/api/peerconnectioninterface.h"
+#include "api/mediastreaminterface.h"
+#include "api/peerconnectioninterface.h"
 
 #include "alcallback.h"
 

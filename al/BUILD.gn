@@ -1,13 +1,13 @@
 import("../webrtc.gni")
 
-group("altexo") {
+group("al1") {
   # This target shall build all targets in examples.
   testonly = true
   public_deps = []
 
   if (is_linux || is_win) {
     public_deps += [
-      ":altexosdk",
+      ":al",
     ]
   }
 }
@@ -42,31 +42,12 @@ if (is_linux || is_win) {
     }
   }
 
-  rtc_shared_library("altexosdk") {
-  # rtc_executable("altexosdk") {
+  # rtc_shared_library("altexosdk") {
+  rtc_executable("al") {
   # rtc_static_library("altexosdk") {
   #  testonly = true
     sources = [
-      #  "altexosdk/src/altesting.hpp",
-      #  "altexosdk/src/altesting.cpp",
-        "src/alsdkplugin.cpp",
-        "src/alsdkplugin.hpp",
-        "src/alcallback.h",
-        "src/alvideocapturer.cpp",
-        "src/alvideocapturer.h",
-        "src/conductor/aldatamanager.cpp",
-        "src/conductor/aldatamanager.h",
-        "src/alvideorenderer.cpp",
-        "src/alvideorenderer.h",
-        "src/alwebrtcfactory.cc",
-        "src/customsocketserver.h",
-        # "src/main.cc",
-        "src/almanager.h",
-        "src/almanager.cpp",
-        "src/conductor/defaults.h",
-        "src/conductor/defaults.cc",
-        "src/conductor/conductor.h",
-        "src/conductor/conductor.cc",
+        "src/main.cpp",
     ]
 
     if (!build_with_chromium && is_clang) {
@@ -126,8 +107,8 @@ if (is_linux || is_win) {
     }
     if (is_linux) {
       include_dirs = [
-        "/home/xors/workspace/ALTEXO/altexo/include",
-        "/home/xors/workspace/lib/include",
+        # "/home/xors/workspace/ALTEXO/altexo/include",
+        # "/home/xors/workspace/lib/include",
       #  "/home/xors/workspace/ALTEXO/altexo/al_utils/src",
       #  "/home/xors/workspace/ALTEXO/altexo/vendor/Boost.DLL/include",
       #  "/usr/include"

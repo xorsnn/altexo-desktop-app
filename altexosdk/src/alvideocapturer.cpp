@@ -1,8 +1,8 @@
 #include "alvideocapturer.h"
+#include "api/video/i420_buffer.h"
 #include "libyuv/convert.h"
-#include "webrtc/api/video/i420_buffer.h"
-#include "webrtc/rtc_base/logging.h"
-#include "webrtc/rtc_base/timeutils.h"
+#include "rtc_base/logging.h"
+#include "rtc_base/timeutils.h"
 #include <stdlib.h>
 
 using namespace cricket;

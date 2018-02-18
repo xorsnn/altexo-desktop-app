@@ -2,10 +2,10 @@
 #define ALDATAMANAGER_H
 
 #include "AL_API/sdk_api.hpp"
-#include "webrtc/altexosdk/src/alvideocapturer.h"
-#include "webrtc/altexosdk/src/alvideorenderer.h"
-#include "webrtc/api/mediastreaminterface.h"
-#include "webrtc/api/peerconnectioninterface.h"
+#include "altexosdk/src/alvideocapturer.h"
+#include "altexosdk/src/alvideorenderer.h"
+#include "api/mediastreaminterface.h"
+#include "api/peerconnectioninterface.h"
 
 class AlDataManager {
 public:

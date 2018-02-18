@@ -1,0 +1,8 @@
+-I/usr/include/SDL2/
+-I/usr/include/
+-I./include/
+-I./src/
+-I../include/
+-I../vendor/Boost.DLL/include/
+-I../../al_utils/src/
+-I../../../../lib/webrtc/webrtc-checkout/src

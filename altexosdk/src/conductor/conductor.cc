@@ -1,25 +1,21 @@
-/*
- *  Copyright 2012 The WebRTC Project Authors. All rights reserved.
- *
- *  Use of this source code is governed by a BSD-style license
- *  that can be found in the LICENSE file in the root of the source
- *  tree. An additional intellectual property rights grant can be found
- *  in the file PATENTS.  All contributing project authors may
- *  be found in the AUTHORS file in the root of the source tree.
- */
+#include "altexosdk/src/conductor/conductor.h"
 
-#include "webrtc/altexosdk/src/conductor/conductor.h"
-#include "AL_API/sdk_api.hpp"
-#include "webrtc/altexosdk/src/conductor/defaults.h"
-#include "webrtc/api/test/fakeconstraints.h"
-#include "webrtc/media/engine/webrtcvideocapturerfactory.h"
-#include "webrtc/modules/video_capture/video_capture_factory.h"
-#include "webrtc/rtc_base/checks.h"
-#include "webrtc/rtc_base/json.h"
-#include "webrtc/rtc_base/logging.h"
 #include <iostream>
 #include <utility>
 #include <vector>
+
+#include "AL_API/sdk_api.hpp"
+#include "altexosdk/src/conductor/defaults.h"
+#include "api/audio_codecs/builtin_audio_decoder_factory.h"
+#include "api/audio_codecs/builtin_audio_encoder_factory.h"
+#include "api/test/fakeconstraints.h"
+#include "media/engine/webrtcvideocapturerfactory.h"
+#include "modules/video_capture/video_capture_factory.h"
+#include "rtc_base/checks.h"
+#include "rtc_base/json.h"
+#include "rtc_base/logging.h"
+
+using webrtc::SdpType;
 
 // Names used for a IceCandidate JSON object.
 const char kCandidateSdpMidName[] = "sdpMid";
@@ -92,7 +88,9 @@ bool Conductor::InitializePeerConnection() {
   RTC_DCHECK(peer_connection_factory_.get() == NULL);
   RTC_DCHECK(m_peerConnection.get() == NULL);
 
-  peer_connection_factory_ = webrtc::CreatePeerConnectionFactory();
+  peer_connection_factory_ = webrtc::CreatePeerConnectionFactory(
+      webrtc::CreateBuiltinAudioEncoderFactory(),
+      webrtc::CreateBuiltinAudioDecoderFactory());
 
   if (!peer_connection_factory_.get()) {
     DeletePeerConnection();
@@ -103,8 +101,7 @@ bool Conductor::InitializePeerConnection() {
     DeletePeerConnection();
   }
   AddStreams();
-  if (m_debug) {
-  }
+
   return m_peerConnection.get() != NULL;
 }
 
@@ -144,8 +141,6 @@ void Conductor::EnsureStreamingUI() {}
 // Called when a remote stream is added
 void Conductor::OnAddStream(
     rtc::scoped_refptr<webrtc::MediaStreamInterface> stream) {
-  if (this->m_debug) {
-  }
 
   stream->AddRef();
   webrtc::VideoTrackVector tracks = stream->GetVideoTracks();

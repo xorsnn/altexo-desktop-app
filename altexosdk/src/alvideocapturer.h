@@ -1,11 +1,11 @@
 #ifndef ALVIDEOCAPTURER_H
 #define ALVIDEOCAPTURER_H
 
-#include "webrtc/media/base/videocapturer.h"
-#include "webrtc/rtc_base/nethelpers.h"
-#include "webrtc/rtc_base/physicalsocketserver.h"
-#include "webrtc/rtc_base/signalthread.h"
-#include "webrtc/rtc_base/sigslot.h"
+#include "media/base/videocapturer.h"
+#include "rtc_base/nethelpers.h"
+#include "rtc_base/physicalsocketserver.h"
+#include "rtc_base/signalthread.h"
+#include "rtc_base/sigslot.h"
 
 class AlVideoCapturer : public cricket::VideoCapturer {
 

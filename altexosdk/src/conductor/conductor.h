@@ -8,15 +8,15 @@
 #include <set>
 #include <string>
 
-#include "webrtc/api/mediastreaminterface.h"
-#include "webrtc/api/peerconnectioninterface.h"
+#include "api/mediastreaminterface.h"
+#include "api/peerconnectioninterface.h"
 
 #include "defaults.h"
 
+#include "altexosdk/src/alcallback.h"
 #include "altextmessage.hpp"
-#include "webrtc/altexosdk/src/alcallback.h"
 
-#include "webrtc/altexosdk/src/alvideorenderer.h"
+#include "altexosdk/src/alvideorenderer.h"
 
 #include "aldatamanager.h"
 
