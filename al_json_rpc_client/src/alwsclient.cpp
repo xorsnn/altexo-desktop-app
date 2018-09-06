@@ -61,24 +61,13 @@ AlWsClient::AlWsClient() : m_internalThread(NULL), m_debug(true) {
 
 AlWsClient::~AlWsClient() {
   force_exit = 1;
-  if (m_debug) {
-    std::cout << "AlWsClient::~AlWsClient 1" << std::endl;
-  }
   if (m_internalThread != NULL) {
-    std::cout << "AlWsClient::~AlWsClient 2" << std::endl;
     m_internalThread->interrupt();
-    std::cout << "AlWsClient::~AlWsClient 3" << std::endl;
     if (m_internalThread->joinable()) {
-      std::cout << "AlWsClient::~AlWsClient 3.1" << std::endl;
       m_internalThread->join();
     }
-    std::cout << "AlWsClient::~AlWsClient 4" << std::endl;
     delete m_internalThread;
-    std::cout << "AlWsClient::~AlWsClient 5" << std::endl;
     m_internalThread = NULL;
-  }
-  if (m_debug) {
-    std::cout << "AlWsClient::~AlWsClient 2" << std::endl;
   }
 }
 
@@ -247,9 +236,6 @@ int AlWsClient::threadMain() {
 }
 
 void AlWsClient::sendMessage(AlTextMessage msg) {
-  if (m_debug) {
-    std::cout << "AlWsClient::sendMessage" << std::endl;
-  }
   m_messageQueue.push(msg);
 }
 

@@ -1,7 +1,0 @@
-syntax: glob
-
-*.user
-*.o
-moc_*
-*.lo
-

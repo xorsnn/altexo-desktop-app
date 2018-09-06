@@ -28,8 +28,6 @@ Manager::Manager()
       m_processingCandidates(false), m_calling(false),
       m_localCandidatesCounter(0), m_remoteCandidatesCounter(0) {
 
-  alLogger() << "Manager constructor";
-
   m_videoSetting.videoMode = al::MODE_2D;
   m_videoSetting.isOn = true;
 
@@ -39,31 +37,25 @@ Manager::Manager()
 
 Manager::~Manager() {
 
-  std::cout << "Manager::~Manager()" << std::endl;
-
   if (m_frameThread != NULL) {
     m_frameThread->interrupt();
     m_frameThread->join();
     delete m_frameThread;
     m_frameThread = NULL;
   }
-  std::cout << "Manager::~Manager()1" << std::endl;
   if (m_wsClient != NULL) {
     m_wsClient.reset();
     m_wsClient = NULL;
     m_wsClientFactory.clear();
   }
-  std::cout << "Manager::~Manager()2" << std::endl;
   if (m_sensor != NULL) {
     m_sensor.reset();
     m_sensor = NULL;
   }
-  std::cout << "Manager::~Manager()3" << std::endl;
   if (m_sdk != NULL) {
     m_sdk.reset();
     m_sdk = NULL;
   }
-  std::cout << "Manager::~Manager()4" << std::endl;
 }
 
 void Manager::initHoloRenderer(SceneRendererCb *holoRenderer) {
@@ -191,7 +183,6 @@ void Manager::initSdk() {
   boostfs::path pluginPath = boostfs::current_path() /
                              boostfs::path("Release") /
                              boostfs::path("altexo_sdk");
-  // alLogger() << "Load Plugin from " << pluginPath;
 
   typedef boost::shared_ptr<AlSdkAPI>(PluginCreate)();
   boost::function<PluginCreate> pluginCreator;
@@ -199,8 +190,6 @@ void Manager::initSdk() {
     pluginCreator = boostdll::import_alias<PluginCreate>(
         pluginPath, "create_plugin", boostdll::load_mode::append_decorations);
   } catch (const boost::system::system_error &err) {
-    // BOOST_LOG_SEV(lg, error) << "Cannot load Plugin from " << pluginPath;
-    // BOOST_LOG_SEV(lg, error) << err.what();
     return;
   }
   /* create the plugin */
@@ -217,44 +206,27 @@ void Manager::initSdk() {
         lib_path2 / "libaltexosdk.so", "plugin",
         boost::dll::load_mode::append_decorations);
   } catch (const boost::system::system_error &err) {
-    // BOOST_LOG_SEV(lg, error) << "Cannot load Plugin from " << pluginPath;
-    // BOOST_LOG_SEV(lg, error) << err.what();
     std::cout << err.what();
     return;
   }
 
-  alLogger() << "Loading the plugin 0.1";
   m_sdk = boost::shared_ptr<AlSdkAPI>(m_sdkPlugin->createSdkApi());
-  // m_sdk = boost::shared_ptr<AlSdkAPI>(new AlSdkPlugin());
-  // AlSdkPlugin d;
-  // AlTesting t;
-  // t.testMethod();
-  // std::cout << t.testMethod2(3, 5) << std::endl;
-  alLogger() << "Loading the plugin 0.2";
 
 #endif
 
-  alLogger() << "Loading the plugin 1";
   m_sdkThread = new boost::thread(&Manager::sdkThread, this);
 
-  alLogger() << "Loading the plugin 2";
   updateResolutionSignal.connect(
       boost::bind(&AlSdkAPI::updateResolution, m_sdk, _1, _2));
   updateResolutionSignal(WIDTH, HEIGHT);
 }
 
 void Manager::onIceCandidateCb(AlTextMessage msg) {
-  alLogger() << "Manager::onIceCandidateCb";
-  alLogger() << msg.toString();
-
   m_remoteCandidates.push(msg.toString());
   handleMessages();
 }
 
 void Manager::onSdpAnswerCb(AlTextMessage msg) {
-  alLogger() << "Manager::onSdpAnswerCb";
-  alLogger() << msg.toString();
-
   boost::property_tree::ptree pt;
   std::stringstream ss(msg.toString());
   boost::property_tree::read_json(ss, pt);
@@ -277,7 +249,6 @@ void Manager::onSdpAnswerCb(AlTextMessage msg) {
 }
 
 void Manager::onSdpOfferCb(const char *cMsg) {
-  alLogger() << "Manager::onSdpOfferCb";
   AlTextMessage msg = AlTextMessage::cStrToMsg(cMsg);
 
   // **
@@ -336,22 +307,15 @@ void Manager::setConnectionMode(std::string mode) {
 }
 
 void Manager::onLocalSdpCb(AlTextMessage sdp) {
-  alLogger() << "Manager::onLocalSdpCb";
-  alLogger() << sdp.toString();
-
   m_localSdp = sdp.toString();
   handleMessages();
 }
 void Manager::onLocalIceCandidateCb(AlTextMessage candidate) {
-  alLogger() << "Manager::onLocalIceCandidateCb";
-  alLogger() << candidate.toString();
-
   m_localCandidates.push(candidate.toString());
   handleMessages();
 }
 
 void Manager::handleMessages() {
-  alLogger() << "Manager::handleMessages";
   if (!m_sentLocalSdp && m_localSdp != "") {
     if (!m_calling) {
       m_wsClient->sendSdpAnswer(AlTextMessage(m_localSdp));
@@ -377,20 +341,12 @@ void Manager::handleMessages() {
     m_processingCandidates = true;
     while (!m_localCandidates.empty()) {
       m_localCandidatesCounter++;
-
-      alLogger() << "local candidates: ";
-      std::cout << m_localCandidatesCounter << std::endl;
-
       std::string candidate = m_localCandidates.front();
       m_localCandidates.pop();
       m_wsClient->sendIceCandidate(AlTextMessage(candidate));
     }
     while (!m_remoteCandidates.empty()) {
       m_remoteCandidatesCounter++;
-
-      alLogger() << "remote candidates: ";
-      std::cout << m_remoteCandidatesCounter << std::endl;
-
       std::string candidate = m_remoteCandidates.front();
       m_remoteCandidates.pop();
       // std::vector<char> candidateVec(candidate.begin(), candidate.end());

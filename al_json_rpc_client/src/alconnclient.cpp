@@ -5,12 +5,8 @@
 #include <boost/property_tree/json_parser.hpp>
 #include <boost/property_tree/ptree.hpp>
 
-// std::string SERVER_WS_LINK = "ws://altexo-signal.local";
-// std::string SERVER_WS_LINK = "wss://signal-dev.altexo.com";
+// TODO: move to config file
 std::string SERVER_WS_LINK = "wss://signal.altexo.com";
-// std::string SERVER_WS_LINK = "wss://dev.lugati.ru";
-// std::string SERVER_LINK = "https://dev.lugati.ru";
-// std::string SERVER_WS_LINK = "wss://dev.lugati.ru";
 
 AlConnClient::AlConnClient(AlWsCb *alWsCb) : m_debug(true) {
   std::cout << "constructor" << std::endl;

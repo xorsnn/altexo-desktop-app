@@ -36,7 +36,6 @@ MainWindow::~MainWindow()
 }
 
 void MainWindow::requestNewFrameSlot() {
-//    qDebug() << "request new frame";
     Q_EMIT this->requestNewFrameSignal();
 }
 
@@ -71,19 +70,14 @@ void MainWindow::on_actionSettings_triggered()
     switch (ret) {
         case QDialog::Accepted:
         {
-            qDebug() << "ok clicked";
             break;
         }
         case QDialog::Rejected:
         {
-            qDebug() << "cancel clicked";
             break;
         }
         default:
             // should never be reached
-            qDebug() << "default behaviour";
-            qDebug() << QDialogButtonBox::Ok;
-            qDebug() << QDialogButtonBox::Cancel;
             break;
     }
 }
@@ -137,8 +131,6 @@ void MainWindow::slotOnLocalIceCandidate(const QString &iceCandidate)
 }
 
 void MainWindow::onJsonMsgSlot(QString msg) {
-    qDebug() << "MainWindow::onJsonMsgSlot";
-
     QJsonDocument doc = QJsonDocument::fromJson(msg.toUtf8());
     QJsonObject jsonObj = doc.object();
     if (jsonObj["type"].toString() == "SDP") {
@@ -157,9 +149,7 @@ void MainWindow::onJsonMsgSlot(QString msg) {
         Q_EMIT this->readyToStreamSignal();
 //        QTimer::singleShot(2000, this, SLOT(readyToStreamSlot()));
     } else {
-        qDebug() << "1+++++++++++++++++++<<<<<<<<<<<<<<<<<<<<<<<<<!!!!!!!!!!!!!!!!!!!!!!!!!!";
-        qDebug() << msg;
-        qDebug() << "2+++++++++++++++++++<<<<<<<<<<<<<<<<<<<<<<<<<!!!!!!!!!!!!!!!!!!!!!!!!!!";
+      // TODO, notify the case
     }
 }
 
@@ -175,6 +165,5 @@ void MainWindow::on_roomEdit_textChanged(const QString &arg1)
 }
 
 void MainWindow::readyToStreamSlot() {
-    qDebug() << "AAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAAA";
     Q_EMIT this->readyToStreamSignal();
 }

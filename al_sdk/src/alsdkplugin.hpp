@@ -105,9 +105,7 @@ public:
     }
   }
   void processUiEventsCb() {
-    // if (m_debug) {
-    // std::cout << "processUiEventsCb" << std::endl;
-    // }
+    std::cout << "processUiEventsCb" << std::endl;
   }
   void SwitchToStreamingUI() {} // ????
   void onDevicesListChangedCb(std::vector<std::string> deviceNames) {
@@ -129,7 +127,7 @@ public:
   //  TODO move to AlManager
   std::string getVideoDeviceName() {
     if (m_debug) {
-      std::cout << "1111111111111111111111111111" << std::endl;
+      std::cout << "Video device name:" << std::endl;
       std::cout << m_videoDeviceName << std::endl;
     }
     return m_videoDeviceName;

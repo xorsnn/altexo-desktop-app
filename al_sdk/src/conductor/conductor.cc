@@ -261,47 +261,6 @@ void Conductor::OnIceCandidate(const webrtc::IceCandidateInterface *candidate) {
   // SendMessage(writer.write(jmessage));
 }
 
-////
-//// PeerConnectionClientObserver implementation.
-////
-
-// void Conductor::OnSignedIn() {
-//    LOG(INFO) << __FUNCTION__;
-//    m_alCallback->switchToPeerListCb(m_client->peers());
-//}
-
-// void Conductor::OnDisconnected() {
-//    LOG(INFO) << __FUNCTION__;
-
-//    DeletePeerConnection();
-
-//    m_alCallback->onDisconnectedCb();
-////    TODO remove when cleaning up
-////    if (m_alCallback->IsWindow())
-////        m_alCallback->SwitchToConnectUI();
-//}
-
-// void Conductor::OnPeerConnected(std::string id, const std::string& name) {
-//    LOG(INFO) << __FUNCTION__;
-//    // Refresh the list if we're showing it.
-//    //    if (m_alCallback->current_ui() == MainWnd::LIST_PEERS)
-//    //        m_alCallback->switchToPeerListCb(m_client->peers());
-//}
-
-// void Conductor::OnPeerDisconnected(std::string id) {
-//    LOG(INFO) << __FUNCTION__;
-//    if (id == peer_id_) {
-//        LOG(INFO) << "Our peer disconnected";
-//        queueUIThreadCallback(PEER_CONNECTION_CLOSED, NULL);
-//    }
-//    //TODO remove when cleaning up
-////    else {
-//        // Refresh the list if we're showing it.
-////        if (m_alCallback->current_ui() == MainWnd::LIST_PEERS)
-////            m_alCallback->switchToPeerListCb(m_client->peers());
-////    }
-//}
-
 void Conductor::OnMessageFromPeer(std::string peer_id,
                                   std::vector<char> msgVec) {
   std::string message(msgVec.begin(), msgVec.end());
@@ -414,42 +373,6 @@ void Conductor::OnMessageFromPeer(std::string peer_id,
   }
 }
 
-// void Conductor::OnMessageSent(int err) {
-//    // Process the next pending message if any.
-//    queueUIThreadCallback(SEND_MESSAGE_TO_PEER, NULL);
-//}
-
-// void Conductor::OnServerConnectionFailure() {
-//    if (this->m_debug) {
-//        std::cout << "Error " << "Failed to connect to " << server_ <<
-//        std::endl;
-//    }
-////    TODO remove when cleaning up
-////    m_alCallback->MessageBox("Error", ("Failed to connect to " +
-/// server_).c_str(),
-////                          true);
-//}
-
-////=====================
-// void Conductor::OnSignedInSlot() {
-//    if (this->m_debug) {
-//        std::cout << "Conductor::OnSignedInSlot" << std::endl;
-//    }
-//    this->OnSignedIn();
-//}
-
-// void Conductor::OnDisconnectedSlot() {
-//    this->OnDisconnected();
-//}
-
-////void Conductor::OnPeerConnectedSlot(QString id, QString name) {
-////    this->OnPeerConnected(id, name);
-////}
-
-// void Conductor::OnPeerDisconnectedSlot(std::string id) {
-//    this->OnPeerDisconnected(id);
-//}
-
 //~=====================
 
 cricket::VideoCapturer *Conductor::OpenVideoCaptureDevice() {
@@ -545,17 +468,6 @@ void Conductor::AddStreams() {
   m_alCallback->SwitchToStreamingUI();
 }
 
-// void Conductor::DisconnectFromCurrentPeer() {
-//    LOG(INFO) << __FUNCTION__;
-//    if (m_peerConnection.get()) {
-//        //        m_client->SendHangUp(peer_id_);
-//        Q_EMIT SendHangUpSignal(peer_id_);
-//        DeletePeerConnection();
-//    }
-
-//    if (m_alCallback->IsWindow())
-//        m_alCallback->switchToPeerListCb(m_client->peers());
-//}
 void Conductor::queueUIThreadCallback(int msg_id, void *data) {
   UIThreadCallback(msg_id, data);
 }
@@ -599,32 +511,6 @@ void Conductor::UIThreadCallback(int msg_id, void *data) {
     if (m_debug) {
       std::cout << "SEND_MESSAGE_TO_PEER" << std::endl;
     }
-    // std::string *msg = reinterpret_cast<std::string *>(data);
-    // if (msg) {
-    //   // For convenience, we always run the message through the queue.
-    //   // This way we can be sure that messages are sent to the server
-    //   // in the same order they were signaled without much hassle.
-    //   m_pendingMessages.push_back(msg);
-    // }
-    //
-    // if (!m_pendingMessages.empty() && !m_client->IsSendingMessage()) {
-    //   msg = m_pendingMessages.front();
-    //   m_pendingMessages.pop_front();
-    //   // TODO hangle failed sending
-    //   std::cout
-    //       << "Q_EMIT SendToPeerSignal(peer_id_,
-    //       QString::fromStdString(*msg));"
-    //       << std::endl;
-    //   m_alCallback->sendToPeerCb(*msg);
-    //   //            Q_EMIT SendToPeerSignal(peer_id_,
-    //   //            QString::fromStdString(*msg));
-    //   //            if (!m_client->SendToPeer(peer_id_, *msg) && peer_id_ !=
-    //   //            "-1") {
-    //   //                LOG(LS_ERROR) << "SendToPeer failed";
-    //   //                DisconnectFromServer();
-    //   //            }
-    //   delete msg;
-    // }
   } break;
 
   case NEW_STREAM_ADDED: {

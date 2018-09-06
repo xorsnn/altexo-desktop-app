@@ -140,13 +140,9 @@ void PeerConnectionClient::Connect(const std::string& server, int port,
         state_ = RESOLVING;
         resolver_ = new rtc::AsyncResolver();
 
-//        qDebug() << this->resolver_;
-//        qDebug() << this->resolver_->SignalDone;
         this->resolver_->SignalDone.connect(this, &PeerConnectionClient::OnResolveResult);
-//        qDebug() << "<<222";
         resolver_->Start(server_address_);
     } else {
-//        qDebug() << "<<333";
         DoConnect();
     }
 }
@@ -304,11 +300,8 @@ void PeerConnectionClient::OnMessageFromPeer(int peer_id,
                                              const std::string& message) {
     if (message.length() == (sizeof(kByeMessage) - 1) &&
             message.compare(kByeMessage) == 0) {
-//        TOOD
-//        callback_->OnPeerDisconnected(peer_id);
     } else {
-//        TODO
-//        callback_->OnMessageFromPeer(peer_id, message);
+      // TODO
     }
 }
 
@@ -400,7 +393,6 @@ void PeerConnectionClient::OnRead(rtc::AsyncSocket* socket) {
 
                 // The body of the response will be a list of already connected peers.
                 if (content_length) {
-//                    qDebug() << "<< 6";
                     size_t pos = eoh + 4;
                     while (pos < control_data_.size()) {
                         size_t eol = control_data_.find('\n', pos);
@@ -412,8 +404,6 @@ void PeerConnectionClient::OnRead(rtc::AsyncSocket* socket) {
                         if (ParseEntry(control_data_.substr(pos, eol - pos), &name, &id,
                                        &connected) && id != my_id_) {
                             peers_[id] = name;
-                            // TOOD
-//                            callback_->OnPeerConnected(id, name);
 
                         }
                         pos = eol + 1;
@@ -470,12 +460,8 @@ void PeerConnectionClient::OnHangingGetRead(rtc::AsyncSocket* socket) {
                                &connected)) {
                     if (connected) {
                         peers_[id] = name;
-                        // TODO
-//                        callback_->OnPeerConnected(id, name);
                     } else {
                         peers_.erase(id);
-                        // TODO
-//                        callback_->OnPeerDisconnected(id);
                     }
                 }
             } else {
@@ -563,9 +549,7 @@ void PeerConnectionClient::OnClose(rtc::AsyncSocket* socket, int err) {
 #else
     if (err != ECONNREFUSED) {
 #endif
-//        qDebug() << "====close ref!===";
         if (socket == hanging_get_.get()) {
-//            qDebug() << "====close get===";
             if (state_ == CONNECTED) {
                 hanging_get_->Close();
                 hanging_get_->Connect(server_address_);
@@ -575,14 +559,11 @@ void PeerConnectionClient::OnClose(rtc::AsyncSocket* socket, int err) {
         }
     } else {
         if (socket == control_socket_.get()) {
-//            qDebug() << "====close control===";
             LOG(WARNING) << "Connection refused; retrying in 2 seconds";
             if (this->debug_) {
-//                qDebug() << "Connection refused; retrying in 2 seconds";
             }
             rtc::Thread::Current()->PostDelayed(RTC_FROM_HERE, kReconnectDelay, this, 0);
         } else {
-//            qDebug() << "====close get!===";
             Close();
             callback_->OnDisconnected();
         }

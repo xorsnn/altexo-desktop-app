@@ -181,12 +181,6 @@ void AlRpc::onMessage(AlTextMessage msg) {
     m_sdpOfferId = msgId;
     sdpOfferSignal(cMsg);
   }
-  // // TODO: remove
-  // // answer notification
-  // else if (method == "answer") {
-  //   // TODO: debugging messages
-  //   std::cout << "*******answer notification*********" << std::endl;
-  // }
   // ice-cadidate notification
   else if (method == "ice-candidate") {
     msgType = AlRpcRequest::SERVER_MESSAGE_TYPE::ROOM_ICE_CANDIDATE;

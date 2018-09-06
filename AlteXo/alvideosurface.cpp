@@ -6,7 +6,6 @@ ALVideoSurface::ALVideoSurface(QWidget *parent) :
 }
 
 void ALVideoSurface::newFrameSlot(QImage image) {
-//    qDebug() << "new frame arrived";
     this->img = image.scaled(640, 240);
     this->update();
 }

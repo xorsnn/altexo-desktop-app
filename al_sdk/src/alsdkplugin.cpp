@@ -9,9 +9,6 @@ AlSdkPlugin::AlSdkPlugin()
     : m_debug(true), WIDTH(0), HEIGHT(0), m_videoDeviceName(""),
       m_internalThread(NULL) {
 
-  if (m_debug) {
-    std::cout << "AlSdkPlugin::AlSdkPlugin()" << std::endl;
-  }
   // m_manager = new AlManager();
 }
 
@@ -21,24 +18,17 @@ AlSdkPlugin::~AlSdkPlugin() {
                                         std::vector<char>());
   m_messageQueue.push(msg);
 
-  std::cout << "AlSdkPlugin::~AlSdkPlugin 1" << std::endl;
   if (m_internalThread != NULL) {
-    std::cout << "AlSdkPlugin::~AlSdkPlugin 11" << std::endl;
     m_internalThread->interrupt();
-    std::cout << "AlSdkPlugin::~AlSdkPlugin 12" << std::endl;
     // TODO interrupt custom sockerserver
     // if (m_internalThread->joinable()) {
     // m_internalThread->join();
     // }
     delete m_internalThread;
-
-    std::cout << "AlSdkPlugin::~AlSdkPlugin 13" << std::endl;
     m_internalThread = NULL;
-    std::cout << "AlSdkPlugin::~AlSdkPlugin 2" << std::endl;
   }
   delete m_manager;
   m_manager = NULL;
-  std::cout << "AlSdkPlugin::~AlSdkPlugin 3" << std::endl;
 }
 
 void AlSdkPlugin::init(AlSDKCb *alSdkCb) {

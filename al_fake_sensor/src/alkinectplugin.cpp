@@ -160,9 +160,6 @@ void AlKinectPlugin::_readPngFile(char *file_name) {
   png_read_image(png_ptr, row_pointers);
 
   fclose(fp);
-  std::cout << "FILE READ!!!" << std::endl;
-  std::cout << width << std::endl;
-  std::cout << height << std::endl;
 
   int index = 0;
   for (y = 0; y < height; y++) {

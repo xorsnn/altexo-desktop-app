@@ -64,13 +64,6 @@ bool AlVideoCapturer::GetPreferredFourccs(std::vector<uint32_t> *fourccs) {
 }
 
 void AlVideoCapturer::threadMain() {
-  if (m_debug) {
-    std::cout << "===========================" << std::endl;
-    std::cout << "===========================" << std::endl;
-    std::cout << "===========================" << std::endl;
-    std::cout << "AlVideoCapturer::threadMain" << std::endl;
-    std::cout << "===========================" << std::endl;
-  }
   try {
     bool stopped = false;
     uint64_t prevTimestamp = 0;

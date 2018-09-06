@@ -1,6 +1,4 @@
 #include "mainwindow.h"
-//#include "alkinectinterface.h"
-
 
 #include <QApplication>
 #include <QThread>
