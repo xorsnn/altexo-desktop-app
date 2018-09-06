@@ -4,6 +4,7 @@
 
 Holographic chat application. While video conferencing is somewhat mainstream, the next major jump is to add a new dimension to make collaboration more authentic and fun. Using Altexo you can communicate via holograms.
 
+![WebVR altexto example](https://github.com/xorsnn/altexo/blob/master/media/WebVR.gif)
 
 See the demo on [youtube](https://youtu.be/hpWKITMRGRw)
 
