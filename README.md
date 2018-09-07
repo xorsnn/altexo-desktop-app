@@ -1,4 +1,4 @@
-# Altexo application #
+# Altexo application (very much work in progress) #
 
 ## Altexo desktop application ui (proof of concept) ##
 
