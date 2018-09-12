@@ -32,6 +32,6 @@ make
 -   Mac
 -   Linux
 
-## Doesn not work on (yet) ##
+## Does not work on (yet) ##
 
 -   Windowns
